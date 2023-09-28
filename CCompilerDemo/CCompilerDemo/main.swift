@@ -6,7 +6,6 @@ func main() {
     guard let data = compiled.data(using: .utf8) else { return }
 
     let currentDirectoryURL = URL(filePath: FileManager.default.currentDirectoryPath)
-    print(FileManager.default.currentDirectoryPath)
     let fileURL = currentDirectoryURL.appending(path: "out.s")
 
     do {
