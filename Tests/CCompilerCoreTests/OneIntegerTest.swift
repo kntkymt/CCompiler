@@ -1,5 +1,5 @@
 import XCTest
-@testable import CCompiler
+@testable import CCompilerCore
 
 final class OneIntegerTests: XCTestCase {
 

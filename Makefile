@@ -1,4 +1,8 @@
-test:
-	clang -o output CCompilerDemo/CCompilerDemo/Output/out.s
-	./output
-	echo $?
+build:
+	swift build -c release
+
+test_modules:
+	swift test
+
+test_exectable: build
+	./test_exectable.sh
