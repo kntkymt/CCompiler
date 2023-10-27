@@ -1,9 +1,9 @@
 
-public func compile() -> String {
+public func compile(int: Int) -> String {
 """
 .globl    _main
 _main:
-    mov    w0, #42
+    mov    w0, #\(int)
     ret
 """
 }

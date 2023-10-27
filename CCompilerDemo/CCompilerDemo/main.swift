@@ -2,7 +2,7 @@ import Foundation
 import CCompiler
 
 func main() {
-    let compiled = compile()
+    let compiled = compile(int: 123)
     guard let data = compiled.data(using: .utf8) else { return }
 
     let currentDirectoryURL = URL(filePath: FileManager.default.currentDirectoryPath)
