@@ -25,7 +25,7 @@ _main:
 
     func testExample2() throws {
         let source = """
-100+2-2+350
+100+2-2+100
 """
 
         let compiled = compile(source)
@@ -37,7 +37,7 @@ _main:
     mov w0, #100
     add w0, w0, #2
     sub w0, w0, #2
-    add w0, w0, #350
+    add w0, w0, #100
     ret
 
 """
