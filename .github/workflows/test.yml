@@ -8,9 +8,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: swift-actions/setup-swift@150267bf6ba01f9d942a4bd55aa2f35ba586767d
-        with:
-          swift-version: "5.9.0"
+      - name: Select Xcode version
+        run: sudo xcode-select -s "/Applications/Xcode_15.0.1.app"
       - name: Test
         run: swift test
         working-directory: CCompiler
