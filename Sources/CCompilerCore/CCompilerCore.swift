@@ -1,7 +1,8 @@
 import Tokenizer
 
 public enum CompileError: Error, Equatable {
-    case invalidSyntax
+    case invalidSyntax(index: Int)
+    case invalidToken(index: Int)
 }
 
 public func compile(_ source: String) throws -> String {
@@ -9,17 +10,30 @@ public func compile(_ source: String) throws -> String {
 
     compiled += "_main:\n"
 
-    let tokens = try tokenize(source)
+    let tokens: [Token] = try {
+        do {
+            return try tokenize(source)
+        } catch let error as TokenizeError {
+            switch error {
+            case .unknownToken(let index):
+                throw CompileError.invalidToken(index: index)
+            }
+        }
+    }()
     var index = 0
 
     @discardableResult
     func consumeToken(_ tokenKind: TokenKind) throws -> Token {
-        if index < tokens.count, tokens[index].kind == tokenKind {
+        if index >= tokens.count {
+            throw CompileError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+
+        if tokens[index].kind == tokenKind {
             let token = tokens[index]
             index += 1
             return token
         } else {
-            throw CompileError.invalidSyntax
+            throw CompileError.invalidSyntax(index: tokens[index].sourceIndex)
         }
     }
 
@@ -42,7 +56,7 @@ public func compile(_ source: String) throws -> String {
             compiled += "    sub w0, w0, #\(int.value)\n"
 
         default:
-            throw CompileError.invalidSyntax
+            throw CompileError.invalidSyntax(index: tokens[index].sourceIndex)
         }
     }
 

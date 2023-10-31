@@ -21,8 +21,17 @@ struct CCompiler {
             } catch {
                 print("failed to write")
             }
+        } catch let error as CompileError {
+            switch error {
+            case .invalidSyntax(let index):
+                print(source)
+                print(String(repeating: " ", count: index) + "^不正な文法です")
+            case .invalidToken(let index):
+                print(source)
+                print(String(repeating: " ", count: index) + "^不正な文字です")
+            }
         } catch {
-            print("failed to compile")
+            print("不明なコンパイルエラー")
         }
     }
 }
