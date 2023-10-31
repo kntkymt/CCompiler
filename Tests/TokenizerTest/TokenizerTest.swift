@@ -8,7 +8,7 @@ final class TokenizerTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number, value: "5")
+                Token(kind: .number, value: "5", sourceIndex: 0)
             ]
         )
     }
@@ -18,7 +18,7 @@ final class TokenizerTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number, value: "123")
+                Token(kind: .number, value: "123", sourceIndex: 0)
             ]
         )
     }
@@ -28,9 +28,9 @@ final class TokenizerTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number, value: "1"),
-                Token(kind: .add, value: "+"),
-                Token(kind: .number, value: "23")
+                Token(kind: .number, value: "1", sourceIndex: 0),
+                Token(kind: .add, value: "+", sourceIndex: 2),
+                Token(kind: .number, value: "23", sourceIndex: 6)
             ]
         )
     }
@@ -39,7 +39,7 @@ final class TokenizerTest: XCTestCase {
         do {
             _ = try tokenize("1 ^")
         } catch let error as TokenizeError {
-            XCTAssertEqual(error, TokenizeError.unknownToken)
+            XCTAssertEqual(error, TokenizeError.unknownToken(index: 2))
         }
     }
 }
