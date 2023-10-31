@@ -9,16 +9,20 @@ struct CCompiler {
             return
         }
 
-        let compiled = compile(source)
-
-        guard let data = compiled.data(using: .utf8) else { return }
-        let currentDirectoryURL = URL(filePath: FileManager.default.currentDirectoryPath)
-        let fileURL = currentDirectoryURL.appending(path: "output.s")
-
         do {
-            try data.write(to: fileURL)
+            let compiled = try compile(source)
+
+            guard let data = compiled.data(using: .utf8) else { return }
+            let currentDirectoryURL = URL(filePath: FileManager.default.currentDirectoryPath)
+            let fileURL = currentDirectoryURL.appending(path: "output.s")
+
+            do {
+                try data.write(to: fileURL)
+            } catch {
+                print("failed to write")
+            }
         } catch {
-            print("failed to write")
+            print("failed to compile")
         }
     }
 }

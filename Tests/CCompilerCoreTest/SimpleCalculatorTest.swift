@@ -8,7 +8,7 @@ final class SimpleCalculatorTest: XCTestCase {
 5+20-4
 """
 
-        let compiled = compile(source)
+        let compiled = try compile(source)
         XCTAssertEqual(
             compiled,
 """
@@ -28,7 +28,7 @@ _main:
 100+2-2+100
 """
 
-        let compiled = compile(source)
+        let compiled = try compile(source)
         XCTAssertEqual(
             compiled,
 """
