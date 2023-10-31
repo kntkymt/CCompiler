@@ -9,11 +9,7 @@ let package = Package(
         .executable(
             name: "ccompiler",
             targets: ["CCompiler"]
-        ),
-        .library(
-            name: "CCompilerCore",
-            targets: ["CCompilerCore"]
-        ),
+        )
     ],
     targets: [
         .executableTarget(
@@ -22,10 +18,22 @@ let package = Package(
                 "CCompilerCore"
             ]
         ),
-        .target(name: "CCompilerCore"),
+        .target(
+            name: "CCompilerCore",
+            dependencies: [
+                "Tokenizer"
+            ]
+        ),
+        .target(
+            name: "Tokenizer"
+        ),
         .testTarget(
             name: "CCompilerCoreTest",
             dependencies: ["CCompilerCore"]
+        ),
+        .testTarget(
+            name: "TokenizerTest",
+            dependencies: ["Tokenizer"]
         ),
     ]
 )

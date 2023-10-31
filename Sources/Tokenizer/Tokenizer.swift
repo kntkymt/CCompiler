@@ -1,19 +1,8 @@
-struct Token: Equatable {
-    var kind: TokenKind
-    var value: String
-}
-
-enum TokenKind {
-    case add
-    case sub
-    case number
-}
-
-enum TokenizeError: Error {
+public enum TokenizeError: Error, Equatable {
     case unknownToken
 }
 
-func tokenize(_ source: String) throws -> [Token] {
+public func tokenize(_ source: String) throws -> [Token] {
     var tokens: [Token] = []
 
     let charactors = [Character](source)

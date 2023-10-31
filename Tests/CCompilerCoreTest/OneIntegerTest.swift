@@ -1,10 +1,10 @@
 import XCTest
 @testable import CCompilerCore
 
-final class OneIntegerTests: XCTestCase {
+final class OneIntegerTest: XCTestCase {
 
     func testExample1() throws {
-        let compiled = compile("5")
+        let compiled = try compile("5")
         XCTAssertEqual(
             compiled,
 """
@@ -18,7 +18,7 @@ _main:
     }
 
     func testExample2() throws {
-        let compiled = compile("123")
+        let compiled = try compile("123")
         XCTAssertEqual(
             compiled,
 """

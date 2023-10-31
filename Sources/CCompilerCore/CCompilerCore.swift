@@ -1,3 +1,5 @@
+import Tokenizer
+
 enum CompileError: Error {
     case invalidSyntax
 }
