@@ -13,7 +13,7 @@ final class TokenizerTest: XCTestCase {
         )
     }
 
-    func testNumber2token() throws {
+    func testNumberMultitoken() throws {
         let tokens = try tokenize("123")
         XCTAssertEqual(
             tokens,

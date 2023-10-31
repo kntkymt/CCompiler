@@ -1,6 +1,6 @@
 import Tokenizer
 
-enum CompileError: Error {
+public enum CompileError: Error, Equatable {
     case invalidSyntax
 }
 
