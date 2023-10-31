@@ -1,5 +1,5 @@
 public enum TokenizeError: Error, Equatable {
-    case unknownToken
+    case unknownToken(index: Int)
 }
 
 public func tokenize(_ source: String) throws -> [Token] {
@@ -8,8 +8,10 @@ public func tokenize(_ source: String) throws -> [Token] {
     let charactors = [Character](source)
     var index = 0
 
-    func extractInt() -> String {
+    func extractNumber() -> Token {
         var token = ""
+        let startIndex = index
+
         while index < charactors.count {
             let nextToken = charactors[index]
             if nextToken.isNumber {
@@ -20,7 +22,7 @@ public func tokenize(_ source: String) throws -> [Token] {
             }
         }
 
-        return token
+        return Token(kind: .number, value: token, sourceIndex: startIndex)
     }
 
     while index < charactors.count {
@@ -30,24 +32,23 @@ public func tokenize(_ source: String) throws -> [Token] {
         }
 
         if charactors[index] == "+" {
-            tokens.append(Token(kind: .add, value: "+"))
+            tokens.append(Token(kind: .add, value: "+", sourceIndex: index))
             index += 1
             continue
         }
 
         if charactors[index] == "-" {
-            tokens.append(Token(kind: .sub, value: "-"))
+            tokens.append(Token(kind: .sub, value: "-", sourceIndex: index))
             index += 1
             continue
         }
 
         if charactors[index].isNumber {
-            let numberString = extractInt()
-            tokens.append(Token(kind: .number, value: numberString))
+            tokens.append(extractNumber())
             continue
         }
 
-        throw TokenizeError.unknownToken
+        throw TokenizeError.unknownToken(index: index)
     }
 
     return tokens
