@@ -29,6 +29,8 @@ struct CCompiler {
             case .invalidToken(let index):
                 print(source)
                 print(String(repeating: " ", count: index) + "^不正な文字です")
+            case .unknown:
+                print("不明なコンパイルエラー")
             }
         } catch {
             print("不明なコンパイルエラー")
