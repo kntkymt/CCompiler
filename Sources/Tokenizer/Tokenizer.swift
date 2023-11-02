@@ -2,7 +2,7 @@ public enum TokenizeError: Error, Equatable {
     case unknownToken(index: Int)
 }
 
-public func tokenize(_ source: String) throws -> [Token] {
+public func tokenize(source: String) throws -> [Token] {
     var tokens: [Token] = []
 
     let charactors = [Character](source)
@@ -39,6 +39,30 @@ public func tokenize(_ source: String) throws -> [Token] {
 
         if charactors[index] == "-" {
             tokens.append(Token(kind: .sub, value: "-", sourceIndex: index))
+            index += 1
+            continue
+        }
+
+        if charactors[index] == "*" {
+            tokens.append(Token(kind: .mul, value: "*", sourceIndex: index))
+            index += 1
+            continue
+        }
+
+        if charactors[index] == "/" {
+            tokens.append(Token(kind: .div, value: "/", sourceIndex: index))
+            index += 1
+            continue
+        }
+
+        if charactors[index] == "(" {
+            tokens.append(Token(kind: .parenthesisLeft, value: "(", sourceIndex: index))
+            index += 1
+            continue
+        }
+
+        if charactors[index] == ")" {
+            tokens.append(Token(kind: .parenthesisRight, value: ")", sourceIndex: index))
             index += 1
             continue
         }

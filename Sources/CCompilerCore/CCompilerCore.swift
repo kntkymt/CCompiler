@@ -1,65 +1,48 @@
+import Parser
+import Generator
 import Tokenizer
 
 public enum CompileError: Error, Equatable {
     case invalidSyntax(index: Int)
     case invalidToken(index: Int)
+    case unknown
 }
 
 public func compile(_ source: String) throws -> String {
     var compiled = ".globl _main\n"
-
     compiled += "_main:\n"
 
-    let tokens: [Token] = try {
+    let tokens = try {
         do {
-            return try tokenize(source)
+            return try tokenize(source: source)
         } catch let error as TokenizeError {
             switch error {
             case .unknownToken(let index):
                 throw CompileError.invalidToken(index: index)
             }
+
+        } catch {
+            throw CompileError.unknown
         }
     }()
-    var index = 0
+    let rootNode = try {
+        do {
+            return try parse(tokens: tokens)
+        } catch let error as ParseError {
+            switch error {
+            case .invalidSyntax(let index):
+                throw CompileError.invalidSyntax(index: index)
+            }
 
-    @discardableResult
-    func consumeToken(_ tokenKind: TokenKind) throws -> Token {
-        if index >= tokens.count {
-            throw CompileError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        } catch {
+            throw CompileError.unknown
         }
+    }()
 
-        if tokens[index].kind == tokenKind {
-            let token = tokens[index]
-            index += 1
-            return token
-        } else {
-            throw CompileError.invalidSyntax(index: tokens[index].sourceIndex)
-        }
-    }
+    compiled += generate(node: rootNode)
 
-    // 最初は数字
-    let firstInt = try consumeToken(.number)
-    compiled += "    mov w0, #\(firstInt.value)\n"
-
-    while index < tokens.count {
-        switch tokens[index].kind {
-        case .add:
-            try consumeToken(.add)
-
-            let int = try consumeToken(.number)
-            compiled += "    add w0, w0, #\(int.value)\n"
-
-        case .sub:
-            try consumeToken(.sub)
-
-            let int = try consumeToken(.number)
-            compiled += "    sub w0, w0, #\(int.value)\n"
-
-        default:
-            throw CompileError.invalidSyntax(index: tokens[index].sourceIndex)
-        }
-    }
-
+    compiled += "    ldr w0, [sp]\n"
+    compiled += "    add sp, sp, #16\n"
     compiled += "    ret\n"
 
     return compiled
