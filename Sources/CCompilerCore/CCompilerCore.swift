@@ -12,19 +12,26 @@ public func compile(_ source: String) throws -> String {
     var compiled = ".globl _main\n"
     compiled += "_main:\n"
 
-    let rootNode = try {
+    let tokens = try {
         do {
-            return try parse(source)
-        } catch let error as ParseError {
-            switch error {
-            case .invalidSyntax(let index):
-                throw CompileError.invalidSyntax(index: index)
-            }
-
+            return try tokenize(source: source)
         } catch let error as TokenizeError {
             switch error {
             case .unknownToken(let index):
                 throw CompileError.invalidToken(index: index)
+            }
+
+        } catch {
+            throw CompileError.unknown
+        }
+    }()
+    let rootNode = try {
+        do {
+            return try parse(tokens: tokens)
+        } catch let error as ParseError {
+            switch error {
+            case .invalidSyntax(let index):
+                throw CompileError.invalidSyntax(index: index)
             }
 
         } catch {

@@ -2,7 +2,7 @@ public enum TokenizeError: Error, Equatable {
     case unknownToken(index: Int)
 }
 
-public func tokenize(_ source: String) throws -> [Token] {
+public func tokenize(source: String) throws -> [Token] {
     var tokens: [Token] = []
 
     let charactors = [Character](source)

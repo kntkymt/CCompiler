@@ -4,12 +4,10 @@ public enum ParseError: Error, Equatable {
     case invalidSyntax(index: Int)
 }
 
-public func parse(_ source: String) throws -> Node {
-    if source.isEmpty {
+public func parse(tokens: [Token]) throws -> Node {
+    if tokens.isEmpty {
         throw ParseError.invalidSyntax(index: 0)
     }
-
-    let tokens = try tokenize(source)
     var index = 0
 
     @discardableResult

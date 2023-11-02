@@ -4,7 +4,7 @@ import XCTest
 final class TokenizerTest: XCTestCase {
 
     func testNumber() throws {
-        let tokens = try tokenize("5")
+        let tokens = try tokenize(source: "5")
         XCTAssertEqual(
             tokens,
             [
@@ -14,7 +14,7 @@ final class TokenizerTest: XCTestCase {
     }
 
     func testNumberMultitoken() throws {
-        let tokens = try tokenize("123")
+        let tokens = try tokenize(source: "123")
         XCTAssertEqual(
             tokens,
             [
@@ -24,7 +24,7 @@ final class TokenizerTest: XCTestCase {
     }
 
     func testIgnoreSpaces() throws {
-        let tokens = try tokenize("1 +   23")
+        let tokens = try tokenize(source: "1 +   23")
         XCTAssertEqual(
             tokens,
             [
@@ -36,7 +36,7 @@ final class TokenizerTest: XCTestCase {
     }
 
     func testCalculateOperand() throws {
-        let tokens = try tokenize("1+2-3*4/5+(1+2)")
+        let tokens = try tokenize(source: "1+2-3*4/5+(1+2)")
         XCTAssertEqual(
             tokens,
             [
@@ -61,7 +61,7 @@ final class TokenizerTest: XCTestCase {
 
     func testFailUnknownToken() throws {
         do {
-            _ = try tokenize("1 ^")
+            _ = try tokenize(source: "1 ^")
         } catch let error as TokenizeError {
             XCTAssertEqual(error, TokenizeError.unknownToken(index: 2))
         }
