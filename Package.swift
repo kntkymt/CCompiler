@@ -21,15 +21,32 @@ let package = Package(
         .target(
             name: "CCompilerCore",
             dependencies: [
-                "Tokenizer"
+                "Parser",
+                "Generator"
             ]
         ),
         .target(
             name: "Tokenizer"
         ),
+        .target(
+            name: "Parser",
+            dependencies: [
+                "Tokenizer"
+            ]
+        ),
+        .target(
+            name: "Generator",
+            dependencies: [
+                "Parser"
+            ]
+        ),
         .testTarget(
             name: "CCompilerCoreTest",
             dependencies: ["CCompilerCore"]
+        ),
+        .testTarget(
+            name: "ParserTest",
+            dependencies: ["Parser"]
         ),
         .testTarget(
             name: "TokenizerTest",
