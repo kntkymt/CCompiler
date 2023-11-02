@@ -21,6 +21,7 @@ let package = Package(
         .target(
             name: "CCompilerCore",
             dependencies: [
+                "Tokenizer",
                 "Parser",
                 "Generator"
             ]
