@@ -27,6 +27,14 @@ final class CompileErrorTest: XCTestCase {
         }
     }
 
+    func testInvalidSyntax4() throws {
+        do {
+            _ = try compile("+")
+        } catch let error as CompileError {
+            XCTAssertEqual(error, .invalidSyntax(index: 0))
+        }
+    }
+
     func testInvalidToken() throws {
         do {
             _ = try compile("5     ^")
