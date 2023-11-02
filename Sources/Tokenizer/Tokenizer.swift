@@ -43,6 +43,30 @@ public func tokenize(_ source: String) throws -> [Token] {
             continue
         }
 
+        if charactors[index] == "*" {
+            tokens.append(Token(kind: .mul, value: "*", sourceIndex: index))
+            index += 1
+            continue
+        }
+
+        if charactors[index] == "/" {
+            tokens.append(Token(kind: .div, value: "/", sourceIndex: index))
+            index += 1
+            continue
+        }
+
+        if charactors[index] == "(" {
+            tokens.append(Token(kind: .parenthesisLeft, value: "(", sourceIndex: index))
+            index += 1
+            continue
+        }
+
+        if charactors[index] == ")" {
+            tokens.append(Token(kind: .parenthesisRight, value: ")", sourceIndex: index))
+            index += 1
+            continue
+        }
+
         if charactors[index].isNumber {
             tokens.append(extractNumber())
             continue
