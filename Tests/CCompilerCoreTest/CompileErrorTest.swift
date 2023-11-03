@@ -7,7 +7,7 @@ final class CompileErrorTest: XCTestCase {
         do {
             _ = try compile("5 ++")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 3))
+            XCTAssertEqual(error, .invalidSyntax(index: 4))
         }
     }
 
@@ -31,7 +31,7 @@ final class CompileErrorTest: XCTestCase {
         do {
             _ = try compile("+")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 0))
+            XCTAssertEqual(error, .invalidSyntax(index: 1))
         }
     }
 
