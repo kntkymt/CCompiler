@@ -51,21 +51,21 @@ public func parse(tokens: [Token]) throws -> Node {
         return node
     }
 
-    // mul = primary ("*" primary | "/" primary)*
+    // mul = unary ("*" unary | "/" unary)*
     func mul() throws -> Node {
-        var node = try primary()
+        var node = try unary()
 
         while index < tokens.count {
             switch tokens[index].kind {
             case .mul:
                 let mulToken = try consumeToken(.mul)
-                let rightNode = try primary()
+                let rightNode = try unary()
 
                 node = Node(kind: .mul, left: node, right: rightNode, token: mulToken)
 
             case .div:
                 let divToken = try consumeToken(.div)
-                let rightNode = try primary()
+                let rightNode = try unary()
 
                 node = Node(kind: .div, left: node, right: rightNode, token: divToken)
 
@@ -75,6 +75,33 @@ public func parse(tokens: [Token]) throws -> Node {
         }
 
         return node
+    }
+
+    // unary = ("+" | "-")? primary
+    func unary() throws -> Node {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+
+        switch tokens[index].kind {
+        case .add:
+            try consumeToken(.add)
+            
+            // 単項+は影響がないので無視する
+            return try primary()
+
+        case .sub:
+            let subToken = try consumeToken(.sub)
+
+            // 0 - rightとして認識
+            let left = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "0", sourceIndex: tokens[index].sourceIndex))
+            let right = try primary()
+
+            return Node(kind: .sub, left: left, right: right, token: subToken)
+
+        default:
+            return try primary()
+        }
     }
 
     // primary = num | "(" expr ")"

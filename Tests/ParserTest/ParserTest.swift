@@ -74,4 +74,34 @@ final class ParserTest: XCTestCase {
             rootNode
         )
     }
+
+    func testUnaryAdd() throws {
+        let node = try parse(tokens: [
+            Token(kind: .add, value: "+", sourceIndex: 0),
+            Token(kind: .number, value: "1", sourceIndex: 1),
+        ])
+
+        let numberNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 1))
+
+        XCTAssertEqual(
+            node,
+            numberNode
+        )
+    }
+
+    func testUnarySub() throws {
+        let node = try parse(tokens: [
+            Token(kind: .sub, value: "-", sourceIndex: 0),
+            Token(kind: .number, value: "1", sourceIndex: 1),
+        ])
+
+        let leftNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "0", sourceIndex: 1))
+        let rightNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 1))
+        let rootNode = Node(kind: .sub, left: leftNode, right: rightNode, token: Token(kind: .sub, value: "-", sourceIndex: 0))
+
+        XCTAssertEqual(
+            node,
+            rootNode
+        )
+    }
 }
