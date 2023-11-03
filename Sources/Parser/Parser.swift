@@ -11,12 +11,27 @@ public func parse(tokens: [Token]) throws -> Node {
     var index = 0
 
     @discardableResult
-    func consumeToken(_ tokenKind: TokenKind) throws -> Token {
+    func consumeNumberToken() throws -> Token {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
 
-        if tokens[index].kind == tokenKind {
+        if case .number = tokens[index].kind {
+            let token = tokens[index]
+            index += 1
+            return token
+        } else {
+            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+        }
+    }
+
+    @discardableResult
+    func consumeToken(_ tokenKind: Token.Kind.ReservedKind) throws -> Token {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+
+        if case .reserved(let reservedKind) = tokens[index].kind, reservedKind == tokenKind {
             let token = tokens[index]
             index += 1
             return token
@@ -36,13 +51,13 @@ public func parse(tokens: [Token]) throws -> Node {
 
         while index < tokens.count {
             switch tokens[index].kind {
-            case .equal:
+            case .reserved(kind: .equal):
                 let token = try consumeToken(.equal)
                 let rightNode = try relational()
 
                 node = Node(kind: .equal, left: node, right: rightNode, token: token)
 
-            case .notEqual:
+            case .reserved(kind: .notEqual):
                 let token = try consumeToken(.notEqual)
                 let rightNode = try relational()
 
@@ -62,25 +77,25 @@ public func parse(tokens: [Token]) throws -> Node {
 
         while index < tokens.count {
             switch tokens[index].kind {
-            case .lessThan:
+            case .reserved(kind: .lessThan):
                 let token = try consumeToken(.lessThan)
                 let rightNode = try add()
 
                 node = Node(kind: .lessThan, left: node, right: rightNode, token: token)
 
-            case .lessThanOrEqual:
+            case .reserved(kind: .lessThanOrEqual):
                 let token = try consumeToken(.lessThanOrEqual)
                 let rightNode = try add()
 
                 node = Node(kind: .lessThanOrEqual, left: node, right: rightNode, token: token)
 
-            case .greaterThan:
+            case .reserved(kind: .greaterThan):
                 let token = try consumeToken(.greaterThan)
                 let rightNode = try add()
 
                 node = Node(kind: .lessThan, left: rightNode, right: node, token: token)
 
-            case .greaterThanOrEqual:
+            case .reserved(kind: .greaterThanOrEqual):
                 let token = try consumeToken(.greaterThanOrEqual)
                 let rightNode = try add()
 
@@ -100,13 +115,13 @@ public func parse(tokens: [Token]) throws -> Node {
 
         while index < tokens.count {
             switch tokens[index].kind {
-            case .add:
+            case .reserved(kind: .add):
                 let addToken = try consumeToken(.add)
                 let rightNode = try mul()
 
                 node = Node(kind: .add, left: node, right: rightNode, token: addToken)
 
-            case .sub:
+            case .reserved(kind: .sub):
                 let subToken = try consumeToken(.sub)
                 let rightNode = try mul()
 
@@ -126,13 +141,13 @@ public func parse(tokens: [Token]) throws -> Node {
 
         while index < tokens.count {
             switch tokens[index].kind {
-            case .mul:
+            case .reserved(kind: .mul):
                 let mulToken = try consumeToken(.mul)
                 let rightNode = try unary()
 
                 node = Node(kind: .mul, left: node, right: rightNode, token: mulToken)
 
-            case .div:
+            case .reserved(kind: .div):
                 let divToken = try consumeToken(.div)
                 let rightNode = try unary()
 
@@ -153,17 +168,17 @@ public func parse(tokens: [Token]) throws -> Node {
         }
 
         switch tokens[index].kind {
-        case .add:
+        case .reserved(kind: .add):
             try consumeToken(.add)
-            
+
             // 単項+は影響がないので無視する
             return try primary()
 
-        case .sub:
+        case .reserved(kind: .sub):
             let subToken = try consumeToken(.sub)
 
             // 0 - rightとして認識
-            let left = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "0", sourceIndex: tokens[index].sourceIndex))
+            let left = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number("0"), sourceIndex: tokens[index].sourceIndex))
             let right = try primary()
 
             return Node(kind: .sub, left: left, right: right, token: subToken)
@@ -180,7 +195,7 @@ public func parse(tokens: [Token]) throws -> Node {
         }
 
         switch tokens[index].kind {
-        case .parenthesisLeft:
+        case .reserved(kind: .parenthesisLeft):
             try consumeToken(.parenthesisLeft)
 
             let exprNode = try expr()
@@ -191,7 +206,7 @@ public func parse(tokens: [Token]) throws -> Node {
 
         case .number:
 
-            let numberToken = try consumeToken(.number)
+            let numberToken = try consumeNumberToken()
             let numberNode = Node(kind: .number, left: nil, right: nil, token: numberToken)
 
             return numberNode

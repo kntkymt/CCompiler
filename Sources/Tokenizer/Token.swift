@@ -1,58 +1,68 @@
 public struct Token: Equatable {
 
     // MARK: - Property
-    
-    public var kind: TokenKind
-    public var value: String
 
+    public var kind: Kind
     public var sourceIndex: Int
+
+    public var value: String {
+        switch kind {
+        case .reserved(let kind):
+            return kind.rawValue
+
+        case .number(let value):
+            return value
+        }
+    }
 
     // MARK: - Initializer
 
-    public init(kind: TokenKind, value: String, sourceIndex: Int) {
+    public init(kind: Kind, sourceIndex: Int) {
         self.kind = kind
-        self.value = value
         self.sourceIndex = sourceIndex
     }
-}
 
-public enum TokenKind {
-    /// `+`
-    case add
+    public enum Kind: Equatable {
 
-    /// `-`
-    case sub
+        case reserved(ReservedKind)
+        case number(String)
 
-    /// `*`
-    case mul
+        public enum ReservedKind: String, CaseIterable {
+            /// `+`
+            case add = "+"
 
-    /// `/`
-    case div
+            /// `-`
+            case sub = "-"
 
-    /// integer e.g. 1, 123
-    case number
+            /// `*`
+            case mul = "*"
 
-    /// `(`
-    case parenthesisLeft
+            /// `/`
+            case div = "/"
 
-    /// `)`
-    case parenthesisRight
+            /// `(`
+            case parenthesisLeft = "("
 
-    /// `==`
-    case equal
+            /// `)`
+            case parenthesisRight = ")"
 
-    /// `!=`
-    case notEqual
+            /// `==`
+            case equal = "=="
 
-    /// `<`
-    case lessThan
+            /// `!=`
+            case notEqual = "!="
 
-    /// `<=`
-    case lessThanOrEqual
+            /// `<`
+            case lessThan = "<"
 
-    /// `>`
-    case greaterThan
+            /// `<=`
+            case lessThanOrEqual = "<="
 
-    /// `>=`
-    case greaterThanOrEqual
+            /// `>`
+            case greaterThan = ">"
+
+            /// `>=`
+            case greaterThanOrEqual = ">="
+        }
+    }
 }

@@ -8,7 +8,7 @@ final class TokenizerTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number, value: "5", sourceIndex: 0)
+                Token(kind: .number("5"), sourceIndex: 0)
             ]
         )
     }
@@ -18,7 +18,7 @@ final class TokenizerTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number, value: "123", sourceIndex: 0)
+                Token(kind: .number("123"), sourceIndex: 0)
             ]
         )
     }
@@ -28,9 +28,9 @@ final class TokenizerTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number, value: "1", sourceIndex: 0),
-                Token(kind: .add, value: "+", sourceIndex: 2),
-                Token(kind: .number, value: "23", sourceIndex: 6)
+                Token(kind: .number("1"), sourceIndex: 0),
+                Token(kind: .reserved(.add), sourceIndex: 2),
+                Token(kind: .number("23"), sourceIndex: 6)
             ]
         )
     }
@@ -40,21 +40,21 @@ final class TokenizerTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number, value: "1", sourceIndex: 0),
-                Token(kind: .add, value: "+", sourceIndex: 1),
-                Token(kind: .number, value: "2", sourceIndex: 2),
-                Token(kind: .sub, value: "-", sourceIndex: 3),
-                Token(kind: .number, value: "3", sourceIndex: 4),
-                Token(kind: .mul, value: "*", sourceIndex: 5),
-                Token(kind: .number, value: "4", sourceIndex: 6),
-                Token(kind: .div, value: "/", sourceIndex: 7),
-                Token(kind: .number, value: "5", sourceIndex: 8),
-                Token(kind: .add, value: "+", sourceIndex: 9),
-                Token(kind: .parenthesisLeft, value: "(", sourceIndex: 10),
-                Token(kind: .number, value: "1", sourceIndex: 11),
-                Token(kind: .add, value: "+", sourceIndex: 12),
-                Token(kind: .number, value: "2", sourceIndex: 13),
-                Token(kind: .parenthesisRight, value: ")", sourceIndex: 14),
+                Token(kind: .number("1"), sourceIndex: 0),
+                Token(kind: .reserved(.add), sourceIndex: 1),
+                Token(kind: .number("2"), sourceIndex: 2),
+                Token(kind: .reserved(.sub), sourceIndex: 3),
+                Token(kind: .number("3"), sourceIndex: 4),
+                Token(kind: .reserved(.mul), sourceIndex: 5),
+                Token(kind: .number("4"), sourceIndex: 6),
+                Token(kind: .reserved(.div), sourceIndex: 7),
+                Token(kind: .number("5"), sourceIndex: 8),
+                Token(kind: .reserved(.add), sourceIndex: 9),
+                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 10),
+                Token(kind: .number("1"), sourceIndex: 11),
+                Token(kind: .reserved(.add), sourceIndex: 12),
+                Token(kind: .number("2"), sourceIndex: 13),
+                Token(kind: .reserved(.parenthesisRight), sourceIndex: 14)
             ]
         )
     }
@@ -65,9 +65,9 @@ final class TokenizerTest: XCTestCase {
             XCTAssertEqual(
                 tokens,
                 [
-                    Token(kind: .number, value: "1", sourceIndex: 0),
-                    Token(kind: .equal, value: "==", sourceIndex: 1),
-                    Token(kind: .number, value: "2", sourceIndex: 3)
+                    Token(kind: .number("1"), sourceIndex: 0),
+                    Token(kind: .reserved(.equal), sourceIndex: 1),
+                    Token(kind: .number("2"), sourceIndex: 3)
                 ]
             )
         }
@@ -77,9 +77,9 @@ final class TokenizerTest: XCTestCase {
             XCTAssertEqual(
                 tokens,
                 [
-                    Token(kind: .number, value: "1", sourceIndex: 0),
-                    Token(kind: .notEqual, value: "!=", sourceIndex: 1),
-                    Token(kind: .number, value: "2", sourceIndex: 3)
+                    Token(kind: .number("1"), sourceIndex: 0),
+                    Token(kind: .reserved(.notEqual), sourceIndex: 1),
+                    Token(kind: .number("2"), sourceIndex: 3)
                 ]
             )
         }
@@ -89,9 +89,9 @@ final class TokenizerTest: XCTestCase {
             XCTAssertEqual(
                 tokens,
                 [
-                    Token(kind: .number, value: "1", sourceIndex: 0),
-                    Token(kind: .greaterThan, value: ">", sourceIndex: 1),
-                    Token(kind: .number, value: "2", sourceIndex: 2)
+                    Token(kind: .number("1"), sourceIndex: 0),
+                    Token(kind: .reserved(.greaterThan), sourceIndex: 1),
+                    Token(kind: .number("2"), sourceIndex: 2)
                 ]
             )
         }
@@ -101,9 +101,9 @@ final class TokenizerTest: XCTestCase {
             XCTAssertEqual(
                 tokens,
                 [
-                    Token(kind: .number, value: "1", sourceIndex: 0),
-                    Token(kind: .greaterThanOrEqual, value: ">=", sourceIndex: 1),
-                    Token(kind: .number, value: "2", sourceIndex: 3)
+                    Token(kind: .number("1"), sourceIndex: 0),
+                    Token(kind: .reserved(.greaterThanOrEqual), sourceIndex: 1),
+                    Token(kind: .number("2"), sourceIndex: 3)
                 ]
             )
         }
@@ -113,9 +113,9 @@ final class TokenizerTest: XCTestCase {
             XCTAssertEqual(
                 tokens,
                 [
-                    Token(kind: .number, value: "1", sourceIndex: 0),
-                    Token(kind: .lessThan, value: "<", sourceIndex: 1),
-                    Token(kind: .number, value: "2", sourceIndex: 2)
+                    Token(kind: .number("1"), sourceIndex: 0),
+                    Token(kind: .reserved(.lessThan), sourceIndex: 1),
+                    Token(kind: .number("2"), sourceIndex: 2)
                 ]
             )
         }
@@ -125,9 +125,9 @@ final class TokenizerTest: XCTestCase {
             XCTAssertEqual(
                 tokens,
                 [
-                    Token(kind: .number, value: "1", sourceIndex: 0),
-                    Token(kind: .lessThanOrEqual, value: "<=", sourceIndex: 1),
-                    Token(kind: .number, value: "2", sourceIndex: 3)
+                    Token(kind: .number("1"), sourceIndex: 0),
+                    Token(kind: .reserved(.lessThanOrEqual), sourceIndex: 1),
+                    Token(kind: .number("2"), sourceIndex: 3)
                 ]
             )
         }
