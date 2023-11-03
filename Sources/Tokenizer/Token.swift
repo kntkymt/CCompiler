@@ -17,13 +17,42 @@ public struct Token: Equatable {
 }
 
 public enum TokenKind {
+    /// `+`
     case add
+
+    /// `-`
     case sub
+
+    /// `*`
     case mul
+
+    /// `/`
     case div
 
+    /// integer e.g. 1, 123
     case number
 
+    /// `(`
     case parenthesisLeft
+
+    /// `)`
     case parenthesisRight
+
+    /// `==`
+    case equal
+
+    /// `!=`
+    case notEqual
+
+    /// `<`
+    case lessThan
+
+    /// `<=`
+    case lessThanOrEqual
+
+    /// `>`
+    case greaterThan
+
+    /// `>=`
+    case greaterThanOrEqual
 }
