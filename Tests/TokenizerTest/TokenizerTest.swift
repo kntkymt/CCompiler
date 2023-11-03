@@ -59,6 +59,80 @@ final class TokenizerTest: XCTestCase {
         )
     }
 
+    func testCompare() throws {
+        try XCTContext.runActivity(named: "equal") { _ in
+            let tokens = try tokenize(source: "1==2")
+            XCTAssertEqual(
+                tokens,
+                [
+                    Token(kind: .number, value: "1", sourceIndex: 0),
+                    Token(kind: .equal, value: "==", sourceIndex: 1),
+                    Token(kind: .number, value: "2", sourceIndex: 3)
+                ]
+            )
+        }
+
+        try XCTContext.runActivity(named: "notEqual") { _ in
+            let tokens = try tokenize(source: "1!=2")
+            XCTAssertEqual(
+                tokens,
+                [
+                    Token(kind: .number, value: "1", sourceIndex: 0),
+                    Token(kind: .notEqual, value: "!=", sourceIndex: 1),
+                    Token(kind: .number, value: "2", sourceIndex: 3)
+                ]
+            )
+        }
+
+        try XCTContext.runActivity(named: "greaterThan") { _ in
+            let tokens = try tokenize(source: "1>2")
+            XCTAssertEqual(
+                tokens,
+                [
+                    Token(kind: .number, value: "1", sourceIndex: 0),
+                    Token(kind: .greaterThan, value: ">", sourceIndex: 1),
+                    Token(kind: .number, value: "2", sourceIndex: 2)
+                ]
+            )
+        }
+
+        try XCTContext.runActivity(named: "greaterThanOrEqual") { _ in
+            let tokens = try tokenize(source: "1>=2")
+            XCTAssertEqual(
+                tokens,
+                [
+                    Token(kind: .number, value: "1", sourceIndex: 0),
+                    Token(kind: .greaterThanOrEqual, value: ">=", sourceIndex: 1),
+                    Token(kind: .number, value: "2", sourceIndex: 3)
+                ]
+            )
+        }
+
+        try XCTContext.runActivity(named: "lessThan") { _ in
+            let tokens = try tokenize(source: "1<2")
+            XCTAssertEqual(
+                tokens,
+                [
+                    Token(kind: .number, value: "1", sourceIndex: 0),
+                    Token(kind: .lessThan, value: "<", sourceIndex: 1),
+                    Token(kind: .number, value: "2", sourceIndex: 2)
+                ]
+            )
+        }
+
+        try XCTContext.runActivity(named: "lessThanOrEqual") { _ in
+            let tokens = try tokenize(source: "1<=2")
+            XCTAssertEqual(
+                tokens,
+                [
+                    Token(kind: .number, value: "1", sourceIndex: 0),
+                    Token(kind: .lessThanOrEqual, value: "<=", sourceIndex: 1),
+                    Token(kind: .number, value: "2", sourceIndex: 3)
+                ]
+            )
+        }
+    }
+
     func testFailUnknownToken() throws {
         do {
             _ = try tokenize(source: "1 ^")
