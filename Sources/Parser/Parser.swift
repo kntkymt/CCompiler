@@ -25,8 +25,77 @@ public func parse(tokens: [Token]) throws -> Node {
         }
     }
 
-    // expr = mul ("+" mul | "-" mul)*
+    // expr = equality
     func expr() throws -> Node {
+        try equality()
+    }
+
+    // equality = relational ("==" relational | "!=" relational)*
+    func equality() throws -> Node {
+        var node = try relational()
+
+        while index < tokens.count {
+            switch tokens[index].kind {
+            case .equal:
+                let token = try consumeToken(.equal)
+                let rightNode = try relational()
+
+                node = Node(kind: .equal, left: node, right: rightNode, token: token)
+
+            case .notEqual:
+                let token = try consumeToken(.notEqual)
+                let rightNode = try relational()
+
+                node = Node(kind: .notEqual, left: node, right: rightNode, token: token)
+
+            default:
+                return node
+            }
+        }
+
+        return node
+    }
+
+    // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+    func relational() throws -> Node {
+        var node = try add()
+
+        while index < tokens.count {
+            switch tokens[index].kind {
+            case .lessThan:
+                let token = try consumeToken(.lessThan)
+                let rightNode = try add()
+
+                node = Node(kind: .lessThan, left: node, right: rightNode, token: token)
+
+            case .lessThanOrEqual:
+                let token = try consumeToken(.lessThanOrEqual)
+                let rightNode = try add()
+
+                node = Node(kind: .lessThanOrEqual, left: node, right: rightNode, token: token)
+
+            case .greaterThan:
+                let token = try consumeToken(.greaterThan)
+                let rightNode = try add()
+
+                node = Node(kind: .greaterThan, left: node, right: rightNode, token: token)
+
+            case .greaterThanOrEqual:
+                let token = try consumeToken(.greaterThanOrEqual)
+                let rightNode = try add()
+
+                node = Node(kind: .greaterThanOrEqual, left: node, right: rightNode, token: token)
+
+            default:
+                return node
+            }
+        }
+
+        return node
+    }
+
+    // add = mul ("+" mul | "-" mul)*
+    func add() throws -> Node {
         var node = try mul()
 
         while index < tokens.count {

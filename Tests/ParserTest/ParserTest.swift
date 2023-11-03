@@ -104,4 +104,108 @@ final class ParserTest: XCTestCase {
             rootNode
         )
     }
+
+    func testCompare() throws {
+        try XCTContext.runActivity(named: "equal") { _ in
+            let node = try parse(tokens: [
+                Token(kind: .number, value: "1", sourceIndex: 0),
+                Token(kind: .equal, value: "==", sourceIndex: 1),
+                Token(kind: .number, value: "2", sourceIndex: 3),
+            ])
+
+            let leftNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 0))
+            let rightNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "2", sourceIndex: 3))
+            let rootNode = Node(kind: .equal, left: leftNode, right: rightNode, token: Token(kind: .equal, value: "==", sourceIndex: 1))
+
+            XCTAssertEqual(
+                node,
+                rootNode
+            )
+        }
+
+        try XCTContext.runActivity(named: "notEqual") { _ in
+            let node = try parse(tokens: [
+                Token(kind: .number, value: "1", sourceIndex: 0),
+                Token(kind: .notEqual, value: "!=", sourceIndex: 1),
+                Token(kind: .number, value: "2", sourceIndex: 3),
+            ])
+
+            let leftNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 0))
+            let rightNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "2", sourceIndex: 3))
+            let rootNode = Node(kind: .notEqual, left: leftNode, right: rightNode, token: Token(kind: .notEqual, value: "!=", sourceIndex: 1))
+
+            XCTAssertEqual(
+                node,
+                rootNode
+            )
+        }
+
+        try XCTContext.runActivity(named: "greaterThan") { _ in
+            let node = try parse(tokens: [
+                Token(kind: .number, value: "1", sourceIndex: 0),
+                Token(kind: .greaterThan, value: ">", sourceIndex: 1),
+                Token(kind: .number, value: "2", sourceIndex: 2),
+            ])
+
+            let leftNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 0))
+            let rightNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "2", sourceIndex: 2))
+            let rootNode = Node(kind: .greaterThan, left: leftNode, right: rightNode, token: Token(kind: .greaterThan, value: ">", sourceIndex: 1))
+
+            XCTAssertEqual(
+                node,
+                rootNode
+            )
+        }
+
+        try XCTContext.runActivity(named: "greaterThanOrEqual") { _ in
+            let node = try parse(tokens: [
+                Token(kind: .number, value: "1", sourceIndex: 0),
+                Token(kind: .greaterThanOrEqual, value: ">=", sourceIndex: 1),
+                Token(kind: .number, value: "2", sourceIndex: 3),
+            ])
+
+            let leftNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 0))
+            let rightNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "2", sourceIndex: 3))
+            let rootNode = Node(kind: .greaterThanOrEqual, left: leftNode, right: rightNode, token: Token(kind: .greaterThanOrEqual, value: ">=", sourceIndex: 1))
+
+            XCTAssertEqual(
+                node,
+                rootNode
+            )
+        }
+
+        try XCTContext.runActivity(named: "lessThan") { _ in
+            let node = try parse(tokens: [
+                Token(kind: .number, value: "1", sourceIndex: 0),
+                Token(kind: .lessThan, value: "<", sourceIndex: 1),
+                Token(kind: .number, value: "2", sourceIndex: 2),
+            ])
+
+            let leftNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 0))
+            let rightNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "2", sourceIndex: 2))
+            let rootNode = Node(kind: .lessThan, left: leftNode, right: rightNode, token: Token(kind: .lessThan, value: "<", sourceIndex: 1))
+
+            XCTAssertEqual(
+                node,
+                rootNode
+            )
+        }
+
+        try XCTContext.runActivity(named: "lessThanOrEqual") { _ in
+            let node = try parse(tokens: [
+                Token(kind: .number, value: "1", sourceIndex: 0),
+                Token(kind: .lessThanOrEqual, value: "<=", sourceIndex: 1),
+                Token(kind: .number, value: "2", sourceIndex: 3),
+            ])
+
+            let leftNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 0))
+            let rightNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "2", sourceIndex: 3))
+            let rootNode = Node(kind: .lessThanOrEqual, left: leftNode, right: rightNode, token: Token(kind: .lessThanOrEqual, value: "<=", sourceIndex: 1))
+
+            XCTAssertEqual(
+                node,
+                rootNode
+            )
+        }
+    }
 }

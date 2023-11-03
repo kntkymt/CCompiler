@@ -26,9 +26,36 @@ public final class Node: Equatable {
 }
 
 public enum NodeKind: Equatable {
+    /// `+`
     case add
+
+    /// `-`
     case sub
+
+    /// `*`
     case mul
+
+    /// `/`
     case div
+
+    /// integer e.g. 1, 123
     case number
+
+    /// `==`
+    case equal
+
+    /// `!=`
+    case notEqual
+
+    /// `<`
+    case lessThan
+
+    /// `<=`
+    case lessThanOrEqual
+
+    /// `>`
+    case greaterThan
+
+    /// `>=`
+    case greaterThanOrEqual
 }
