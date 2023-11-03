@@ -78,13 +78,13 @@ public func parse(tokens: [Token]) throws -> Node {
                 let token = try consumeToken(.greaterThan)
                 let rightNode = try add()
 
-                node = Node(kind: .greaterThan, left: node, right: rightNode, token: token)
+                node = Node(kind: .lessThan, left: rightNode, right: node, token: token)
 
             case .greaterThanOrEqual:
                 let token = try consumeToken(.greaterThanOrEqual)
                 let rightNode = try add()
 
-                node = Node(kind: .greaterThanOrEqual, left: node, right: rightNode, token: token)
+                node = Node(kind: .lessThanOrEqual, left: rightNode, right: node, token: token)
 
             default:
                 return node

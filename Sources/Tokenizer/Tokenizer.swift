@@ -70,31 +70,37 @@ public func tokenize(source: String) throws -> [Token] {
         if index + 1 < charactors.count, String(charactors[index...index+1]) == "==" {
             tokens.append(Token(kind: .equal, value: "==", sourceIndex: index))
             index += 2
+            continue
         }
 
         if index + 1 < charactors.count, String(charactors[index...index+1]) == "!=" {
             tokens.append(Token(kind: .notEqual, value: "!=", sourceIndex: index))
             index += 2
+            continue
         }
 
         if index + 1 < charactors.count, String(charactors[index...index+1]) == "<=" {
             tokens.append(Token(kind: .lessThanOrEqual, value: "<=", sourceIndex: index))
             index += 2
+            continue
         }
 
         if index + 1 < charactors.count, String(charactors[index...index+1]) == ">=" {
             tokens.append(Token(kind: .greaterThanOrEqual, value: ">=", sourceIndex: index))
             index += 2
+            continue
         }
 
         if charactors[index] == "<" {
             tokens.append(Token(kind: .lessThan, value: "<", sourceIndex: index))
             index += 1
+            continue
         }
 
         if charactors[index] == ">" {
             tokens.append(Token(kind: .greaterThan, value: ">", sourceIndex: index))
             index += 1
+            continue
         }
 
         if charactors[index].isNumber {

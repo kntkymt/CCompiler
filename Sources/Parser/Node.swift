@@ -52,10 +52,4 @@ public enum NodeKind: Equatable {
 
     /// `<=`
     case lessThanOrEqual
-
-    /// `>`
-    case greaterThan
-
-    /// `>=`
-    case greaterThanOrEqual
 }

@@ -149,7 +149,7 @@ final class ParserTest: XCTestCase {
 
             let leftNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 0))
             let rightNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "2", sourceIndex: 2))
-            let rootNode = Node(kind: .greaterThan, left: leftNode, right: rightNode, token: Token(kind: .greaterThan, value: ">", sourceIndex: 1))
+            let rootNode = Node(kind: .lessThan, left: rightNode, right: leftNode, token: Token(kind: .greaterThan, value: ">", sourceIndex: 1))
 
             XCTAssertEqual(
                 node,
@@ -166,7 +166,7 @@ final class ParserTest: XCTestCase {
 
             let leftNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "1", sourceIndex: 0))
             let rightNode = Node(kind: .number, left: nil, right: nil, token: Token(kind: .number, value: "2", sourceIndex: 3))
-            let rootNode = Node(kind: .greaterThanOrEqual, left: leftNode, right: rightNode, token: Token(kind: .greaterThanOrEqual, value: ">=", sourceIndex: 1))
+            let rootNode = Node(kind: .lessThanOrEqual, left: rightNode, right: leftNode, token: Token(kind: .greaterThanOrEqual, value: ">=", sourceIndex: 1))
 
             XCTAssertEqual(
                 node,
