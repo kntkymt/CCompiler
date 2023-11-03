@@ -22,12 +22,12 @@ public func tokenize(source: String) throws -> [Token] {
             }
         }
 
-        return Token(kind: .number(string), sourceIndex: startIndex)
+        return .number(string, sourceIndex: startIndex)
     }
 
     // 文字数が多い物からチェックしないといけない
     // 例: <= の時に<を先にチェックすると<, =の2つのトークンになってしまう
-    let reservedKinds = Token.Kind.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    let reservedKinds = Token.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
 
 root:
     while index < charactors.count {
@@ -45,7 +45,7 @@ root:
             let reservedString = reservedKind.rawValue
             if index + (reservedString.count - 1) < charactors.count,
                String(charactors[index..<index+reservedString.count]) == reservedString {
-                tokens.append(Token(kind: .reserved(reservedKind), sourceIndex: index))
+                tokens.append(.reserved(reservedKind, sourceIndex: index))
                 index += reservedString.count
 
                 continue root

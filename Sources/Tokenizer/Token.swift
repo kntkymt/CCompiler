@@ -1,68 +1,65 @@
-public struct Token: Equatable {
+public enum Token: Equatable {
 
     // MARK: - Property
 
-    public var kind: Kind
-    public var sourceIndex: Int
+    case reserved(_ kind: ReservedKind, sourceIndex: Int)
+    case number(_ value: String, sourceIndex: Int)
 
     public var value: String {
-        switch kind {
-        case .reserved(let kind):
+        switch self {
+        case .reserved(let kind, _):
             return kind.rawValue
 
-        case .number(let value):
+        case .number(let value, _):
             return value
         }
     }
 
-    // MARK: - Initializer
+    public var sourceIndex: Int {
+        switch self {
+        case .reserved(_, let sourceIndex):
+            return sourceIndex
 
-    public init(kind: Kind, sourceIndex: Int) {
-        self.kind = kind
-        self.sourceIndex = sourceIndex
+        case .number(_, let sourceIndex):
+            return sourceIndex
+        }
     }
 
-    public enum Kind: Equatable {
+    public enum ReservedKind: String, CaseIterable {
+        /// `+`
+        case add = "+"
 
-        case reserved(ReservedKind)
-        case number(String)
+        /// `-`
+        case sub = "-"
 
-        public enum ReservedKind: String, CaseIterable {
-            /// `+`
-            case add = "+"
+        /// `*`
+        case mul = "*"
 
-            /// `-`
-            case sub = "-"
+        /// `/`
+        case div = "/"
 
-            /// `*`
-            case mul = "*"
+        /// `(`
+        case parenthesisLeft = "("
 
-            /// `/`
-            case div = "/"
+        /// `)`
+        case parenthesisRight = ")"
 
-            /// `(`
-            case parenthesisLeft = "("
+        /// `==`
+        case equal = "=="
 
-            /// `)`
-            case parenthesisRight = ")"
+        /// `!=`
+        case notEqual = "!="
 
-            /// `==`
-            case equal = "=="
+        /// `<`
+        case lessThan = "<"
 
-            /// `!=`
-            case notEqual = "!="
+        /// `<=`
+        case lessThanOrEqual = "<="
 
-            /// `<`
-            case lessThan = "<"
+        /// `>`
+        case greaterThan = ">"
 
-            /// `<=`
-            case lessThanOrEqual = "<="
-
-            /// `>`
-            case greaterThan = ">"
-
-            /// `>=`
-            case greaterThanOrEqual = ">="
-        }
+        /// `>=`
+        case greaterThanOrEqual = ">="
     }
 }
