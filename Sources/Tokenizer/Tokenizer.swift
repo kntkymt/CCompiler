@@ -9,96 +9,29 @@ public func tokenize(source: String) throws -> [Token] {
     var index = 0
 
     func extractNumber() -> Token {
-        var token = ""
+        var string = ""
         let startIndex = index
 
         while index < charactors.count {
             let nextToken = charactors[index]
             if nextToken.isNumber {
-                token += String(nextToken)
+                string += String(nextToken)
                 index += 1
             } else {
                 break
             }
         }
 
-        return Token(kind: .number, value: token, sourceIndex: startIndex)
+        return .number(string, sourceIndex: startIndex)
     }
 
+    // 文字数が多い物からチェックしないといけない
+    // 例: <= の時に<を先にチェックすると<, =の2つのトークンになってしまう
+    let reservedKinds = Token.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+
+root:
     while index < charactors.count {
         if charactors[index].isWhitespace {
-            index += 1
-            continue
-        }
-
-        if charactors[index] == "+" {
-            tokens.append(Token(kind: .add, value: "+", sourceIndex: index))
-            index += 1
-            continue
-        }
-
-        if charactors[index] == "-" {
-            tokens.append(Token(kind: .sub, value: "-", sourceIndex: index))
-            index += 1
-            continue
-        }
-
-        if charactors[index] == "*" {
-            tokens.append(Token(kind: .mul, value: "*", sourceIndex: index))
-            index += 1
-            continue
-        }
-
-        if charactors[index] == "/" {
-            tokens.append(Token(kind: .div, value: "/", sourceIndex: index))
-            index += 1
-            continue
-        }
-
-        if charactors[index] == "(" {
-            tokens.append(Token(kind: .parenthesisLeft, value: "(", sourceIndex: index))
-            index += 1
-            continue
-        }
-
-        if charactors[index] == ")" {
-            tokens.append(Token(kind: .parenthesisRight, value: ")", sourceIndex: index))
-            index += 1
-            continue
-        }
-
-        if index + 1 < charactors.count, String(charactors[index...index+1]) == "==" {
-            tokens.append(Token(kind: .equal, value: "==", sourceIndex: index))
-            index += 2
-            continue
-        }
-
-        if index + 1 < charactors.count, String(charactors[index...index+1]) == "!=" {
-            tokens.append(Token(kind: .notEqual, value: "!=", sourceIndex: index))
-            index += 2
-            continue
-        }
-
-        if index + 1 < charactors.count, String(charactors[index...index+1]) == "<=" {
-            tokens.append(Token(kind: .lessThanOrEqual, value: "<=", sourceIndex: index))
-            index += 2
-            continue
-        }
-
-        if index + 1 < charactors.count, String(charactors[index...index+1]) == ">=" {
-            tokens.append(Token(kind: .greaterThanOrEqual, value: ">=", sourceIndex: index))
-            index += 2
-            continue
-        }
-
-        if charactors[index] == "<" {
-            tokens.append(Token(kind: .lessThan, value: "<", sourceIndex: index))
-            index += 1
-            continue
-        }
-
-        if charactors[index] == ">" {
-            tokens.append(Token(kind: .greaterThan, value: ">", sourceIndex: index))
             index += 1
             continue
         }
@@ -106,6 +39,17 @@ public func tokenize(source: String) throws -> [Token] {
         if charactors[index].isNumber {
             tokens.append(extractNumber())
             continue
+        }
+
+        for reservedKind in reservedKinds {
+            let reservedString = reservedKind.rawValue
+            if index + (reservedString.count - 1) < charactors.count,
+               String(charactors[index..<index+reservedString.count]) == reservedString {
+                tokens.append(.reserved(reservedKind, sourceIndex: index))
+                index += reservedString.count
+
+                continue root
+            }
         }
 
         throw TokenizeError.unknownToken(index: index)

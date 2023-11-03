@@ -1,58 +1,65 @@
-public struct Token: Equatable {
+public enum Token: Equatable {
 
     // MARK: - Property
-    
-    public var kind: TokenKind
-    public var value: String
 
-    public var sourceIndex: Int
+    case reserved(_ kind: ReservedKind, sourceIndex: Int)
+    case number(_ value: String, sourceIndex: Int)
 
-    // MARK: - Initializer
+    public var value: String {
+        switch self {
+        case .reserved(let kind, _):
+            return kind.rawValue
 
-    public init(kind: TokenKind, value: String, sourceIndex: Int) {
-        self.kind = kind
-        self.value = value
-        self.sourceIndex = sourceIndex
+        case .number(let value, _):
+            return value
+        }
     }
-}
 
-public enum TokenKind {
-    /// `+`
-    case add
+    public var sourceIndex: Int {
+        switch self {
+        case .reserved(_, let sourceIndex):
+            return sourceIndex
 
-    /// `-`
-    case sub
+        case .number(_, let sourceIndex):
+            return sourceIndex
+        }
+    }
 
-    /// `*`
-    case mul
+    public enum ReservedKind: String, CaseIterable {
+        /// `+`
+        case add = "+"
 
-    /// `/`
-    case div
+        /// `-`
+        case sub = "-"
 
-    /// integer e.g. 1, 123
-    case number
+        /// `*`
+        case mul = "*"
 
-    /// `(`
-    case parenthesisLeft
+        /// `/`
+        case div = "/"
 
-    /// `)`
-    case parenthesisRight
+        /// `(`
+        case parenthesisLeft = "("
 
-    /// `==`
-    case equal
+        /// `)`
+        case parenthesisRight = ")"
 
-    /// `!=`
-    case notEqual
+        /// `==`
+        case equal = "=="
 
-    /// `<`
-    case lessThan
+        /// `!=`
+        case notEqual = "!="
 
-    /// `<=`
-    case lessThanOrEqual
+        /// `<`
+        case lessThan = "<"
 
-    /// `>`
-    case greaterThan
+        /// `<=`
+        case lessThanOrEqual = "<="
 
-    /// `>=`
-    case greaterThanOrEqual
+        /// `>`
+        case greaterThan = ">"
+
+        /// `>=`
+        case greaterThanOrEqual = ">="
+    }
 }
