@@ -38,6 +38,22 @@ public func generate(node: Node) -> String {
     case .div:
         result += "    sdiv w0, w1, w0\n"
 
+    case .equal:
+        result += "    cmp w1, w0\n"
+        result += "    cset w0, eq\n"
+
+    case .notEqual:
+        result += "    cmp w1, w0\n"
+        result += "    cset w0, ne\n"
+
+    case .lessThan:
+        result += "    cmp w1, w0\n"
+        result += "    cset w0, lt\n"
+
+    case .lessThanOrEqual:
+        result += "    cmp w1, w0\n"
+        result += "    cset w0, le\n"
+
     default:
         break
     }
