@@ -133,4 +133,15 @@ final class TokensTest: XCTestCase {
             ]
         )
     }
+
+    func testSemicolon() throws {
+        let tokens = try tokenize(source: "1;")
+        XCTAssertEqual(
+            tokens,
+            [
+                .number("1", sourceIndex: 0),
+                .reserved(.semicolon, sourceIndex: 1),
+            ]
+        )
+    }
 }
