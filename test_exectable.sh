@@ -36,5 +36,6 @@ assert 6 "a = 5;a + 1;"
 assert 6 "a = 5;b = 1;a + b;"
 assert 2 "a=b=1;a + b;"
 assert 14 "a = 3;b = 5 * 6 - 8;a + b / 2;"
+assert 15 "hoge = 5;fuga = 3;hoge * fuga;"
 
 echo OK

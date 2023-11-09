@@ -45,7 +45,8 @@ public func compile(_ source: String) throws -> String {
     // 今のスタックのトップをBRに（新しい関数フレームを宣言）
     compiled += "    mov x29, sp\n"
 
-    // a...zの変数を確保
+    // FIXME: ここの確保数を実際の数にしたいが、Parserで調べるのかGenで調べるのかわからないので保留
+    // 26個分の変数を確保
     compiled += "    sub sp, sp, #208\n"
 
     for node in nodes {
