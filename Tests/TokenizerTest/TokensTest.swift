@@ -134,6 +134,18 @@ final class TokensTest: XCTestCase {
         )
     }
 
+    func testAssign() throws {
+        let tokens = try tokenize(source: "a=1")
+        XCTAssertEqual(
+            tokens,
+            [
+                .identifier("a", sourceIndex: 0),
+                .reserved(.assign, sourceIndex: 1),
+                .number("1", sourceIndex: 2),
+            ]
+        )
+    }
+
     func testSemicolon() throws {
         let tokens = try tokenize(source: "1;")
         XCTAssertEqual(

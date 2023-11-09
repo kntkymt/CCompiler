@@ -69,6 +69,9 @@ public enum Token: Equatable {
         /// `>=`
         case greaterThanOrEqual = ">="
 
+        /// `=`
+        case assign = "="
+
         /// `;`
         case semicolon = ";"
     }
