@@ -52,6 +52,12 @@ root:
             }
         }
 
+        if "a" <= charactors[index], charactors[index] <= "z" {
+            tokens.append(.identifier(charactors[index], sourceIndex: index))
+            index += 1
+            continue
+        }
+
         throw TokenizeError.unknownToken(index: index)
     }
 
