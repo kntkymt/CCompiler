@@ -28,36 +28,18 @@ public func generate(node: Node) throws -> String {
 
         return result
 
-    case .assign:
-        guard let left = node.left, let right = node.right else {
-            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
-        }
-
-        // leftはアドレス, rightはrightの結果
-        result += try generatePushLocalVariableAddress(node: left)
-        result += try generate(node: right)
-
-        result += "    ldr x0, [sp]\n"
-        result += "    add sp, sp, #16\n"
-        result += "    ldr x1, [sp]\n"
-        result += "    add sp, sp, #16\n"
-
-        // 代入演算
-        result += "    str x0, [x1]\n"
-
-        // 右辺を再度push（Cではa=2は2を返す）
-        result += "    str x0, [sp, #-16]!\n"
-
-        return result
-
     default:
-        // それ以外の二項演算
+        // それ以外の演算
 
         guard let left = node.left, let right = node.right else {
             throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
         }
 
-        result += try generate(node: left)
+        if node.kind == .assign {
+            result += try generatePushLocalVariableAddress(node: left)
+        } else {
+            result += try generate(node: left)
+        }
         result += try generate(node: right)
 
         // 両方のノードの結果をpop
@@ -95,6 +77,9 @@ public func generate(node: Node) throws -> String {
         case .lessThanOrEqual:
             result += "    cmp x1, x0\n"
             result += "    cset x0, le\n"
+
+        case .assign:
+            result += "    str x0, [x1]\n"
 
         default:
             break
