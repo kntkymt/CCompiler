@@ -39,7 +39,7 @@ public func compile(_ source: String) throws -> String {
         }
     }()
 
-    compiled += generate(node: rootNode)
+    compiled += generate(node: rootNode[0])
 
     compiled += "    ldr w0, [sp]\n"
     compiled += "    add sp, sp, #16\n"

@@ -4,11 +4,26 @@ public enum ParseError: Error, Equatable {
     case invalidSyntax(index: Int)
 }
 
-public func parse(tokens: [Token]) throws -> Node {
+public func parse(tokens: [Token]) throws -> [Node] {
     if tokens.isEmpty {
         throw ParseError.invalidSyntax(index: 0)
     }
     var index = 0
+
+    @discardableResult
+    func consumeIdentifierToken() throws -> Token {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+
+        if case .identifier = tokens[index] {
+            let token = tokens[index]
+            index += 1
+            return token
+        } else {
+            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+        }
+    }
 
     @discardableResult
     func consumeNumberToken() throws -> Token {
@@ -40,9 +55,45 @@ public func parse(tokens: [Token]) throws -> Node {
         }
     }
 
-    // expr = equality
+    // MARK: - Syntax
+
+    // program = stmt*
+    func program() throws -> [Node] {
+        var nodes: [Node] = []
+
+        while index < tokens.count {
+            print("\(index), \(tokens.count)")
+            nodes.append(try stmt())
+        }
+
+        return nodes
+    }
+
+    // stmt = expr ";"
+    func stmt() throws -> Node {
+        let node = try expr()
+        try consumeReservedToken(.semicolon)
+
+        return node
+    }
+
+    // expr = assign
     func expr() throws -> Node {
-        try equality()
+        try assign()
+    }
+
+    // assign = equality ("=" assign)?
+    func assign() throws -> Node {
+        var node = try equality()
+
+        if case .reserved(.assign, _) = tokens[index] {
+            let token = try consumeReservedToken(.assign)
+            let rightNode = try assign()
+
+            node = Node(kind: .assign, left: node, right: rightNode, token: token)
+        }
+
+        return node
     }
 
     // equality = relational ("==" relational | "!=" relational)*
@@ -188,7 +239,7 @@ public func parse(tokens: [Token]) throws -> Node {
         }
     }
 
-    // primary = num | "(" expr ")"
+    // primary = num | ident | "(" expr ")"
     func primary() throws -> Node {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
@@ -205,11 +256,16 @@ public func parse(tokens: [Token]) throws -> Node {
             return exprNode
 
         case .number:
-
             let numberToken = try consumeNumberToken()
             let numberNode = Node(kind: .number, left: nil, right: nil, token: numberToken)
 
             return numberNode
+
+        case .identifier:
+            let identifierToken = try consumeIdentifierToken()
+            let identifierNode = Node(kind: .localVariable, left: nil, right: nil, token: identifierToken)
+
+            return identifierNode
 
         default:
             throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
@@ -217,5 +273,5 @@ public func parse(tokens: [Token]) throws -> Node {
     }
 
 
-    return try expr()
+    return try program()
 }

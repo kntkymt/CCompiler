@@ -8,8 +8,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.add, sourceIndex: 1),
-            .number("2", sourceIndex: 2)
-        ])
+            .number("2", sourceIndex: 2),
+            .reserved(.semicolon, sourceIndex: 3)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
@@ -25,8 +26,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.sub, sourceIndex: 1),
-            .number("2", sourceIndex: 2)
-        ])
+            .number("2", sourceIndex: 2),
+            .reserved(.semicolon, sourceIndex: 3)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
@@ -42,8 +44,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.mul, sourceIndex: 1),
-            .number("2", sourceIndex: 2)
-        ])
+            .number("2", sourceIndex: 2),
+            .reserved(.semicolon, sourceIndex: 3)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
@@ -59,8 +62,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.div, sourceIndex: 1),
-            .number("2", sourceIndex: 2)
-        ])
+            .number("2", sourceIndex: 2),
+            .reserved(.semicolon, sourceIndex: 3)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
@@ -75,8 +79,9 @@ final class OperatorsTest: XCTestCase {
     func testUnaryAdd() throws {
         let node = try parse(tokens: [
             .reserved(.add, sourceIndex: 0),
-            .number("1", sourceIndex: 1)
-        ])
+            .number("1", sourceIndex: 1),
+            .reserved(.semicolon, sourceIndex: 2)
+        ])[0]
 
         let numberNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 1))
 
@@ -89,8 +94,9 @@ final class OperatorsTest: XCTestCase {
     func testUnarySub() throws {
         let node = try parse(tokens: [
             .reserved(.sub, sourceIndex: 0),
-            .number("1", sourceIndex: 1)
-        ])
+            .number("1", sourceIndex: 1),
+            .reserved(.semicolon, sourceIndex: 2)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("0", sourceIndex: 1))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 1))
@@ -106,8 +112,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.equal, sourceIndex: 1),
-            .number("2", sourceIndex: 3)
-        ])
+            .number("2", sourceIndex: 3),
+            .reserved(.semicolon, sourceIndex: 4)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 3))
@@ -123,8 +130,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.notEqual, sourceIndex: 1),
-            .number("2", sourceIndex: 3)
-        ])
+            .number("2", sourceIndex: 3),
+            .reserved(.semicolon, sourceIndex: 3)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 3))
@@ -140,8 +148,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.greaterThan, sourceIndex: 1),
-            .number("2", sourceIndex: 2)
-        ])
+            .number("2", sourceIndex: 2),
+            .reserved(.semicolon, sourceIndex: 3)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
@@ -157,8 +166,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.greaterThanOrEqual, sourceIndex: 1),
-            .number("2", sourceIndex: 3)
-        ])
+            .number("2", sourceIndex: 3),
+            .reserved(.semicolon, sourceIndex: 4)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 3))
@@ -174,8 +184,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.lessThan, sourceIndex: 1),
-            .number("2", sourceIndex: 2)
-        ])
+            .number("2", sourceIndex: 2),
+            .reserved(.semicolon, sourceIndex: 3)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
@@ -191,8 +202,9 @@ final class OperatorsTest: XCTestCase {
         let node = try parse(tokens: [
             .number("1", sourceIndex: 0),
             .reserved(.lessThanOrEqual, sourceIndex: 1),
-            .number("2", sourceIndex: 3)
-        ])
+            .number("2", sourceIndex: 3),
+            .reserved(.semicolon, sourceIndex: 4)
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 3))

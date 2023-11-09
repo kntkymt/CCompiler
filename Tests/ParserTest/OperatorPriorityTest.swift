@@ -11,7 +11,8 @@ final class OperatorPriorityTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.add, sourceIndex: 3),
             .number("3", sourceIndex: 4),
-        ])
+            .reserved(.semicolon, sourceIndex: 5),
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
@@ -33,7 +34,8 @@ final class OperatorPriorityTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.mul, sourceIndex: 3),
             .number("3", sourceIndex: 4),
-        ])
+            .reserved(.semicolon, sourceIndex: 5),
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
@@ -55,7 +57,8 @@ final class OperatorPriorityTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.mul, sourceIndex: 3),
             .number("3", sourceIndex: 4),
-        ])
+            .reserved(.semicolon, sourceIndex: 5),
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("3", sourceIndex: 4))
@@ -79,7 +82,8 @@ final class OperatorPriorityTest: XCTestCase {
             .reserved(.parenthesisRight, sourceIndex: 4),
             .reserved(.mul, sourceIndex: 5),
             .number("3", sourceIndex: 6),
-        ])
+            .reserved(.semicolon, sourceIndex: 7),
+        ])[0]
 
         let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 1))
         let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 3))
