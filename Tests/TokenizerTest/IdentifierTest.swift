@@ -35,4 +35,12 @@ final class IdentifierTest: XCTestCase {
             ]
         )
     }
+
+    func testIdentifierNotAlphabet() throws {
+        do {
+            let tokens = try tokenize(source: "あ")
+        } catch let error as TokenizeError {
+            XCTAssertEqual(error, .unknownToken(index: 0))
+        }
+    }
 }
