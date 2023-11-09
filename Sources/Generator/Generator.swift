@@ -9,8 +9,8 @@ public func generate(node: Node) throws -> String {
 
     switch node.kind {
     case .number:
-        result += "    mov w0, #\(node.token.value)\n"
-        result += "    str w0, [sp, #-16]!\n"
+        result += "    mov x0, #\(node.token.value)\n"
+        result += "    str x0, [sp, #-16]!\n"
 
         return result
 
@@ -61,47 +61,47 @@ public func generate(node: Node) throws -> String {
         result += try generate(node: right)
 
         // 両方のノードの結果をpop
-        // rightが先に取れるので w0, w1, w0の順番
-        result += "    ldr w0, [sp]\n"
+        // rightが先に取れるので x0, x1, x0の順番
+        result += "    ldr x0, [sp]\n"
         result += "    add sp, sp, #16\n"
-        result += "    ldr w1, [sp]\n"
+        result += "    ldr x1, [sp]\n"
         result += "    add sp, sp, #16\n"
 
         switch node.kind {
         case .add:
-            result += "    add w0, w1, w0\n"
+            result += "    add x0, x1, x0\n"
 
         case .sub:
-            result += "    sub w0, w1, w0\n"
+            result += "    sub x0, x1, x0\n"
 
         case .mul:
-            result += "    mul w0, w1, w0\n"
+            result += "    mul x0, x1, x0\n"
 
         case .div:
-            result += "    sdiv w0, w1, w0\n"
+            result += "    sdiv x0, x1, x0\n"
 
         case .equal:
-            result += "    cmp w1, w0\n"
-            result += "    cset w0, eq\n"
+            result += "    cmp x1, x0\n"
+            result += "    cset x0, eq\n"
 
         case .notEqual:
-            result += "    cmp w1, w0\n"
-            result += "    cset w0, ne\n"
+            result += "    cmp x1, x0\n"
+            result += "    cset x0, ne\n"
 
         case .lessThan:
-            result += "    cmp w1, w0\n"
-            result += "    cset w0, lt\n"
+            result += "    cmp x1, x0\n"
+            result += "    cset x0, lt\n"
 
         case .lessThanOrEqual:
-            result += "    cmp w1, w0\n"
-            result += "    cset w0, le\n"
+            result += "    cmp x1, x0\n"
+            result += "    cset x0, le\n"
 
         default:
             break
         }
 
         // 演算結果をpush
-        result += "    str w0, [sp, #-16]!\n"
+        result += "    str x0, [sp, #-16]!\n"
 
         return result
     }
