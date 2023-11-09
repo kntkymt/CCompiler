@@ -62,7 +62,6 @@ public func parse(tokens: [Token]) throws -> [Node] {
         var nodes: [Node] = []
 
         while index < tokens.count {
-            print("\(index), \(tokens.count)")
             nodes.append(try stmt())
         }
 
@@ -85,6 +84,10 @@ public func parse(tokens: [Token]) throws -> [Node] {
     // assign = equality ("=" assign)?
     func assign() throws -> Node {
         var node = try equality()
+
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
 
         if case .reserved(.assign, _) = tokens[index] {
             let token = try consumeReservedToken(.assign)
