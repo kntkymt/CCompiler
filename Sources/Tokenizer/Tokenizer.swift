@@ -25,6 +25,23 @@ public func tokenize(source: String) throws -> [Token] {
         return .number(string, sourceIndex: startIndex)
     }
 
+    func extractIdentifier() -> Token {
+        var string = ""
+        let startIndex = index
+
+        while index < charactors.count {
+            let nextToken = charactors[index]
+            if nextToken.isLowerAlphabet {
+                string += String(nextToken)
+                index += 1
+            } else {
+                break
+            }
+        }
+
+        return .identifier(string, sourceIndex: startIndex)
+    }
+
     // 文字数が多い物からチェックしないといけない
     // 例: <= の時に<を先にチェックすると<, =の2つのトークンになってしまう
     let reservedKinds = Token.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
@@ -52,9 +69,8 @@ root:
             }
         }
 
-        if "a" <= charactors[index], charactors[index] <= "z" {
-            tokens.append(.identifier(charactors[index], sourceIndex: index))
-            index += 1
+        if charactors[index].isLowerAlphabet {
+            tokens.append(extractIdentifier())
             continue
         }
 
@@ -62,4 +78,10 @@ root:
     }
 
     return tokens
+}
+
+private extension Character {
+    var isLowerAlphabet: Bool {
+        "a" <= self && self <= "z"
+    }
 }

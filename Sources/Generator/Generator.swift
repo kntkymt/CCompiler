@@ -92,17 +92,26 @@ public func generate(node: Node) throws -> String {
     }
 }
 
+private var variableAddressOffset: [String: Int] = [:]
+
 /// nameの変数のアドレスをスタックにpushするコードを生成する
 private func generatePushLocalVariableAddress(node: Node) throws -> String {
-    guard node.kind == .localVariable, let variableName = node.token.value.first else {
+    guard node.kind == .localVariable else {
         throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
     }
 
     var result = ""
 
-    // BRから a, b, c, d...と固定で変数が確保されている想定
-    let offset = (variableName.asciiValue! - Character("a").asciiValue! + 1) * 8
+    let offset: Int = {
+        if let offset = variableAddressOffset[node.token.value] {
+            return offset
+        } else {
+            let offset = (variableAddressOffset.count + 1) * 8
+            variableAddressOffset[node.token.value] = offset
 
+            return offset
+        }
+    }()
     result += "    sub x0, x29, #\(offset)\n"
     result += "    str x0, [sp, #-16]!\n"
 
