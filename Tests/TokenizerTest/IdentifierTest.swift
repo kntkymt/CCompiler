@@ -30,8 +30,18 @@ final class IdentifierTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                .identifier("a", sourceIndex: 0),
-                .identifier("b", sourceIndex: 1)
+                .identifier("ab", sourceIndex: 0)
+            ]
+        )
+    }
+
+    func testIdentifierMulti2() throws {
+        let tokens = try tokenize(source: "ab hoge")
+        XCTAssertEqual(
+            tokens,
+            [
+                .identifier("ab", sourceIndex: 0),
+                .identifier("hoge", sourceIndex: 3)
             ]
         )
     }
