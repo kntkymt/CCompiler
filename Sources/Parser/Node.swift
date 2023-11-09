@@ -52,4 +52,10 @@ public enum NodeKind: Equatable {
 
     /// `<=`
     case lessThanOrEqual
+
+    /// assign to var e.g: a = 10
+    case assign
+
+    /// local variable
+    case localVariable
 }

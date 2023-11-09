@@ -4,6 +4,7 @@ public enum Token: Equatable {
 
     case reserved(_ kind: ReservedKind, sourceIndex: Int)
     case number(_ value: String, sourceIndex: Int)
+    case identifier(_ value: Character, sourceIndex: Int)
 
     public var value: String {
         switch self {
@@ -12,6 +13,9 @@ public enum Token: Equatable {
 
         case .number(let value, _):
             return value
+
+        case .identifier(let value, _):
+            return String(value)
         }
     }
 
@@ -21,6 +25,9 @@ public enum Token: Equatable {
             return sourceIndex
 
         case .number(_, let sourceIndex):
+            return sourceIndex
+
+        case .identifier(_, let sourceIndex):
             return sourceIndex
         }
     }
@@ -61,5 +68,11 @@ public enum Token: Equatable {
 
         /// `>=`
         case greaterThanOrEqual = ">="
+
+        /// `=`
+        case assign = "="
+
+        /// `;`
+        case semicolon = ";"
     }
 }
