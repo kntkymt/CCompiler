@@ -61,4 +61,7 @@ public enum NodeKind: Equatable {
 
     /// return statement
     case `return`
+
+    /// while statement
+    case `while`
 }

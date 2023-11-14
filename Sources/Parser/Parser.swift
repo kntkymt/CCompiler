@@ -84,20 +84,38 @@ public func parse(tokens: [Token]) throws -> [Node] {
     }
 
     // stmt    = expr ";"
+    //         | "while" "(" expr ")" stmt
     //         | "return" expr ";"
     func stmt() throws -> Node {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+
         let node: Node
 
-        if case .keyword(.return, _) = tokens[index] {
+        switch tokens[index] {
+        case .keyword(.return, _):
             let token = try consumeKeywordToken(.return)
 
             let left = try expr()
             node = Node(kind: .return, left: left, right: nil, token: token)
-        } else {
-            node = try expr()
-        }
+            try consumeReservedToken(.semicolon)
 
-        try consumeReservedToken(.semicolon)
+        case .keyword(.while, _):
+            let token = try consumeKeywordToken(.while)
+
+            try consumeReservedToken(.parenthesisLeft)
+            let condition = try expr()
+            try consumeReservedToken(.parenthesisRight)
+
+            let statement = try stmt()
+
+            node = Node(kind: .while, left: condition, right: statement, token: token)
+
+        default:
+            node = try expr()
+            try consumeReservedToken(.semicolon)
+        }
 
         return node
     }
