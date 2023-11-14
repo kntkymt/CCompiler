@@ -31,7 +31,7 @@ public func tokenize(source: String) throws -> [Token] {
 
         while index < charactors.count {
             let nextToken = charactors[index]
-            if nextToken.isLowerAlphabet {
+            if nextToken.isIdentifierCharactor {
                 string += String(nextToken)
                 index += 1
             } else {
@@ -45,6 +45,7 @@ public func tokenize(source: String) throws -> [Token] {
     // 文字数が多い物からチェックしないといけない
     // 例: <= の時に<を先にチェックすると<, =の2つのトークンになってしまう
     let reservedKinds = Token.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    let keywordKinds = Token.KeywordKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
 
 root:
     while index < charactors.count {
@@ -69,7 +70,25 @@ root:
             }
         }
 
-        if charactors[index].isLowerAlphabet {
+        for keywordKind in keywordKinds {
+            let keywordString = keywordKind.rawValue
+            if index + (keywordString.count - 1) < charactors.count,
+               String(charactors[index..<index+keywordString.count]) == keywordString {
+
+                // keywordの次がidentifierの文字だった場合はkeywordではなくidentifier
+                if index + (keywordString.count - 1) + 1 < charactors.count,
+                   charactors[index + keywordString.count].isIdentifierCharactor {
+                    break
+                }
+
+                tokens.append(.keyword(keywordKind, sourceIndex: index))
+                index += keywordString.count
+
+                continue root
+            }
+        }
+
+        if charactors[index].isIdentifierCharactor {
             tokens.append(extractIdentifier())
             continue
         }
@@ -81,7 +100,7 @@ root:
 }
 
 private extension Character {
-    var isLowerAlphabet: Bool {
-        "a" <= self && self <= "z"
+    var isIdentifierCharactor: Bool {
+        ("a" <= self && self <= "z") || ("A" <= self && self <= "Z") || ("0" <= self && self <= "9") || self == "_"
     }
 }

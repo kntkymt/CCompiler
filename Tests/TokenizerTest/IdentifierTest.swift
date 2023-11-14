@@ -46,6 +46,36 @@ final class IdentifierTest: XCTestCase {
         )
     }
 
+    func testIdentifierUpper() throws {
+        let tokens = try tokenize(source: "AB")
+        XCTAssertEqual(
+            tokens,
+            [
+                .identifier("AB", sourceIndex: 0)
+            ]
+        )
+    }
+
+    func testIdentifierNumber() throws {
+        let tokens = try tokenize(source: "A2")
+        XCTAssertEqual(
+            tokens,
+            [
+                .identifier("A2", sourceIndex: 0)
+            ]
+        )
+    }
+
+    func testIdentifierUnderScore() throws {
+        let tokens = try tokenize(source: "_")
+        XCTAssertEqual(
+            tokens,
+            [
+                .identifier("_", sourceIndex: 0)
+            ]
+        )
+    }
+
     func testIdentifierNotAlphabet() throws {
         do {
             _ = try tokenize(source: "あ")
