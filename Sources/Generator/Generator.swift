@@ -55,10 +55,10 @@ public func generate(node: Node) throws -> String {
             throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
         }
         let labelID = getLabelID()
-        let beginLabel = "Lbegin\(labelID)"
-        let endLabel = "Lend\(labelID)"
+        let beginLabel = ".Lbegin\(labelID)"
+        let endLabel = ".Lend\(labelID)"
 
-        result += ".\(beginLabel):\n"
+        result += "\(beginLabel):\n"
 
         result += try generate(node: condition)
 
@@ -66,13 +66,13 @@ public func generate(node: Node) throws -> String {
         result += "    add sp, sp, #16\n"
 
         result += "    cmp x0, #0\n"
-        result += "    beq .\(endLabel)\n"
+        result += "    beq \(endLabel)\n"
 
         result += try generate(node: statement)
 
-        result += "    b .\(beginLabel)\n"
+        result += "    b \(beginLabel)\n"
 
-        result += ".\(endLabel):\n"
+        result += "\(endLabel):\n"
 
         return result
 
@@ -81,7 +81,7 @@ public func generate(node: Node) throws -> String {
             throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
         }
         let labelID = getLabelID()
-        let endLabel = "Lend\(labelID)"
+        let endLabel = ".Lend\(labelID)"
 
         result += try generate(node: condition)
 
@@ -95,22 +95,22 @@ public func generate(node: Node) throws -> String {
                 throw GenerateError.invalidSyntax(index: right.token.sourceIndex)
             }
 
-            let elseLabel = "Lelse\(labelID)"
+            let elseLabel = ".Lelse\(labelID)"
 
-            result += "    beq .\(elseLabel)\n"
+            result += "    beq \(elseLabel)\n"
             result += try generate(node: trueCondition)
-            result += "    b .\(endLabel)\n"
+            result += "    b \(endLabel)\n"
 
-            result += ".\(elseLabel):\n"
+            result += "\(elseLabel):\n"
             result += try generate(node: falseCondition)
 
         } else {
-            result += "    beq .\(endLabel)\n"
+            result += "    beq \(endLabel)\n"
 
             result += try generate(node: right)
         }
 
-        result += ".\(endLabel):\n"
+        result += "\(endLabel):\n"
 
         return result
 
@@ -122,14 +122,14 @@ public func generate(node: Node) throws -> String {
         }
 
         let labelID = getLabelID()
-        let beginLabel = "Lbegin\(labelID)"
-        let endLabel = "Lend\(labelID)"
+        let beginLabel = ".Lbegin\(labelID)"
+        let endLabel = ".Lend\(labelID)"
 
         if let preExpr = node.left {
             result += try generate(node: preExpr)
         }
 
-        result += ".\(beginLabel):\n"
+        result += "\(beginLabel):\n"
 
         if let condition = forCondition.left {
             result += try generate(node: condition)
@@ -142,7 +142,7 @@ public func generate(node: Node) throws -> String {
         }
 
         result += "    cmp x0, #0\n"
-        result += "    beq .\(endLabel)\n"
+        result += "    beq \(endLabel)\n"
 
         result += try generate(node: statement)
 
@@ -150,9 +150,9 @@ public func generate(node: Node) throws -> String {
             result += try generate(node: postExpr)
         }
 
-        result += "    b .\(beginLabel)\n"
+        result += "    b \(beginLabel)\n"
 
-        result += ".\(endLabel):\n"
+        result += "\(endLabel):\n"
 
         return result
 
