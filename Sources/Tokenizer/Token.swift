@@ -85,5 +85,9 @@ public enum Token: Equatable {
 
     public enum KeywordKind: String, CaseIterable {
         case `return`
+        case `if`
+        case `else`
+        case `while`
+        case `for`
     }
 }

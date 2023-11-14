@@ -50,6 +50,112 @@ public func generate(node: Node) throws -> String {
 
         return result
 
+    case .while:
+        guard let condition = node.left, let statement = node.right else {
+            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
+        }
+        let labelID = getLabelID()
+        let beginLabel = ".Lbegin\(labelID)"
+        let endLabel = ".Lend\(labelID)"
+
+        result += "\(beginLabel):\n"
+
+        result += try generate(node: condition)
+
+        result += "    ldr x0, [sp]\n"
+        result += "    add sp, sp, #16\n"
+
+        result += "    cmp x0, #0\n"
+        result += "    beq \(endLabel)\n"
+
+        result += try generate(node: statement)
+
+        result += "    b \(beginLabel)\n"
+
+        result += "\(endLabel):\n"
+
+        return result
+
+    case .if:
+        guard let condition = node.left, let right = node.right else {
+            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
+        }
+        let labelID = getLabelID()
+        let endLabel = ".Lend\(labelID)"
+
+        result += try generate(node: condition)
+
+        result += "    ldr x0, [sp]\n"
+        result += "    add sp, sp, #16\n"
+
+        result += "    cmp x0, #0\n"
+
+        if right.kind == .else {
+            guard let trueCondition = right.left, let falseCondition = right.right else {
+                throw GenerateError.invalidSyntax(index: right.token.sourceIndex)
+            }
+
+            let elseLabel = ".Lelse\(labelID)"
+
+            result += "    beq \(elseLabel)\n"
+            result += try generate(node: trueCondition)
+            result += "    b \(endLabel)\n"
+
+            result += "\(elseLabel):\n"
+            result += try generate(node: falseCondition)
+
+        } else {
+            result += "    beq \(endLabel)\n"
+
+            result += try generate(node: right)
+        }
+
+        result += "\(endLabel):\n"
+
+        return result
+
+    case .for:
+        guard let forCondition = node.right,
+              let forBody = forCondition.right,
+              let statement = forBody.left else {
+            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
+        }
+
+        let labelID = getLabelID()
+        let beginLabel = ".Lbegin\(labelID)"
+        let endLabel = ".Lend\(labelID)"
+
+        if let preExpr = node.left {
+            result += try generate(node: preExpr)
+        }
+
+        result += "\(beginLabel):\n"
+
+        if let condition = forCondition.left {
+            result += try generate(node: condition)
+
+            result += "    ldr x0, [sp]\n"
+            result += "    add sp, sp, #16\n"
+        } else {
+            // 条件がない場合はtrue
+            result += "    mov x0, #1\n"
+        }
+
+        result += "    cmp x0, #0\n"
+        result += "    beq \(endLabel)\n"
+
+        result += try generate(node: statement)
+
+        if let postExpr = forBody.right {
+            result += try generate(node: postExpr)
+        }
+
+        result += "    b \(beginLabel)\n"
+
+        result += "\(endLabel):\n"
+
+        return result
+
     default:
         // それ以外の演算
 
@@ -112,6 +218,14 @@ public func generate(node: Node) throws -> String {
 
         return result
     }
+}
+
+private var labelCount = 0
+func getLabelID() -> String {
+    let id = labelCount
+    labelCount += 1
+
+    return id.description
 }
 
 private var variableAddressOffset: [String: Int] = [:]
