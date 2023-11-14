@@ -114,6 +114,48 @@ public func generate(node: Node) throws -> String {
 
         return result
 
+    case .for:
+        guard let forCondition = node.right,
+              let forBody = forCondition.right,
+              let statement = forBody.left else {
+            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
+        }
+
+        let labelID = getLabelID()
+        let beginLabel = "Lbegin\(labelID)"
+        let endLabel = "Lend\(labelID)"
+
+        if let preExpr = node.left {
+            result += try generate(node: preExpr)
+        }
+
+        result += ".\(beginLabel):\n"
+
+        if let condition = forCondition.left {
+            result += try generate(node: condition)
+
+            result += "    ldr x0, [sp]\n"
+            result += "    add sp, sp, #16\n"
+        } else {
+            // 条件がない場合はtrue
+            result += "    mov x0, #1\n"
+        }
+
+        result += "    cmp x0, #0\n"
+        result += "    beq .\(endLabel)\n"
+
+        result += try generate(node: statement)
+
+        if let postExpr = forBody.right {
+            result += try generate(node: postExpr)
+        }
+
+        result += "    b .\(beginLabel)\n"
+
+        result += ".\(endLabel):\n"
+
+        return result
+
     default:
         // それ以外の演算
 
