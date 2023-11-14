@@ -55,6 +55,21 @@ public func parse(tokens: [Token]) throws -> [Node] {
         }
     }
 
+    @discardableResult
+    func consumeKeywordToken(_ keywordKind: Token.KeywordKind) throws -> Token {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+
+        if case .keyword(let kind, _) = tokens[index], kind == keywordKind {
+            let token = tokens[index]
+            index += 1
+            return token
+        } else {
+            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+        }
+    }
+
     // MARK: - Syntax
 
     // program = stmt*
@@ -68,9 +83,20 @@ public func parse(tokens: [Token]) throws -> [Node] {
         return nodes
     }
 
-    // stmt = expr ";"
+    // stmt    = expr ";"
+    //         | "return" expr ";"
     func stmt() throws -> Node {
-        let node = try expr()
+        let node: Node
+
+        if case .keyword(.return, _) = tokens[index] {
+            let token = try consumeKeywordToken(.return)
+
+            let left = try expr()
+            node = Node(kind: .return, left: left, right: nil, token: token)
+        } else {
+            node = try expr()
+        }
+
         try consumeReservedToken(.semicolon)
 
         return node

@@ -3,12 +3,16 @@ public enum Token: Equatable {
     // MARK: - Property
 
     case reserved(_ kind: ReservedKind, sourceIndex: Int)
+    case keyword(_ kind: KeywordKind, sourceIndex: Int)
     case number(_ value: String, sourceIndex: Int)
     case identifier(_ value: String, sourceIndex: Int)
 
     public var value: String {
         switch self {
         case .reserved(let kind, _):
+            return kind.rawValue
+
+        case .keyword(let kind, _):
             return kind.rawValue
 
         case .number(let value, _):
@@ -22,6 +26,9 @@ public enum Token: Equatable {
     public var sourceIndex: Int {
         switch self {
         case .reserved(_, let sourceIndex):
+            return sourceIndex
+
+        case .keyword(_, let sourceIndex):
             return sourceIndex
 
         case .number(_, let sourceIndex):
@@ -74,5 +81,9 @@ public enum Token: Equatable {
 
         /// `;`
         case semicolon = ";"
+    }
+
+    public enum KeywordKind: String, CaseIterable {
+        case `return`
     }
 }

@@ -58,4 +58,7 @@ public enum NodeKind: Equatable {
 
     /// local variable
     case localVariable
+
+    /// return statement
+    case `return`
 }
