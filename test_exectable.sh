@@ -38,5 +38,6 @@ assert 2 "a=b=1;return a + b;"
 assert 14 "a = 3;b = 5 * 6 - 8;return a + b / 2;"
 assert 15 "hoge = 5;fuga = 3;return hoge * fuga;"
 assert 1 "return 1; return 0;"
+assert 12 "a = 0;while (a < 10) a=a+3;return a;"
 
 echo OK

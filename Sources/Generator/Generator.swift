@@ -50,6 +50,32 @@ public func generate(node: Node) throws -> String {
 
         return result
 
+    case .while:
+        guard let condition = node.left, let statement = node.right else {
+            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
+        }
+        let labelID = getLabelID()
+        let beginLabel = "Lbegin\(labelID)"
+        let endLabel = "Lend\(labelID)"
+
+        result += ".\(beginLabel):\n"
+
+        result += try generate(node: condition)
+
+        result += "    ldr x0, [sp]\n"
+        result += "    add sp, sp, #16\n"
+
+        result += "    cmp x0, #0\n"
+        result += "    beq .\(endLabel)\n"
+
+        result += try generate(node: statement)
+
+        result += "    b .\(beginLabel)\n"
+
+        result += ".\(endLabel):\n"
+
+        return result
+
     default:
         // それ以外の演算
 
@@ -112,6 +138,14 @@ public func generate(node: Node) throws -> String {
 
         return result
     }
+}
+
+private var labelCount = 0
+func getLabelID() -> String {
+    let id = labelCount
+    labelCount += 1
+
+    return id.description
 }
 
 private var variableAddressOffset: [String: Int] = [:]
