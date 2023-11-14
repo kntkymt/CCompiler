@@ -6,8 +6,8 @@ public final class Node: Equatable {
 
     public let kind: NodeKind
 
-    public let left: Node?
-    public let right: Node?
+    public var left: Node?
+    public var right: Node?
 
     public let token: Token
 
@@ -70,4 +70,13 @@ public enum NodeKind: Equatable {
 
     /// if else statement
     case `else`
+
+    /// for statement start
+    case `for`
+
+    /// for statement condintion
+    case forCondition
+
+    /// for body
+    case forBody
 }

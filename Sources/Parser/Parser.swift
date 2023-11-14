@@ -86,6 +86,7 @@ public func parse(tokens: [Token]) throws -> [Node] {
     // stmt    = expr ";"
     //         | "if" "(" expr ")" stmt ("else" stmt)?
     //         | "while" "(" expr ")" stmt
+    //         | "for" "(" expr? ";" expr? ";" expr? ")" stmt
     //         | "return" expr ";"
     func stmt() throws -> Node {
         if index >= tokens.count {
@@ -130,6 +131,50 @@ public func parse(tokens: [Token]) throws -> [Node] {
             let statement = try stmt()
 
             node = Node(kind: .while, left: condition, right: statement, token: token)
+
+        case .keyword(.for, _):
+            //           for
+            //      pre       forCondition
+            //           condition        forBody
+            //                      statement       post
+            let forToken = try consumeKeywordToken(.for)
+            node = Node(kind: .for, left: nil, right: nil, token: forToken)
+
+            try consumeReservedToken(.parenthesisLeft)
+
+            if case .reserved(.semicolon, _) = tokens[index] {
+                try consumeReservedToken(.semicolon)
+            } else {
+                let preExpr = try expr()
+                try consumeReservedToken(.semicolon)
+
+                node.left = preExpr
+            }
+
+            // FIXME: forのASTのNodeを一個にしたい
+            node.right = Node(kind: .forCondition, left: nil, right: nil, token: forToken)
+
+            if case .reserved(.semicolon, _) = tokens[index] {
+                try consumeReservedToken(.semicolon)
+            } else {
+                let condition = try expr()
+                try consumeReservedToken(.semicolon)
+                
+                node.right?.left = condition
+            }
+
+            node.right?.right = Node(kind: .forBody, left: nil, right: nil, token: forToken)
+
+            if case .reserved(.parenthesisRight, _) = tokens[index] {
+                try consumeReservedToken(.parenthesisRight)
+            } else {
+                let postExpr = try expr()
+                try consumeReservedToken(.parenthesisRight)
+
+                node.right?.right?.right = postExpr
+            }
+
+            node.right?.right?.left = try stmt()
 
         case .keyword(.return, _):
             let token = try consumeKeywordToken(.return)
