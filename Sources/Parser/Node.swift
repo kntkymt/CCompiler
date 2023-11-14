@@ -64,4 +64,10 @@ public enum NodeKind: Equatable {
 
     /// while statement
     case `while`
+
+    /// if statement
+    case `if`
+
+    /// if else statement
+    case `else`
 }

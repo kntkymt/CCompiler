@@ -84,6 +84,7 @@ public func parse(tokens: [Token]) throws -> [Node] {
     }
 
     // stmt    = expr ";"
+    //         | "if" "(" expr ")" stmt ("else" stmt)?
     //         | "while" "(" expr ")" stmt
     //         | "return" expr ";"
     func stmt() throws -> Node {
@@ -94,12 +95,30 @@ public func parse(tokens: [Token]) throws -> [Node] {
         let node: Node
 
         switch tokens[index] {
-        case .keyword(.return, _):
-            let token = try consumeKeywordToken(.return)
+        case .keyword(.if, _):
+            let ifToken = try consumeKeywordToken(.if)
 
-            let left = try expr()
-            node = Node(kind: .return, left: left, right: nil, token: token)
-            try consumeReservedToken(.semicolon)
+            try consumeReservedToken(.parenthesisLeft)
+            let condition = try expr()
+            try consumeReservedToken(.parenthesisRight)
+
+            let trueStatement = try stmt()
+
+            // if-elseの場合
+            //             if
+            // condition        else
+            //             true       false
+            if index < tokens.count, case .keyword(.else, _) = tokens[index] {
+                let elseToken = try consumeKeywordToken(.else)
+                let falseStatement = try stmt()
+
+                let elseNode = Node(kind: .else, left: trueStatement, right: falseStatement, token: elseToken)
+
+                node = Node(kind: .if, left: condition, right: elseNode, token: ifToken)
+
+            } else {
+                node = Node(kind: .if, left: condition, right: trueStatement, token: ifToken)
+            }
 
         case .keyword(.while, _):
             let token = try consumeKeywordToken(.while)
@@ -111,6 +130,13 @@ public func parse(tokens: [Token]) throws -> [Node] {
             let statement = try stmt()
 
             node = Node(kind: .while, left: condition, right: statement, token: token)
+
+        case .keyword(.return, _):
+            let token = try consumeKeywordToken(.return)
+
+            let left = try expr()
+            node = Node(kind: .return, left: left, right: nil, token: token)
+            try consumeReservedToken(.semicolon)
 
         default:
             node = try expr()
