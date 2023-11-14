@@ -66,15 +66,5 @@ public func compile(_ source: String) throws -> String {
         }
     }
 
-    // エピローグ
-    // spを元の位置に戻す
-    compiled += "    mov sp, x29\n"
-
-    // 古いBR, 古いLRを復帰
-    compiled += "    ldp x29, x30, [x29]\n"
-    compiled += "    add sp, sp, #16\n"
-
-    compiled += "    ret\n"
-
     return compiled
 }

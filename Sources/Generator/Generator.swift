@@ -28,6 +28,28 @@ public func generate(node: Node) throws -> String {
 
         return result
 
+    case .return:
+        guard let left = node.left else {
+            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
+        }
+
+        // return結果をスタックにpush
+        result += try generate(node: left)
+        result += "    ldr x0, [sp]\n"
+        result += "    add sp, sp, #16\n"
+
+        // エピローグ
+        // spを元の位置に戻す
+        result += "    mov sp, x29\n"
+
+        // 古いBR, 古いLRを復帰
+        result += "    ldp x29, x30, [x29]\n"
+        result += "    add sp, sp, #16\n"
+
+        result += "    ret\n"
+
+        return result
+
     default:
         // それ以外の演算
 
