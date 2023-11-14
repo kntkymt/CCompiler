@@ -76,6 +76,44 @@ public func generate(node: Node) throws -> String {
 
         return result
 
+    case .if:
+        guard let condition = node.left, let right = node.right else {
+            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
+        }
+        let labelID = getLabelID()
+        let endLabel = "Lend\(labelID)"
+
+        result += try generate(node: condition)
+
+        result += "    ldr x0, [sp]\n"
+        result += "    add sp, sp, #16\n"
+
+        result += "    cmp x0, #0\n"
+
+        if right.kind == .else {
+            guard let trueCondition = right.left, let falseCondition = right.right else {
+                throw GenerateError.invalidSyntax(index: right.token.sourceIndex)
+            }
+
+            let elseLabel = "Lelse\(labelID)"
+
+            result += "    beq .\(elseLabel)\n"
+            result += try generate(node: trueCondition)
+            result += "    b .\(endLabel)\n"
+
+            result += ".\(elseLabel):\n"
+            result += try generate(node: falseCondition)
+
+        } else {
+            result += "    beq .\(endLabel)\n"
+
+            result += try generate(node: right)
+        }
+
+        result += ".\(endLabel):\n"
+
+        return result
+
     default:
         // それ以外の演算
 
