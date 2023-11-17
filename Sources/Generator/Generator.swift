@@ -4,19 +4,29 @@ public enum GenerateError: Error {
     case invalidSyntax(index: Int)
 }
 
-public func generate(node: Node) throws -> String {
+extension NodeProtocol {
+    func casted<T: NodeProtocol>(_ type: T.Type) throws -> T {
+        guard let casted = self as? T else { throw GenerateError.invalidSyntax(index: self.sourceTokens[0].sourceIndex) }
+
+        return casted
+    }
+}
+
+public func generate(node: any NodeProtocol) throws -> String {
     var result = ""
 
     switch node.kind {
-    case .number:
-        result += "    mov x0, #\(node.token.value)\n"
+    case .integerLiteral:
+        let casted = try node.casted(IntegerLiteralNode.self)
+        result += "    mov x0, #\(casted.literal)\n"
         result += "    str x0, [sp, #-16]!\n"
 
         return result
 
-    case .localVariable:
+    case .identifier:
+        let casted = try node.casted(IdentifierNode.self)
         // アドレスをpush
-        result += try generatePushLocalVariableAddress(node: node)
+        result += try generatePushLocalVariableAddress(node: casted)
 
         // アドレスをpop
         result += "    ldr x0, [sp]\n"
@@ -28,13 +38,11 @@ public func generate(node: Node) throws -> String {
 
         return result
 
-    case .return:
-        guard let left = node.left else {
-            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
-        }
+    case .returnStatement:
+        let casted = try node.casted(ReturnStatementNode.self)
 
         // return結果をスタックにpush
-        result += try generate(node: left)
+        result += try generate(node: casted.expression)
         result += "    ldr x0, [sp]\n"
         result += "    add sp, sp, #16\n"
 
@@ -50,17 +58,15 @@ public func generate(node: Node) throws -> String {
 
         return result
 
-    case .while:
-        guard let condition = node.left, let statement = node.right else {
-            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
-        }
+    case .whileStatement:
+        let casted = try node.casted(WhileStatementNode.self)
         let labelID = getLabelID()
         let beginLabel = ".Lbegin\(labelID)"
         let endLabel = ".Lend\(labelID)"
 
         result += "\(beginLabel):\n"
 
-        result += try generate(node: condition)
+        result += try generate(node: casted.condition)
 
         result += "    ldr x0, [sp]\n"
         result += "    add sp, sp, #16\n"
@@ -68,7 +74,7 @@ public func generate(node: Node) throws -> String {
         result += "    cmp x0, #0\n"
         result += "    beq \(endLabel)\n"
 
-        result += try generate(node: statement)
+        result += try generate(node: casted.body)
 
         result += "    b \(beginLabel)\n"
 
@@ -76,62 +82,52 @@ public func generate(node: Node) throws -> String {
 
         return result
 
-    case .if:
-        guard let condition = node.left, let right = node.right else {
-            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
-        }
+    case .ifStatement:
+        let casted = try node.casted(IfStatementNode.self)
         let labelID = getLabelID()
         let endLabel = ".Lend\(labelID)"
 
-        result += try generate(node: condition)
+        result += try generate(node: casted.condition)
 
         result += "    ldr x0, [sp]\n"
         result += "    add sp, sp, #16\n"
 
         result += "    cmp x0, #0\n"
 
-        if right.kind == .else {
-            guard let trueCondition = right.left, let falseCondition = right.right else {
-                throw GenerateError.invalidSyntax(index: right.token.sourceIndex)
-            }
-
+        if let falseBody = casted.falseBody {
             let elseLabel = ".Lelse\(labelID)"
 
             result += "    beq \(elseLabel)\n"
-            result += try generate(node: trueCondition)
+            result += try generate(node: casted.trueBody)
             result += "    b \(endLabel)\n"
 
             result += "\(elseLabel):\n"
-            result += try generate(node: falseCondition)
+            result += try generate(node: falseBody)
 
         } else {
             result += "    beq \(endLabel)\n"
 
-            result += try generate(node: right)
+            result += try generate(node: casted.trueBody)
         }
 
         result += "\(endLabel):\n"
 
         return result
 
-    case .for:
-        guard let forCondition = node.right,
-              let forBody = forCondition.right,
-              let statement = forBody.left else {
-            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
-        }
+    case .forStatement:
+        let casted = try node.casted(ForStatementNode.self)
 
         let labelID = getLabelID()
         let beginLabel = ".Lbegin\(labelID)"
         let endLabel = ".Lend\(labelID)"
 
-        if let preExpr = node.left {
+        if let preExpr = casted.pre {
             result += try generate(node: preExpr)
         }
 
         result += "\(beginLabel):\n"
 
-        if let condition = forCondition.left {
+        if let condition = casted.condition {
             result += try generate(node: condition)
 
             result += "    ldr x0, [sp]\n"
@@ -144,9 +140,9 @@ public func generate(node: Node) throws -> String {
         result += "    cmp x0, #0\n"
         result += "    beq \(endLabel)\n"
 
-        result += try generate(node: statement)
+        result += try generate(node: casted.body)
 
-        if let postExpr = forBody.right {
+        if let postExpr = casted.post {
             result += try generate(node: postExpr)
         }
 
@@ -156,67 +152,85 @@ public func generate(node: Node) throws -> String {
 
         return result
 
-    default:
-        // それ以外の演算
+    case .infixOperatorExpr:
+        let casted = try node.casted(InfixOperatorExpressionNode.self)
 
-        guard let left = node.left, let right = node.right else {
-            throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
-        }
+        if casted.operator is AssignNode {
+            result += try generatePushLocalVariableAddress(node: casted.left.casted(IdentifierNode.self))
+            result += try generate(node: casted.right)
 
-        if node.kind == .assign {
-            result += try generatePushLocalVariableAddress(node: left)
-        } else {
-            result += try generate(node: left)
-        }
-        result += try generate(node: right)
+            // 両方のノードの結果をpop
+            // rightが先に取れるので x0, x1, x0の順番
+            result += "    ldr x0, [sp]\n"
+            result += "    add sp, sp, #16\n"
+            result += "    ldr x1, [sp]\n"
+            result += "    add sp, sp, #16\n"
 
-        // 両方のノードの結果をpop
-        // rightが先に取れるので x0, x1, x0の順番
-        result += "    ldr x0, [sp]\n"
-        result += "    add sp, sp, #16\n"
-        result += "    ldr x1, [sp]\n"
-        result += "    add sp, sp, #16\n"
-
-        switch node.kind {
-        case .add:
-            result += "    add x0, x1, x0\n"
-
-        case .sub:
-            result += "    sub x0, x1, x0\n"
-
-        case .mul:
-            result += "    mul x0, x1, x0\n"
-
-        case .div:
-            result += "    sdiv x0, x1, x0\n"
-
-        case .equal:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, eq\n"
-
-        case .notEqual:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, ne\n"
-
-        case .lessThan:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, lt\n"
-
-        case .lessThanOrEqual:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, le\n"
-
-        case .assign:
+            // assign
             result += "    str x0, [x1]\n"
 
-        default:
-            break
+            result += "    str x0, [sp, #-16]!\n"
+
+
+        } else if let binaryOperator = casted.operator as? BinaryOperatorNode {
+            result += try generate(node: casted.left)
+            result += try generate(node: casted.right)
+
+            // 両方のノードの結果をpop
+            // rightが先に取れるので x0, x1, x0の順番
+            result += "    ldr x0, [sp]\n"
+            result += "    add sp, sp, #16\n"
+            result += "    ldr x1, [sp]\n"
+            result += "    add sp, sp, #16\n"
+
+            switch binaryOperator.operatorKind {
+            case .add:
+                result += "    add x0, x1, x0\n"
+
+            case .sub:
+                result += "    sub x0, x1, x0\n"
+
+            case .mul:
+                result += "    mul x0, x1, x0\n"
+
+            case .div:
+                result += "    sdiv x0, x1, x0\n"
+
+            case .equal:
+                result += "    cmp x1, x0\n"
+                result += "    cset x0, eq\n"
+
+            case .notEqual:
+                result += "    cmp x1, x0\n"
+                result += "    cset x0, ne\n"
+
+            case .lessThan:
+                result += "    cmp x1, x0\n"
+                result += "    cset x0, lt\n"
+
+            case .lessThanOrEqual:
+                result += "    cmp x1, x0\n"
+                result += "    cset x0, le\n"
+
+            case .greaterThan:
+                result += "    cmp x1, x0\n"
+                result += "    cset x0, gt\n"
+
+            case .greaterThanOrEqual:
+                result += "    cmp x1, x0\n"
+                result += "    cset x0, ge\n"
+            }
+
+            result += "    str x0, [sp, #-16]!\n"
+
+        } else {
+            throw GenerateError.invalidSyntax(index: node.sourceTokens[0].sourceIndex)
         }
 
-        // 演算結果をpush
-        result += "    str x0, [sp, #-16]!\n"
-
         return result
+
+    default:
+        throw GenerateError.invalidSyntax(index: node.sourceTokens[0].sourceIndex)
     }
 }
 
@@ -231,19 +245,15 @@ func getLabelID() -> String {
 private var variableAddressOffset: [String: Int] = [:]
 
 /// nameの変数のアドレスをスタックにpushするコードを生成する
-private func generatePushLocalVariableAddress(node: Node) throws -> String {
-    guard node.kind == .localVariable else {
-        throw GenerateError.invalidSyntax(index: node.token.sourceIndex)
-    }
-
+private func generatePushLocalVariableAddress(node: IdentifierNode) throws -> String {
     var result = ""
 
     let offset: Int = {
-        if let offset = variableAddressOffset[node.token.value] {
+        if let offset = variableAddressOffset[node.identifierName] {
             return offset
         } else {
             let offset = (variableAddressOffset.count + 1) * 8
-            variableAddressOffset[node.token.value] = offset
+            variableAddressOffset[node.identifierName] = offset
 
             return offset
         }

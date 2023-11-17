@@ -5,214 +5,235 @@ import Tokenizer
 final class OperatorsTest: XCTestCase {
 
     func testAdd() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.add, sourceIndex: 1),
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
-        let rootNode = Node(kind: .add, left: leftNode, right: rightNode, token: .reserved(.add, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testSub() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.sub, sourceIndex: 1),
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
-        let rootNode = Node(kind: .sub, left: leftNode, right: rightNode, token: .reserved(.sub, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testMul() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.mul, sourceIndex: 1),
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
-        let rootNode = Node(kind: .mul, left: leftNode, right: rightNode, token: .reserved(.mul, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testDiv() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.div, sourceIndex: 1),
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
-        let rootNode = Node(kind: .div, left: leftNode, right: rightNode, token: .reserved(.div, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testUnaryAdd() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .reserved(.add, sourceIndex: 0),
             .number("1", sourceIndex: 1),
             .reserved(.semicolon, sourceIndex: 2)
-        ])[0]
-
-        let numberNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            numberNode
+            node as! IntegerLiteralNode,
+            IntegerLiteralNode(token: tokens[1])
         )
     }
 
     func testUnarySub() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .reserved(.sub, sourceIndex: 0),
             .number("1", sourceIndex: 1),
             .reserved(.semicolon, sourceIndex: 2)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("0", sourceIndex: 1))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 1))
-        let rootNode = Node(kind: .sub, left: leftNode, right: rightNode, token: .reserved(.sub, sourceIndex: 0))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[0]),
+                left: IntegerLiteralNode(token: .number("0", sourceIndex: 1)),
+                right: IntegerLiteralNode(token: tokens[1]),
+                sourceTokens: Array(tokens[0...1])
+            )
         )
     }
 
     func testEqual() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.equal, sourceIndex: 1),
             .number("2", sourceIndex: 3),
             .reserved(.semicolon, sourceIndex: 4)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 3))
-        let rootNode = Node(kind: .equal, left: leftNode, right: rightNode, token: .reserved(.equal, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testNotEqual() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.notEqual, sourceIndex: 1),
             .number("2", sourceIndex: 3),
-            .reserved(.semicolon, sourceIndex: 3)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 3))
-        let rootNode = Node(kind: .notEqual, left: leftNode, right: rightNode, token: .reserved(.notEqual, sourceIndex: 1))
+            .reserved(.semicolon, sourceIndex: 4)
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testGreaterThan() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.greaterThan, sourceIndex: 1),
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
-        let rootNode = Node(kind: .lessThan, left: rightNode, right: leftNode, token: .reserved(.greaterThan, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testGreaterThanOrEqual() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.greaterThanOrEqual, sourceIndex: 1),
             .number("2", sourceIndex: 3),
             .reserved(.semicolon, sourceIndex: 4)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 3))
-        let rootNode = Node(kind: .lessThanOrEqual, left: rightNode, right: leftNode, token: .reserved(.greaterThanOrEqual, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testLessThan() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.lessThan, sourceIndex: 1),
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
-        let rootNode = Node(kind: .lessThan, left: leftNode, right: rightNode, token: .reserved(.lessThan, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testLessThanOrEqual() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.lessThanOrEqual, sourceIndex: 1),
             .number("2", sourceIndex: 3),
             .reserved(.semicolon, sourceIndex: 4)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 3))
-        let rootNode = Node(kind: .lessThanOrEqual, left: leftNode, right: rightNode, token: .reserved(.lessThanOrEqual, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 }

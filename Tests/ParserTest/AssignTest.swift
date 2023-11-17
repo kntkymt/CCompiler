@@ -5,62 +5,70 @@ import Tokenizer
 final class AssignTest: XCTestCase {
 
     func testAssignToVar() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .identifier("a", sourceIndex: 0),
             .reserved(.assign, sourceIndex: 1),
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
-        ])[0]
-
-        let leftNode = Node(kind: .localVariable, left: nil, right: nil, token: .identifier("a", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
-        let rootNode = Node(kind: .assign, left: leftNode, right: rightNode, token: .reserved(.assign, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: AssignNode(token: tokens[1]),
+                left: IdentifierNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]), 
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 
     func testAssignTo2Var() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .identifier("a", sourceIndex: 0),
             .reserved(.assign, sourceIndex: 1),
             .identifier("b", sourceIndex: 2),
             .reserved(.assign, sourceIndex: 3),
             .number("2", sourceIndex: 4),
             .reserved(.semicolon, sourceIndex: 5)
-        ])[0]
-
-        let childLeft = Node(kind: .localVariable, left: nil, right: nil, token: .identifier("b", sourceIndex: 2))
-        let childRight = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 4))
-        let childNode = Node(kind: .assign, left: childLeft, right: childRight, token: .reserved(.assign, sourceIndex: 3))
-
-        let leftNode = Node(kind: .localVariable, left: nil, right: nil, token: .identifier("a", sourceIndex: 0))
-        let rootNode = Node(kind: .assign, left: leftNode, right: childNode, token: .reserved(.assign, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: AssignNode(token: tokens[1]),
+                left: IdentifierNode(token: tokens[0]),
+                right: InfixOperatorExpressionNode(
+                    operator: AssignNode(token: tokens[3]),
+                    left: IdentifierNode(token: tokens[2]),
+                    right: IntegerLiteralNode(token: tokens[4]), 
+                    sourceTokens: Array(tokens[2...4])
+                ),
+                sourceTokens: Array(tokens[0...4])
+            )
         )
     }
 
     // 数への代入は文法上は許される、意味解析で排除する
     func testAssingToNumber() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .number("1", sourceIndex: 0),
             .reserved(.assign, sourceIndex: 1),
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
-        ])[0]
-
-        let leftNode = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 0))
-        let rightNode = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 2))
-        let rootNode = Node(kind: .assign, left: leftNode, right: rightNode, token: .reserved(.assign, sourceIndex: 1))
+        ]
+        let node = try parse(tokens: tokens)[0]
 
         XCTAssertEqual(
-            node,
-            rootNode
+            node as! InfixOperatorExpressionNode,
+            InfixOperatorExpressionNode(
+                operator: AssignNode(token: tokens[1]),
+                left: IntegerLiteralNode(token: tokens[0]),
+                right: IntegerLiteralNode(token: tokens[2]),
+                sourceTokens: Array(tokens[0...2])
+            )
         )
     }
 }
