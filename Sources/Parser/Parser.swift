@@ -96,6 +96,21 @@ public func parse(tokens: [Token]) throws -> [any NodeProtocol] {
         let startIndex = index
 
         switch tokens[index] {
+        case .reserved(.braceLeft, _):
+            try consumeReservedToken(.braceLeft)
+
+            var statements: [any NodeProtocol] = []
+            while index < tokens.count {
+                if index < tokens.count, case .reserved(.braceRight, _) = tokens[index] {
+                    try consumeReservedToken(.braceRight)
+                    break
+                }
+
+                statements.append(try stmt())
+            }
+
+            return BlockStatementNode(statements: statements, sourceTokens: Array(tokens[startIndex..<index]))
+
         case .keyword(.if, _):
             let ifToken = try consumeKeywordToken(.if)
 

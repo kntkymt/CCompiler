@@ -8,10 +8,12 @@ public enum NodeKind {
     case assign
 
     case infixOperatorExpr
+
     case ifStatement
     case whileStatement
     case forStatement
     case returnStatement
+    case blockStatement
 }
 
 public protocol NodeProtocol: Equatable {
