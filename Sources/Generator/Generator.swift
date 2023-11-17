@@ -38,6 +38,19 @@ public func generate(node: any NodeProtocol) throws -> String {
 
         return result
 
+    case .blockStatement:
+        let casted = try node.casted(BlockStatementNode.self)
+
+        for statement in casted.statements {
+            result += try generate(node: statement)
+
+            // いらない結果をpop
+            result += "    ldr x0, [sp]\n"
+            result += "    add sp, sp, #16\n"
+        }
+
+        return result
+
     case .returnStatement:
         let casted = try node.casted(ReturnStatementNode.self)
 
