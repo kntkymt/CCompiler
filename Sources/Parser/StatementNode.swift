@@ -6,6 +6,7 @@ public class WhileStatementNode: NodeProtocol {
 
     public let token: Token
     public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { [condition, body] }
 
     public var condition: any NodeProtocol
     public var body: any NodeProtocol
@@ -15,12 +16,6 @@ public class WhileStatementNode: NodeProtocol {
         self.condition = condition
         self.body = body
         self.sourceTokens = sourceTokens
-    }
-
-    public static func == (lhs: WhileStatementNode, rhs: WhileStatementNode) -> Bool {
-        lhs.sourceTokens == rhs.sourceTokens
-        && AnyNode(lhs.condition) == AnyNode(rhs.condition)
-        && AnyNode(lhs.body) == AnyNode(rhs.body)
     }
 }
 
@@ -36,6 +31,23 @@ public class ForStatementNode: NodeProtocol {
     public var body: any NodeProtocol
 
     public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] {
+        var result: [any NodeProtocol] = [body]
+
+        if let pre {
+            result.append(pre)
+        }
+
+        if let post {
+            result.append(post)
+        }
+
+        if let condition {
+            result.append(condition)
+        }
+
+        return result
+    }
 
     init(token: Token, condition: (any NodeProtocol)?, pre: (any NodeProtocol)?, post: (any NodeProtocol)?, body: any NodeProtocol, sourceTokens: [Token]) {
         self.token = token
@@ -44,14 +56,6 @@ public class ForStatementNode: NodeProtocol {
         self.post = post
         self.body = body
         self.sourceTokens = sourceTokens
-    }
-
-    public static func == (lhs: ForStatementNode, rhs: ForStatementNode) -> Bool {
-        lhs.sourceTokens == rhs.sourceTokens
-        && AnyNode(lhs.condition) == AnyNode(rhs.condition)
-        && AnyNode(lhs.pre) == AnyNode(rhs.pre)
-        && AnyNode(lhs.post) == AnyNode(rhs.post)
-        && AnyNode(lhs.body) == AnyNode(rhs.body)
     }
 }
 
@@ -67,6 +71,15 @@ public class IfStatementNode: NodeProtocol {
     public var falseBody: (any NodeProtocol)?
 
     public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] {
+        var result: [any NodeProtocol] = [condition, trueBody]
+
+        if let falseBody {
+            result.append(falseBody)
+        }
+
+        return result
+    }
 
     init(ifToken: Token, condition: any NodeProtocol, trueBody: any NodeProtocol, elseToken: Token?, falseBody: (any NodeProtocol)?, sourceTokens: [Token]) {
         self.ifToken = ifToken
@@ -75,13 +88,6 @@ public class IfStatementNode: NodeProtocol {
         self.elseToken = elseToken
         self.falseBody = falseBody
         self.sourceTokens = sourceTokens
-    }
-
-    public static func == (lhs: IfStatementNode, rhs: IfStatementNode) -> Bool {
-        lhs.sourceTokens == rhs.sourceTokens
-        && AnyNode(lhs.condition) == AnyNode(rhs.condition)
-        && AnyNode(lhs.trueBody) == AnyNode(rhs.trueBody)
-        && AnyNode(lhs.falseBody) == AnyNode(rhs.falseBody)
     }
 }
 
@@ -93,16 +99,12 @@ public class ReturnStatementNode: NodeProtocol {
     public var expression: any NodeProtocol
 
     public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { [expression] }
 
     init(token: Token, expression: any NodeProtocol, sourceTokens: [Token]) {
         self.token = token
         self.expression = expression
         self.sourceTokens = sourceTokens
-    }
-
-    public static func == (lhs: ReturnStatementNode, rhs: ReturnStatementNode) -> Bool {
-        lhs.sourceTokens == rhs.sourceTokens
-        && AnyNode(lhs.expression) == AnyNode(rhs.expression)
     }
 }
 
@@ -112,6 +114,7 @@ public class BlockStatementNode: NodeProtocol {
 
     public var kind: NodeKind = .blockStatement
     public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { statements }
 
     public var statements: [any NodeProtocol]
 
@@ -120,12 +123,5 @@ public class BlockStatementNode: NodeProtocol {
     init(statements: [any NodeProtocol], sourceTokens: [Token]) {
         self.statements = statements
         self.sourceTokens = sourceTokens
-    }
-
-    public static func == (lhs: BlockStatementNode, rhs: BlockStatementNode) -> Bool {
-        lhs.sourceTokens == rhs.sourceTokens
-        && zip(lhs.statements, rhs.statements).allSatisfy { lhsStatement, rhsStatement in
-            AnyNode(lhsStatement) == AnyNode(rhsStatement)
-        }
     }
 }

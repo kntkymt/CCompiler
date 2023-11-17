@@ -18,27 +18,34 @@ public enum NodeKind {
 
 public protocol NodeProtocol: Equatable {
     var sourceTokens: [Token] { get }
+    var children: [any NodeProtocol] { get }
     var kind: NodeKind { get }
+}
+
+extension NodeProtocol {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        AnyNode(lhs) == AnyNode(rhs)
+    }
 }
 
 public final class AnyNode: NodeProtocol {
 
     public let sourceTokens: [Token]
+    public let children: [any NodeProtocol]
     public let kind: NodeKind
 
     init(_ node: any NodeProtocol) {
         self.sourceTokens = node.sourceTokens
+        self.children = node.children
         self.kind = node.kind
     }
 
-    convenience init?(_ node: (any NodeProtocol)?) {
-        guard let node else { return nil }
-
-        self.init(node)
-    }
-
     public static func == (lhs: AnyNode, rhs: AnyNode) -> Bool {
-        lhs.kind == rhs.kind && lhs.sourceTokens == rhs.sourceTokens
+        lhs.kind == rhs.kind 
+        && lhs.sourceTokens == rhs.sourceTokens
+        && zip(lhs.children, rhs.children).allSatisfy { lhsChild, rhsChild in
+            AnyNode(lhsChild) == AnyNode(rhsChild)
+        }
     }
 }
 
@@ -49,6 +56,7 @@ public class IntegerLiteralNode: NodeProtocol {
     public let kind: NodeKind = .integerLiteral
 
     public let sourceTokens: [Token]
+    public let children: [any NodeProtocol] = []
     public var token: Token
 
     public var literal: String {
@@ -61,10 +69,6 @@ public class IntegerLiteralNode: NodeProtocol {
         self.token = token
         self.sourceTokens = [token]
     }
-
-    public static func == (lhs: IntegerLiteralNode, rhs: IntegerLiteralNode) -> Bool {
-        lhs.token == rhs.token
-    }
 }
 
 public class IdentifierNode: NodeProtocol {
@@ -74,6 +78,7 @@ public class IdentifierNode: NodeProtocol {
     public var kind: NodeKind = .identifier
 
     public let sourceTokens: [Token]
+    public let children: [any NodeProtocol] = []
     public var token: Token
 
     public var identifierName: String {
@@ -85,10 +90,6 @@ public class IdentifierNode: NodeProtocol {
     init(token: Token) {
         self.token = token
         self.sourceTokens = [token]
-    }
-
-    public static func == (lhs: IdentifierNode, rhs: IdentifierNode) -> Bool {
-        lhs.token == rhs.token
     }
 }
 
@@ -167,6 +168,7 @@ public class BinaryOperatorNode: NodeProtocol {
         }
     }
     public let sourceTokens: [Token]
+    public let children: [any NodeProtocol] = []
     public var token: Token
 
     // MARK: - Initializer
@@ -174,10 +176,6 @@ public class BinaryOperatorNode: NodeProtocol {
     init(token: Token) {
         self.token = token
         self.sourceTokens = [token]
-    }
-
-    public static func == (lhs: BinaryOperatorNode, rhs: BinaryOperatorNode) -> Bool {
-        lhs.token == rhs.token
     }
 }
 
@@ -188,6 +186,7 @@ public class AssignNode: NodeProtocol {
     public var kind: NodeKind = .assign
 
     public let sourceTokens: [Token]
+    public let children: [any NodeProtocol] = []
     public var token: Token
 
     // MARK: - Initializer
@@ -195,10 +194,6 @@ public class AssignNode: NodeProtocol {
     init(token: Token) {
         self.token = token
         self.sourceTokens = [token]
-    }
-
-    public static func == (lhs: AssignNode, rhs: AssignNode) -> Bool {
-        lhs.token == rhs.token
     }
 }
 
@@ -214,6 +209,7 @@ public class InfixOperatorExpressionNode: NodeProtocol {
     public var `operator`: any NodeProtocol
 
     public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { [left, right, `operator`] }
 
     // MARK: - Initializer
 
@@ -222,12 +218,5 @@ public class InfixOperatorExpressionNode: NodeProtocol {
         self.left = left
         self.right = right
         self.sourceTokens = sourceTokens
-    }
-
-    public static func == (lhs: InfixOperatorExpressionNode, rhs: InfixOperatorExpressionNode) -> Bool {
-        lhs.sourceTokens == rhs.sourceTokens
-        && AnyNode(lhs.left) == AnyNode(rhs.left)
-        && AnyNode(lhs.right) == AnyNode(rhs.right)
-        && AnyNode(lhs.operator) == AnyNode(rhs.operator)
     }
 }
