@@ -36,7 +36,7 @@ public final class AnyNode: NodeProtocol {
     }
 
     public static func == (lhs: AnyNode, rhs: AnyNode) -> Bool {
-        lhs.sourceTokens == rhs.sourceTokens && lhs.kind == rhs.kind
+        lhs.kind == rhs.kind && lhs.sourceTokens == rhs.sourceTokens
     }
 }
 
@@ -61,7 +61,7 @@ public class IntegerLiteralNode: NodeProtocol {
     }
 
     public static func == (lhs: IntegerLiteralNode, rhs: IntegerLiteralNode) -> Bool {
-        lhs.kind == rhs.kind && lhs.token == rhs.token
+        lhs.token == rhs.token
     }
 }
 
@@ -86,7 +86,7 @@ public class IdentifierNode: NodeProtocol {
     }
 
     public static func == (lhs: IdentifierNode, rhs: IdentifierNode) -> Bool {
-        lhs.kind == rhs.kind && lhs.token == rhs.token
+        lhs.token == rhs.token
     }
 }
 
@@ -175,7 +175,7 @@ public class BinaryOperatorNode: NodeProtocol {
     }
 
     public static func == (lhs: BinaryOperatorNode, rhs: BinaryOperatorNode) -> Bool {
-        lhs.token == rhs.token && lhs.kind == rhs.kind
+        lhs.token == rhs.token
     }
 }
 
@@ -224,7 +224,6 @@ public class InfixOperatorExpressionNode: NodeProtocol {
 
     public static func == (lhs: InfixOperatorExpressionNode, rhs: InfixOperatorExpressionNode) -> Bool {
         lhs.sourceTokens == rhs.sourceTokens
-        && lhs.kind == rhs.kind
         && AnyNode(lhs.left) == AnyNode(rhs.left)
         && AnyNode(lhs.right) == AnyNode(rhs.right)
         && AnyNode(lhs.operator) == AnyNode(rhs.operator)

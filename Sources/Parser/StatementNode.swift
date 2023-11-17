@@ -19,7 +19,6 @@ public class WhileStatementNode: NodeProtocol {
 
     public static func == (lhs: WhileStatementNode, rhs: WhileStatementNode) -> Bool {
         lhs.sourceTokens == rhs.sourceTokens
-        && lhs.kind == rhs.kind
         && AnyNode(lhs.condition) == AnyNode(rhs.condition)
         && AnyNode(lhs.body) == AnyNode(rhs.body)
     }
@@ -49,7 +48,6 @@ public class ForStatementNode: NodeProtocol {
 
     public static func == (lhs: ForStatementNode, rhs: ForStatementNode) -> Bool {
         lhs.sourceTokens == rhs.sourceTokens
-        && lhs.kind == rhs.kind
         && AnyNode(lhs.condition) == AnyNode(rhs.condition)
         && AnyNode(lhs.pre) == AnyNode(rhs.pre)
         && AnyNode(lhs.post) == AnyNode(rhs.post)
@@ -81,7 +79,6 @@ public class IfStatementNode: NodeProtocol {
 
     public static func == (lhs: IfStatementNode, rhs: IfStatementNode) -> Bool {
         lhs.sourceTokens == rhs.sourceTokens
-        && lhs.kind == rhs.kind
         && AnyNode(lhs.condition) == AnyNode(rhs.condition)
         && AnyNode(lhs.trueBody) == AnyNode(rhs.trueBody)
         && AnyNode(lhs.falseBody) == AnyNode(rhs.falseBody)
@@ -105,7 +102,6 @@ public class ReturnStatementNode: NodeProtocol {
 
     public static func == (lhs: ReturnStatementNode, rhs: ReturnStatementNode) -> Bool {
         lhs.sourceTokens == rhs.sourceTokens
-        && lhs.kind == rhs.kind
         && AnyNode(lhs.expression) == AnyNode(rhs.expression)
     }
 }
