@@ -50,7 +50,7 @@ final class TokensTest: XCTestCase {
         )
     }
 
-    func testparenthesis() throws {
+    func testParenthesis() throws {
         let tokens = try tokenize(source: "(1)")
         XCTAssertEqual(
             tokens,

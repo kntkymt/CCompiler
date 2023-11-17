@@ -4,7 +4,7 @@ public enum ParseError: Error, Equatable {
     case invalidSyntax(index: Int)
 }
 
-public func parse(tokens: [Token]) throws -> [Node] {
+public func parse(tokens: [Token]) throws -> [any NodeProtocol] {
     if tokens.isEmpty {
         throw ParseError.invalidSyntax(index: 0)
     }
@@ -73,8 +73,8 @@ public func parse(tokens: [Token]) throws -> [Node] {
     // MARK: - Syntax
 
     // program = stmt*
-    func program() throws -> [Node] {
-        var nodes: [Node] = []
+    func program() throws -> [any NodeProtocol] {
+        var nodes: [any NodeProtocol] = []
 
         while index < tokens.count {
             nodes.append(try stmt())
@@ -84,16 +84,16 @@ public func parse(tokens: [Token]) throws -> [Node] {
     }
 
     // stmt    = expr ";"
+    //         | "{" stmt* "}"
     //         | "if" "(" expr ")" stmt ("else" stmt)?
     //         | "while" "(" expr ")" stmt
     //         | "for" "(" expr? ";" expr? ";" expr? ")" stmt
     //         | "return" expr ";"
-    func stmt() throws -> Node {
+    func stmt() throws -> any NodeProtocol {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
-
-        let node: Node
+        let startIndex = index
 
         switch tokens[index] {
         case .keyword(.if, _):
@@ -105,21 +105,14 @@ public func parse(tokens: [Token]) throws -> [Node] {
 
             let trueStatement = try stmt()
 
-            // if-elseの場合
-            //             if
-            // condition        else
-            //             true       false
+            var elseToken: Token?
+            var falseStatement: (any NodeProtocol)?
             if index < tokens.count, case .keyword(.else, _) = tokens[index] {
-                let elseToken = try consumeKeywordToken(.else)
-                let falseStatement = try stmt()
-
-                let elseNode = Node(kind: .else, left: trueStatement, right: falseStatement, token: elseToken)
-
-                node = Node(kind: .if, left: condition, right: elseNode, token: ifToken)
-
-            } else {
-                node = Node(kind: .if, left: condition, right: trueStatement, token: ifToken)
+                elseToken = try consumeKeywordToken(.else)
+                falseStatement = try stmt()
             }
+
+            return IfStatementNode(ifToken: ifToken, condition: condition, trueBody: trueStatement, elseToken: elseToken, falseBody: falseStatement, sourceTokens: Array(tokens[startIndex..<index]))
 
         case .keyword(.while, _):
             let token = try consumeKeywordToken(.while)
@@ -128,76 +121,63 @@ public func parse(tokens: [Token]) throws -> [Node] {
             let condition = try expr()
             try consumeReservedToken(.parenthesisRight)
 
-            let statement = try stmt()
-
-            node = Node(kind: .while, left: condition, right: statement, token: token)
+            return WhileStatementNode(token: token, condition: condition, body: try stmt(), sourceTokens: Array(tokens[startIndex..<index]))
 
         case .keyword(.for, _):
-            //           for
-            //      pre       forCondition
-            //           condition        forBody
-            //                      statement       post
             let forToken = try consumeKeywordToken(.for)
-            node = Node(kind: .for, left: nil, right: nil, token: forToken)
-
             try consumeReservedToken(.parenthesisLeft)
 
+            var preExpr: (any NodeProtocol)?
             if case .reserved(.semicolon, _) = tokens[index] {
                 try consumeReservedToken(.semicolon)
             } else {
-                let preExpr = try expr()
+                preExpr = try expr()
                 try consumeReservedToken(.semicolon)
-
-                node.left = preExpr
             }
 
-            // FIXME: forのASTのNodeを一個にしたい
-            node.right = Node(kind: .forCondition, left: nil, right: nil, token: forToken)
-
+            var condition: (any NodeProtocol)?
             if case .reserved(.semicolon, _) = tokens[index] {
                 try consumeReservedToken(.semicolon)
             } else {
-                let condition = try expr()
+                condition = try expr()
                 try consumeReservedToken(.semicolon)
-                
-                node.right?.left = condition
             }
 
-            node.right?.right = Node(kind: .forBody, left: nil, right: nil, token: forToken)
-
+            var postExpr: (any NodeProtocol)?
             if case .reserved(.parenthesisRight, _) = tokens[index] {
                 try consumeReservedToken(.parenthesisRight)
             } else {
-                let postExpr = try expr()
+                postExpr = try expr()
                 try consumeReservedToken(.parenthesisRight)
-
-                node.right?.right?.right = postExpr
             }
 
-            node.right?.right?.left = try stmt()
+            return ForStatementNode(token: forToken, condition: condition, pre: preExpr, post: postExpr, body: try stmt(), sourceTokens: Array(tokens[startIndex..<index]))
 
         case .keyword(.return, _):
             let token = try consumeKeywordToken(.return)
 
             let left = try expr()
-            node = Node(kind: .return, left: left, right: nil, token: token)
+            let node = ReturnStatementNode(token: token, expression: left, sourceTokens: Array(tokens[startIndex..<index]))
             try consumeReservedToken(.semicolon)
+
+            return node
 
         default:
-            node = try expr()
+            let node = try expr()
             try consumeReservedToken(.semicolon)
-        }
 
-        return node
+            return node
+        }
     }
 
     // expr = assign
-    func expr() throws -> Node {
+    func expr() throws -> any NodeProtocol {
         try assign()
     }
 
     // assign = equality ("=" assign)?
-    func assign() throws -> Node {
+    func assign() throws -> any NodeProtocol {
+        let startIndex = index
         var node = try equality()
 
         if index >= tokens.count {
@@ -208,14 +188,20 @@ public func parse(tokens: [Token]) throws -> [Node] {
             let token = try consumeReservedToken(.assign)
             let rightNode = try assign()
 
-            node = Node(kind: .assign, left: node, right: rightNode, token: token)
+            node = InfixOperatorExpressionNode(
+                operator: AssignNode(token: token),
+                left: node,
+                right: rightNode,
+                sourceTokens: Array(tokens[startIndex..<index])
+            )
         }
 
         return node
     }
 
     // equality = relational ("==" relational | "!=" relational)*
-    func equality() throws -> Node {
+    func equality() throws -> any NodeProtocol {
+        let startIndex = index
         var node = try relational()
 
         while index < tokens.count {
@@ -224,13 +210,23 @@ public func parse(tokens: [Token]) throws -> [Node] {
                 let token = try consumeReservedToken(.equal)
                 let rightNode = try relational()
 
-                node = Node(kind: .equal, left: node, right: rightNode, token: token)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: token),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             case .reserved(.notEqual, _):
                 let token = try consumeReservedToken(.notEqual)
                 let rightNode = try relational()
 
-                node = Node(kind: .notEqual, left: node, right: rightNode, token: token)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: token),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             default:
                 return node
@@ -241,7 +237,8 @@ public func parse(tokens: [Token]) throws -> [Node] {
     }
 
     // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
-    func relational() throws -> Node {
+    func relational() throws -> any NodeProtocol {
+        let startIndex = index
         var node = try add()
 
         while index < tokens.count {
@@ -250,25 +247,45 @@ public func parse(tokens: [Token]) throws -> [Node] {
                 let token = try consumeReservedToken(.lessThan)
                 let rightNode = try add()
 
-                node = Node(kind: .lessThan, left: node, right: rightNode, token: token)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: token),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             case .reserved(.lessThanOrEqual, _):
                 let token = try consumeReservedToken(.lessThanOrEqual)
                 let rightNode = try add()
 
-                node = Node(kind: .lessThanOrEqual, left: node, right: rightNode, token: token)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: token),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             case .reserved(.greaterThan, _):
                 let token = try consumeReservedToken(.greaterThan)
                 let rightNode = try add()
 
-                node = Node(kind: .lessThan, left: rightNode, right: node, token: token)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: token),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             case .reserved(.greaterThanOrEqual, _):
                 let token = try consumeReservedToken(.greaterThanOrEqual)
                 let rightNode = try add()
 
-                node = Node(kind: .lessThanOrEqual, left: rightNode, right: node, token: token)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: token),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             default:
                 return node
@@ -279,7 +296,8 @@ public func parse(tokens: [Token]) throws -> [Node] {
     }
 
     // add = mul ("+" mul | "-" mul)*
-    func add() throws -> Node {
+    func add() throws -> any NodeProtocol {
+        let startIndex = index
         var node = try mul()
 
         while index < tokens.count {
@@ -288,13 +306,23 @@ public func parse(tokens: [Token]) throws -> [Node] {
                 let addToken = try consumeReservedToken(.add)
                 let rightNode = try mul()
 
-                node = Node(kind: .add, left: node, right: rightNode, token: addToken)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: addToken),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             case .reserved(.sub, _):
                 let subToken = try consumeReservedToken(.sub)
                 let rightNode = try mul()
 
-                node = Node(kind: .sub, left: node, right: rightNode, token: subToken)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: subToken),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             default:
                 return node
@@ -305,7 +333,9 @@ public func parse(tokens: [Token]) throws -> [Node] {
     }
 
     // mul = unary ("*" unary | "/" unary)*
-    func mul() throws -> Node {
+    func mul() throws -> any NodeProtocol {
+        let startIndex = index
+
         var node = try unary()
 
         while index < tokens.count {
@@ -314,13 +344,23 @@ public func parse(tokens: [Token]) throws -> [Node] {
                 let mulToken = try consumeReservedToken(.mul)
                 let rightNode = try unary()
 
-                node = Node(kind: .mul, left: node, right: rightNode, token: mulToken)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: mulToken),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             case .reserved(.div, _):
                 let divToken = try consumeReservedToken(.div)
                 let rightNode = try unary()
 
-                node = Node(kind: .div, left: node, right: rightNode, token: divToken)
+                node = InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: divToken),
+                    left: node,
+                    right: rightNode,
+                    sourceTokens: Array(tokens[startIndex..<index])
+                )
 
             default:
                 return node
@@ -331,10 +371,12 @@ public func parse(tokens: [Token]) throws -> [Node] {
     }
 
     // unary = ("+" | "-")? primary
-    func unary() throws -> Node {
+    func unary() throws -> any NodeProtocol {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
+
+        let startIndex = index
 
         switch tokens[index] {
         case .reserved(.add, _):
@@ -347,10 +389,15 @@ public func parse(tokens: [Token]) throws -> [Node] {
             let subToken = try consumeReservedToken(.sub)
 
             // 0 - rightとして認識
-            let left = Node(kind: .number, left: nil, right: nil, token: .number("0", sourceIndex: tokens[index].sourceIndex))
+            let left = IntegerLiteralNode(token: .number("0", sourceIndex: tokens[index].sourceIndex))
             let right = try primary()
 
-            return Node(kind: .sub, left: left, right: right, token: subToken)
+            return InfixOperatorExpressionNode(
+                operator: BinaryOperatorNode(token: subToken),
+                left: left,
+                right: right,
+                sourceTokens: Array(tokens[startIndex..<index])
+            )
 
         default:
             return try primary()
@@ -358,7 +405,7 @@ public func parse(tokens: [Token]) throws -> [Node] {
     }
 
     // primary = num | ident | "(" expr ")"
-    func primary() throws -> Node {
+    func primary() throws -> any NodeProtocol {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
@@ -375,13 +422,13 @@ public func parse(tokens: [Token]) throws -> [Node] {
 
         case .number:
             let numberToken = try consumeNumberToken()
-            let numberNode = Node(kind: .number, left: nil, right: nil, token: numberToken)
+            let numberNode = IntegerLiteralNode(token: numberToken)
 
             return numberNode
 
         case .identifier:
             let identifierToken = try consumeIdentifierToken()
-            let identifierNode = Node(kind: .localVariable, left: nil, right: nil, token: identifierToken)
+            let identifierNode = IdentifierNode(token: identifierToken)
 
             return identifierNode
 

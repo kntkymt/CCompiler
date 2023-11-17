@@ -5,20 +5,25 @@ import Tokenizer
 final class WhileTest: XCTestCase {
 
     func testWhile() throws {
-        let node = try parse(tokens: [
+        let tokens: [Token] = [
             .keyword(.while, sourceIndex: 0),
             .reserved(.parenthesisLeft, sourceIndex: 5),
             .number("1", sourceIndex: 6),
             .reserved(.parenthesisRight, sourceIndex: 7),
             .number("2", sourceIndex: 8),
             .reserved(.semicolon, sourceIndex: 9)
-        ])[0]
+        ]
+        let node = try parse(tokens: tokens)[0]
 
-        let condition = Node(kind: .number, left: nil, right: nil, token: .number("1", sourceIndex: 6))
-        let statement = Node(kind: .number, left: nil, right: nil, token: .number("2", sourceIndex: 8))
-        let whileNode = Node(kind: .while, left: condition, right: statement, token: .keyword(.while, sourceIndex: 0))
-
-        XCTAssertEqual(node, whileNode)
+        XCTAssertEqual(
+            node as! WhileStatementNode,
+            WhileStatementNode(
+                token: tokens[0],
+                condition: IntegerLiteralNode(token: tokens[2]),
+                body: IntegerLiteralNode(token: tokens[4]),
+                sourceTokens: Array(tokens[0...5])
+            )
+        )
     }
 
     func testWhileNoExpr() throws {
