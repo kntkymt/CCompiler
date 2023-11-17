@@ -58,6 +58,12 @@ public enum Token: Equatable {
         /// `)`
         case parenthesisRight = ")"
 
+        /// `{`
+        case braceLeft = "{"
+
+        /// `}`
+        case braceRight = "}"
+
         /// `==`
         case equal = "=="
 
