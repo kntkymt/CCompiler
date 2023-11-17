@@ -106,3 +106,26 @@ public class ReturnStatementNode: NodeProtocol {
     }
 }
 
+public class BlockStatementNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .blockStatement
+    public let sourceTokens: [Token]
+
+    public var statements: [any NodeProtocol]
+
+    // MARK: - Initializer
+
+    init(statements: [any NodeProtocol], sourceTokens: [Token]) {
+        self.statements = statements
+        self.sourceTokens = sourceTokens
+    }
+
+    public static func == (lhs: BlockStatementNode, rhs: BlockStatementNode) -> Bool {
+        lhs.sourceTokens == rhs.sourceTokens
+        && zip(lhs.statements, rhs.statements).allSatisfy { lhsStatement, rhsStatement in
+            AnyNode(lhsStatement) == AnyNode(rhsStatement)
+        }
+    }
+}

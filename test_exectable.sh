@@ -47,5 +47,8 @@ assert 30 "a=0;for(i=0;i<10;i=i+1)a=a+3;return a;"
 assert 15 "a=0;i=5;for(;i<10;i=i+1)a=a+3;return a;"
 assert 12 "a=0;for(;a<10;)a=a+3;return a;"
 assert 10 "a=0;for(;;a=a+1)if(a>=10)return a;"
+assert 20 "a=1;if (1) { a=a+1; a=a*10; } return a;"
+assert 30 "a=0;b=0;for(i=0;i<10;i=i+1) { a=a+3; b=a; } return b;"
+assert 12 "a = 0;while (a < 10) { a=a+3; } return a;"
 
 echo OK
