@@ -103,9 +103,9 @@ final class OperatorPriorityTest: XCTestCase {
             InfixOperatorExpressionNode(
                 operator: BinaryOperatorNode(token: tokens[5]),
                 left: InfixOperatorExpressionNode(
-                    operator: BinaryOperatorNode(token: tokens[3]),
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    right: IntegerLiteralNode(token: tokens[2]), 
+                    operator: BinaryOperatorNode(token: tokens[2]),
+                    left: IntegerLiteralNode(token: tokens[1]),
+                    right: IntegerLiteralNode(token: tokens[3]), 
                     sourceTokens: Array(tokens[1...3])
                 ),
                 right: IntegerLiteralNode(token: tokens[6]),
