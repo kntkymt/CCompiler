@@ -72,21 +72,17 @@ public final class Generator {
         case .functionCallExpr:
             let casted = try node.casted(FunctionCallExpressionNode.self)
 
-            let label = casted.functionName == "main" ? "_main" : casted.functionName
-            result += "    bl \(label)\n"
+            let functionLabel = casted.functionName == "main" ? "_main" : casted.functionName
+            result += "    bl \(functionLabel)\n"
 
             return result
 
         case .functionDecl:
             let casted = try node.casted(FunctionDeclNode.self)
 
-            if case .identifier("main", _) = casted.functionName {
-                result += "_main:\n"
-                functions.insert("_main")
-            } else {
-                result += "\(casted.functionName.value):\n"
-                functions.insert(casted.functionName.value)
-            }
+            let functionLabel = casted.functionName == "main" ? "_main" : casted.functionName
+            functions.insert(functionLabel)
+            result += "\(functionLabel):\n"
 
             // プロローグ
             // push 古いBR, 呼び出し元LR

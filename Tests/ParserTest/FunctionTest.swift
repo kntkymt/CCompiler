@@ -21,7 +21,7 @@ final class FunctionTest: XCTestCase {
         XCTAssertEqual(
             node,
             FunctionDeclNode(
-                functionName: tokens[0],
+                token: tokens[0],
                 block: BlockStatementNode(
                     statements: [
                         IntegerLiteralNode(token: tokens[4]),
@@ -73,7 +73,7 @@ final class FunctionTest: XCTestCase {
             SourceFileNode(
                 functions: [
                     FunctionDeclNode(
-                        functionName: tokens[0],
+                        token: tokens[0],
                         block: BlockStatementNode(
                             statements: [
                                 IntegerLiteralNode(token: tokens[4])
@@ -83,7 +83,7 @@ final class FunctionTest: XCTestCase {
                         sourceTokens: Array(tokens[0...6])
                     ),
                     FunctionDeclNode(
-                        functionName: tokens[7],
+                        token: tokens[7],
                         block: BlockStatementNode(
                             statements: [
                                 IntegerLiteralNode(token: tokens[11])

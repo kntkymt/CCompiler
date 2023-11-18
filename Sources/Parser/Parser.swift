@@ -111,7 +111,7 @@ public final class Parser {
         try consumeReservedToken(.parenthesisLeft)
         try consumeReservedToken(.parenthesisRight)
 
-        return FunctionDeclNode(functionName: functionName, block: try block(), sourceTokens: Array(tokens[startIndex..<index]))
+        return FunctionDeclNode(token: functionName, block: try block(), sourceTokens: Array(tokens[startIndex..<index]))
     }
 
     // stmt    = expr ";"

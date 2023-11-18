@@ -134,13 +134,17 @@ public class FunctionDeclNode: NodeProtocol {
     public let sourceTokens: [Token]
     public var children: [any NodeProtocol] { [block] }
 
-    public let functionName: Token
+    public let token: Token
     public let block: BlockStatementNode
+
+    public var functionName: String {
+        token.value
+    }
 
     // MARK: - Initializer
 
-    init(functionName: Token, block: BlockStatementNode, sourceTokens: [Token]) {
-        self.functionName = functionName
+    init(token: Token, block: BlockStatementNode, sourceTokens: [Token]) {
+        self.token = token
         self.block = block
         self.sourceTokens = sourceTokens
     }
