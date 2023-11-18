@@ -52,5 +52,8 @@ assert 30 "main(){a=0;b=0;for(i=0;i<10;i=i+1) { a=a+3; b=a; } return b;}"
 assert 12 "main(){a = 0;while (a < 10) { a=a+3; } return a;}"
 assert 5 "sub() { return 5; } main() { return sub(); }"
 assert 6 "sub() { return 5; } main() { a=1; b = sub(); return a + b; }"
+assert 3 "sum(a,b) { return a + b; } main() { return sum(1, 2); }"
+assert 12 "sum(a,b) { return a * 10 + b; } main() { return sum(1, 2); }"
+assert 74 "sum(a,b,c) { d = 10; return a * 2 + b * 3 + c * 4 + d * 5; } main() { a = 1; return sum(a * 3, 2, 3); }"
 
 echo OK

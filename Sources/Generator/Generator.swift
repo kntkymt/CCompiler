@@ -72,6 +72,19 @@ public final class Generator {
         case .functionCallExpr:
             let casted = try node.casted(FunctionCallExpressionNode.self)
 
+            // 引数を評価してスタックに積む
+            for argument in casted.arguments {
+                result += try generate(node: argument)
+            }
+
+            // 引数を関数に引き渡すためレジスタに入れる
+            // 結果はスタックに積まれているので番号は逆から
+            // 例: call(a, b) -> x0: a, x1: b
+            for registorIndex in (0..<casted.arguments.count).reversed() {
+                result += "    ldr x\(registorIndex), [sp]\n"
+                result += "    add sp, sp, #16\n"
+            }
+
             let functionLabel = casted.functionName == "main" ? "_main" : casted.functionName
             result += "    bl \(functionLabel)\n"
 
@@ -96,6 +109,14 @@ public final class Generator {
             // FIXME: ここの確保数を実際の数にしたいが、Parserで調べるのかGenで調べるのかわからないので保留
             // 26個分の変数を確保
             result += "    sub sp, sp, #208\n"
+
+            // 引数をローカル変数として保存し直す
+            for (index, parameter) in casted.parameters.enumerated() {
+                let offset = (variableAddressOffset.count + 1) * 8
+                variableAddressOffset[parameter.identifierName] = offset
+
+                result += "    str x\(index), [x29, #-\(offset)]\n"
+            }
 
             result += try generate(node: casted.block)
 
