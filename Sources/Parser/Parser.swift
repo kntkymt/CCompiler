@@ -456,11 +456,13 @@ public final class Parser {
         }
     }
 
-    // primary = num | ident | "(" expr ")"
+    // primary = num | ident ( "()" )? | "(" expr ")"
     func primary() throws -> any NodeProtocol {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
+
+        let startIndex = index
 
         switch tokens[index] {
         case .reserved(.parenthesisLeft, _):
@@ -480,9 +482,15 @@ public final class Parser {
 
         case .identifier:
             let identifierToken = try consumeIdentifierToken()
-            let identifierNode = IdentifierNode(token: identifierToken)
 
-            return identifierNode
+            if index < tokens.count, case .reserved(.parenthesisLeft, _) = tokens[index] {
+                try consumeReservedToken(.parenthesisLeft)
+                try consumeReservedToken(.parenthesisRight)
+
+                return FunctionCallExpressionNode(token: identifierToken, sourceTokens: Array(tokens[startIndex..<index]))
+            } else {
+                return IdentifierNode(token: identifierToken)
+            }
 
         default:
             throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)

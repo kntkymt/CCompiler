@@ -69,6 +69,14 @@ public final class Generator {
 
             return result
 
+        case .functionCallExpr:
+            let casted = try node.casted(FunctionCallExpressionNode.self)
+
+            let label = casted.functionName == "main" ? "_main" : casted.functionName
+            result += "    bl \(label)\n"
+
+            return result
+
         case .functionDecl:
             let casted = try node.casted(FunctionDeclNode.self)
 

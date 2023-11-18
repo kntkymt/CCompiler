@@ -34,6 +34,21 @@ final class FunctionTest: XCTestCase {
         )
     }
 
+    func testFunctionCall() throws {
+        let tokens: [Token] = [
+            .identifier("main", sourceIndex: 0),
+            .reserved(.parenthesisLeft, sourceIndex: 4),
+            .reserved(.parenthesisRight, sourceIndex: 5),
+            .reserved(.semicolon, sourceIndex: 6)
+        ]
+        let node = try Parser(tokens: tokens).stmt()
+
+        XCTAssertEqual(
+            node as! FunctionCallExpressionNode,
+            FunctionCallExpressionNode(token: tokens[0], sourceTokens: Array(tokens[0...2]))
+        )
+    }
+
     func testFunctionDecls() throws {
         let tokens: [Token] = [
             .identifier("main", sourceIndex: 0),

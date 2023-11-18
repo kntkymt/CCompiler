@@ -8,6 +8,7 @@ public enum NodeKind {
     case assign
 
     case infixOperatorExpr
+    case functionCallExpr
 
     case ifStatement
     case whileStatement
@@ -221,6 +222,27 @@ public class InfixOperatorExpressionNode: NodeProtocol {
         self.operator = `operator`
         self.left = left
         self.right = right
+        self.sourceTokens = sourceTokens
+    }
+}
+
+public class FunctionCallExpressionNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .functionCallExpr
+    public let sourceTokens: [Token]
+    public let children: [any NodeProtocol] = []
+
+    public let token: Token
+    public var functionName: String {
+        token.value
+    }
+
+    // MARK: - Initializer
+
+    init(token: Token, sourceTokens: [Token]) {
+        self.token = token
         self.sourceTokens = sourceTokens
     }
 }
