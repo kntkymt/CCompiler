@@ -11,7 +11,7 @@ final class AssignTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -33,7 +33,7 @@ final class AssignTest: XCTestCase {
             .number("2", sourceIndex: 4),
             .reserved(.semicolon, sourceIndex: 5)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -59,7 +59,7 @@ final class AssignTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,

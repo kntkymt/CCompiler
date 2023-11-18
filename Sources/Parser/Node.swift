@@ -8,12 +8,17 @@ public enum NodeKind {
     case assign
 
     case infixOperatorExpr
+    case functionCallExpr
 
     case ifStatement
     case whileStatement
     case forStatement
     case returnStatement
     case blockStatement
+
+    case functionDecl
+
+    case sourceFile
 }
 
 public protocol NodeProtocol: Equatable {
@@ -43,6 +48,7 @@ public final class AnyNode: NodeProtocol {
     public static func == (lhs: AnyNode, rhs: AnyNode) -> Bool {
         lhs.kind == rhs.kind 
         && lhs.sourceTokens == rhs.sourceTokens
+        && lhs.children.count == rhs.children.count
         && zip(lhs.children, rhs.children).allSatisfy { lhsChild, rhsChild in
             AnyNode(lhsChild) == AnyNode(rhsChild)
         }
@@ -217,6 +223,29 @@ public class InfixOperatorExpressionNode: NodeProtocol {
         self.operator = `operator`
         self.left = left
         self.right = right
+        self.sourceTokens = sourceTokens
+    }
+}
+
+public class FunctionCallExpressionNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .functionCallExpr
+    public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { arguments }
+
+    public let token: Token
+    public let arguments: [any NodeProtocol]
+    public var functionName: String {
+        token.value
+    }
+
+    // MARK: - Initializer
+
+    init(token: Token, arguments: [any NodeProtocol], sourceTokens: [Token]) {
+        self.token = token
+        self.arguments = arguments
         self.sourceTokens = sourceTokens
     }
 }

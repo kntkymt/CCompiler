@@ -87,6 +87,9 @@ public enum Token: Equatable {
 
         /// `;`
         case semicolon = ";"
+
+        /// `,`
+        case comma = ","
     }
 
     public enum KeywordKind: String, CaseIterable {

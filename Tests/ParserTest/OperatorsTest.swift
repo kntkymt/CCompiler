@@ -11,7 +11,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -31,7 +31,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -51,7 +51,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -71,7 +71,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -90,7 +90,7 @@ final class OperatorsTest: XCTestCase {
             .number("1", sourceIndex: 1),
             .reserved(.semicolon, sourceIndex: 2)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! IntegerLiteralNode,
@@ -104,7 +104,7 @@ final class OperatorsTest: XCTestCase {
             .number("1", sourceIndex: 1),
             .reserved(.semicolon, sourceIndex: 2)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -124,7 +124,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 3),
             .reserved(.semicolon, sourceIndex: 4)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -144,7 +144,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 3),
             .reserved(.semicolon, sourceIndex: 4)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -164,7 +164,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -184,7 +184,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 3),
             .reserved(.semicolon, sourceIndex: 4)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -204,7 +204,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 2),
             .reserved(.semicolon, sourceIndex: 3)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -224,7 +224,7 @@ final class OperatorsTest: XCTestCase {
             .number("2", sourceIndex: 3),
             .reserved(.semicolon, sourceIndex: 4)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,

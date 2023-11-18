@@ -169,4 +169,16 @@ final class TokensTest: XCTestCase {
             ]
         )
     }
+
+    func testComma() throws {
+        let tokens = try tokenize(source: "1,2")
+        XCTAssertEqual(
+            tokens,
+            [
+                .number("1", sourceIndex: 0),
+                .reserved(.comma, sourceIndex: 1),
+                .number("2", sourceIndex: 2)
+            ]
+        )
+    }
 }

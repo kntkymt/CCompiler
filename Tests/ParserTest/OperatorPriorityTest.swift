@@ -13,7 +13,7 @@ final class OperatorPriorityTest: XCTestCase {
             .number("3", sourceIndex: 4),
             .reserved(.semicolon, sourceIndex: 5),
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -40,7 +40,7 @@ final class OperatorPriorityTest: XCTestCase {
             .number("3", sourceIndex: 4),
             .reserved(.semicolon, sourceIndex: 5),
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -67,7 +67,7 @@ final class OperatorPriorityTest: XCTestCase {
             .number("3", sourceIndex: 4),
             .reserved(.semicolon, sourceIndex: 5),
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
@@ -96,7 +96,7 @@ final class OperatorPriorityTest: XCTestCase {
             .number("3", sourceIndex: 6),
             .reserved(.semicolon, sourceIndex: 7),
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,

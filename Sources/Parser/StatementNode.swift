@@ -125,3 +125,47 @@ public class BlockStatementNode: NodeProtocol {
         self.sourceTokens = sourceTokens
     }
 }
+
+public class FunctionDeclNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .functionDecl
+    public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { [block] + parameters }
+
+    public let token: Token
+    public let block: BlockStatementNode
+    public let parameters: [IdentifierNode]
+
+    public var functionName: String {
+        token.value
+    }
+
+    // MARK: - Initializer
+
+    init(token: Token, block: BlockStatementNode, parameters: [IdentifierNode], sourceTokens: [Token]) {
+        self.token = token
+        self.block = block
+        self.parameters = parameters
+        self.sourceTokens = sourceTokens
+    }
+}
+
+public class SourceFileNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .sourceFile
+    public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { functions }
+
+    public let functions: [FunctionDeclNode]
+
+    // MARK: - Initializer
+
+    init(functions: [FunctionDeclNode], sourceTokens: [Token]) {
+        self.functions = functions
+        self.sourceTokens = sourceTokens
+    }
+}
