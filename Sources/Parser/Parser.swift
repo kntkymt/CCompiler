@@ -79,7 +79,7 @@ public final class Parser {
 
     // MARK: - Public
 
-    public func parse() throws -> [FunctionDeclNode] {
+    public func parse() throws -> SourceFileNode {
         if tokens.isEmpty {
             throw ParseError.invalidSyntax(index: 0)
         }
@@ -90,14 +90,14 @@ public final class Parser {
     // MARK: - Syntax
 
     // program = functionDecl*
-    func program() throws -> [FunctionDeclNode] {
-        var nodes: [FunctionDeclNode] = []
+    func program() throws -> SourceFileNode {
+        var functionDecls: [FunctionDeclNode] = []
 
         while index < tokens.count {
-            nodes.append(try functionDecl())
+            functionDecls.append(try functionDecl())
         }
 
-        return nodes
+        return SourceFileNode(functions: functionDecls, sourceTokens: tokens)
     }
 
     // functionDecl = ident "(" ")" block

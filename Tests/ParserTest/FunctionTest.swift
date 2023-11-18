@@ -6,7 +6,7 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionDecl() throws {
         let tokens: [Token] = [
-            .identifier("hoge", sourceIndex: 0),
+            .identifier("main", sourceIndex: 0),
             .reserved(.parenthesisLeft, sourceIndex: 4),
             .reserved(.parenthesisRight, sourceIndex: 5),
             .reserved(.braceLeft, sourceIndex: 6),
@@ -36,7 +36,7 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionDecls() throws {
         let tokens: [Token] = [
-            .identifier("hoge", sourceIndex: 0),
+            .identifier("main", sourceIndex: 0),
             .reserved(.parenthesisLeft, sourceIndex: 4),
             .reserved(.parenthesisRight, sourceIndex: 5),
             .reserved(.braceLeft, sourceIndex: 6),
@@ -55,28 +55,31 @@ final class FunctionTest: XCTestCase {
 
         XCTAssertEqual(
             nodes,
-            [
-                FunctionDeclNode(
-                    functionName: tokens[0],
-                    block: BlockStatementNode(
-                        statements: [
-                            IntegerLiteralNode(token: tokens[4])
-                        ],
-                        sourceTokens: Array(tokens[3...6])
+            SourceFileNode(
+                functions: [
+                    FunctionDeclNode(
+                        functionName: tokens[0],
+                        block: BlockStatementNode(
+                            statements: [
+                                IntegerLiteralNode(token: tokens[4])
+                            ],
+                            sourceTokens: Array(tokens[3...6])
+                        ),
+                        sourceTokens: Array(tokens[0...6])
                     ),
-                    sourceTokens: Array(tokens[0...6])
-                ),
-                FunctionDeclNode(
-                    functionName: tokens[7],
-                    block: BlockStatementNode(
-                        statements: [
-                            IntegerLiteralNode(token: tokens[11])
-                        ],
-                        sourceTokens: Array(tokens[10...13])
-                    ),
-                    sourceTokens: Array(tokens[7...13])
-                )
-            ]
+                    FunctionDeclNode(
+                        functionName: tokens[7],
+                        block: BlockStatementNode(
+                            statements: [
+                                IntegerLiteralNode(token: tokens[11])
+                            ],
+                            sourceTokens: Array(tokens[10...13])
+                        ),
+                        sourceTokens: Array(tokens[7...13])
+                    )
+                ],
+                sourceTokens: tokens
+            )
         )
     }
 }

@@ -16,6 +16,8 @@ public enum NodeKind {
     case blockStatement
 
     case functionDecl
+
+    case sourceFile
 }
 
 public protocol NodeProtocol: Equatable {

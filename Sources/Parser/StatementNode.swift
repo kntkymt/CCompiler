@@ -145,3 +145,21 @@ public class FunctionDeclNode: NodeProtocol {
         self.sourceTokens = sourceTokens
     }
 }
+
+public class SourceFileNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .sourceFile
+    public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { functions }
+
+    public let functions: [FunctionDeclNode]
+
+    // MARK: - Initializer
+
+    init(functions: [FunctionDeclNode], sourceTokens: [Token]) {
+        self.functions = functions
+        self.sourceTokens = sourceTokens
+    }
+}
