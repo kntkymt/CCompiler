@@ -46,7 +46,7 @@ final class FunctionTest: XCTestCase {
 
         XCTAssertEqual(
             node as! FunctionCallExpressionNode,
-            FunctionCallExpressionNode(token: tokens[0], sourceTokens: Array(tokens[0...2]))
+            FunctionCallExpressionNode(token: tokens[0], arguments: [], sourceTokens: Array(tokens[0...2]))
         )
     }
 
@@ -82,6 +82,31 @@ final class FunctionTest: XCTestCase {
                     IdentifierNode(token: tokens[4])
                 ],
                 sourceTokens: tokens
+            )
+        )
+    }
+
+    func testFunctionCallWithArguments() throws {
+        let tokens: [Token] = [
+            .identifier("main", sourceIndex: 0),
+            .reserved(.parenthesisLeft, sourceIndex: 4),
+            .number("1", sourceIndex: 5),
+            .reserved(.comma, sourceIndex: 6),
+            .identifier("a", sourceIndex: 7),
+            .reserved(.parenthesisRight, sourceIndex: 8),
+            .reserved(.semicolon, sourceIndex: 9)
+        ]
+        let node = try Parser(tokens: tokens).stmt()
+
+        XCTAssertEqual(
+            node as! FunctionCallExpressionNode,
+            FunctionCallExpressionNode(
+                token: tokens[0], 
+                arguments: [
+                    IntegerLiteralNode(token: tokens[2]),
+                    IdentifierNode(token: tokens[4])
+                ],
+                sourceTokens: Array(tokens[0...5])
             )
         )
     }

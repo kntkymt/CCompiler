@@ -233,17 +233,19 @@ public class FunctionCallExpressionNode: NodeProtocol {
 
     public var kind: NodeKind = .functionCallExpr
     public let sourceTokens: [Token]
-    public let children: [any NodeProtocol] = []
+    public var children: [any NodeProtocol] { arguments }
 
     public let token: Token
+    public let arguments: [any NodeProtocol]
     public var functionName: String {
         token.value
     }
 
     // MARK: - Initializer
 
-    init(token: Token, sourceTokens: [Token]) {
+    init(token: Token, arguments: [any NodeProtocol], sourceTokens: [Token]) {
         self.token = token
+        self.arguments = arguments
         self.sourceTokens = sourceTokens
     }
 }

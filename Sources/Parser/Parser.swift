@@ -483,7 +483,7 @@ public final class Parser {
         }
     }
 
-    // primary = num | ident ( "()" )? | "(" expr ")"
+    // primary = num | ident ( "( exprList? )" )? | "(" expr ")"
     func primary() throws -> any NodeProtocol {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
@@ -512,9 +512,19 @@ public final class Parser {
 
             if index < tokens.count, case .reserved(.parenthesisLeft, _) = tokens[index] {
                 try consumeReservedToken(.parenthesisLeft)
+
+                var argments: [any NodeProtocol] = []
+                if index < tokens.count {
+                    if case .reserved(.parenthesisRight, _) = tokens[index] {
+
+                    } else {
+                        argments = try exprList()
+                    }
+                }
+
                 try consumeReservedToken(.parenthesisRight)
 
-                return FunctionCallExpressionNode(token: identifierToken, sourceTokens: Array(tokens[startIndex..<index]))
+                return FunctionCallExpressionNode(token: identifierToken, arguments: argments, sourceTokens: Array(tokens[startIndex..<index]))
             } else {
                 return IdentifierNode(token: identifierToken)
             }
@@ -522,5 +532,26 @@ public final class Parser {
         default:
             throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
         }
+    }
+
+    // exprList = expr ("," expr)*
+    func exprList() throws -> [any NodeProtocol] {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+        var results: [any NodeProtocol] = []
+        results.append(try expr())
+
+        while index < tokens.count {
+            if case .reserved(.parenthesisRight, _) = tokens[index] {
+                break
+            }
+
+            try consumeReservedToken(.comma)
+
+            results.append(try expr())
+        }
+
+        return results
     }
 }
