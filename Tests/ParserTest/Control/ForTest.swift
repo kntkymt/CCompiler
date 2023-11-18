@@ -17,7 +17,7 @@ final class ForTest: XCTestCase {
             .number("4", sourceIndex: 10),
             .reserved(.semicolon, sourceIndex: 11)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! ForStatementNode,
@@ -49,7 +49,7 @@ final class ForTest: XCTestCase {
             .reserved(.semicolon, sourceIndex: 13),
             .reserved(.braceRight, sourceIndex: 14)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! ForStatementNode,
@@ -80,7 +80,7 @@ final class ForTest: XCTestCase {
             .number("4", sourceIndex: 7),
             .reserved(.semicolon, sourceIndex: 8)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! ForStatementNode,

@@ -125,3 +125,23 @@ public class BlockStatementNode: NodeProtocol {
         self.sourceTokens = sourceTokens
     }
 }
+
+public class FunctionDeclNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .functionDecl
+    public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { [block] }
+
+    public let functionName: Token
+    public let block: BlockStatementNode
+
+    // MARK: - Initializer
+
+    init(functionName: Token, block: BlockStatementNode, sourceTokens: [Token]) {
+        self.functionName = functionName
+        self.block = block
+        self.sourceTokens = sourceTokens
+    }
+}

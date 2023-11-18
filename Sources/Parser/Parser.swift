@@ -4,11 +4,18 @@ public enum ParseError: Error, Equatable {
     case invalidSyntax(index: Int)
 }
 
-public func parse(tokens: [Token]) throws -> [any NodeProtocol] {
-    if tokens.isEmpty {
-        throw ParseError.invalidSyntax(index: 0)
+public final class Parser {
+
+    // MARK: - Property
+
+    private var index = 0
+    private var tokens: [Token]
+
+    public init(tokens: [Token]) {
+        self.tokens = tokens
     }
-    var index = 0
+
+    // MARK: - Util
 
     @discardableResult
     func consumeIdentifierToken() throws -> Token {
@@ -70,21 +77,45 @@ public func parse(tokens: [Token]) throws -> [any NodeProtocol] {
         }
     }
 
+    // MARK: - Public
+
+    public func parse() throws -> [FunctionDeclNode] {
+        if tokens.isEmpty {
+            throw ParseError.invalidSyntax(index: 0)
+        }
+
+        return try program()
+    }
+
     // MARK: - Syntax
 
-    // program = stmt*
-    func program() throws -> [any NodeProtocol] {
-        var nodes: [any NodeProtocol] = []
+    // program = functionDecl*
+    func program() throws -> [FunctionDeclNode] {
+        var nodes: [FunctionDeclNode] = []
 
         while index < tokens.count {
-            nodes.append(try stmt())
+            nodes.append(try functionDecl())
         }
 
         return nodes
     }
 
+    // functionDecl = ident "(" ")" block
+    func functionDecl() throws -> FunctionDeclNode {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+        let startIndex = index
+
+        let functionName = try consumeIdentifierToken()
+        try consumeReservedToken(.parenthesisLeft)
+        try consumeReservedToken(.parenthesisRight)
+
+        return FunctionDeclNode(functionName: functionName, block: try block(), sourceTokens: Array(tokens[startIndex..<index]))
+    }
+
     // stmt    = expr ";"
-    //         | "{" stmt* "}"
+    //         | block
     //         | "if" "(" expr ")" stmt ("else" stmt)?
     //         | "while" "(" expr ")" stmt
     //         | "for" "(" expr? ";" expr? ";" expr? ")" stmt
@@ -97,19 +128,7 @@ public func parse(tokens: [Token]) throws -> [any NodeProtocol] {
 
         switch tokens[index] {
         case .reserved(.braceLeft, _):
-            try consumeReservedToken(.braceLeft)
-
-            var statements: [any NodeProtocol] = []
-            while index < tokens.count {
-                if index < tokens.count, case .reserved(.braceRight, _) = tokens[index] {
-                    try consumeReservedToken(.braceRight)
-                    break
-                }
-
-                statements.append(try stmt())
-            }
-
-            return BlockStatementNode(statements: statements, sourceTokens: Array(tokens[startIndex..<index]))
+            return try block()
 
         case .keyword(.if, _):
             let ifToken = try consumeKeywordToken(.if)
@@ -183,6 +202,24 @@ public func parse(tokens: [Token]) throws -> [any NodeProtocol] {
 
             return node
         }
+    }
+
+    // block = "{" stmt* "}"
+    func block() throws -> BlockStatementNode {
+        let startIndex = index
+        try consumeReservedToken(.braceLeft)
+
+        var statements: [any NodeProtocol] = []
+        while index < tokens.count {
+            if index < tokens.count, case .reserved(.braceRight, _) = tokens[index] {
+                try consumeReservedToken(.braceRight)
+                break
+            }
+
+            statements.append(try stmt())
+        }
+
+        return BlockStatementNode(statements: statements, sourceTokens: Array(tokens[startIndex..<index]))
     }
 
     // expr = assign
@@ -451,7 +488,4 @@ public func parse(tokens: [Token]) throws -> [any NodeProtocol] {
             throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
         }
     }
-
-
-    return try program()
 }

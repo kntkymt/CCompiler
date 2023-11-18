@@ -13,7 +13,7 @@ final class IfTest: XCTestCase {
             .number("2", sourceIndex: 5),
             .reserved(.semicolon, sourceIndex: 6)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! IfStatementNode,
@@ -40,7 +40,7 @@ final class IfTest: XCTestCase {
             .number("3", sourceIndex: 8),
             .reserved(.semicolon, sourceIndex: 9)
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! IfStatementNode,

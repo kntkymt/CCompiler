@@ -14,6 +14,8 @@ public enum NodeKind {
     case forStatement
     case returnStatement
     case blockStatement
+
+    case functionDecl
 }
 
 public protocol NodeProtocol: Equatable {

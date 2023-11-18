@@ -10,7 +10,7 @@ final class ReturnTest: XCTestCase {
             .number("2", sourceIndex: 6),
             .reserved(.semicolon, sourceIndex: 7),
         ]
-        let node = try parse(tokens: tokens)[0]
+        let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node as! ReturnStatementNode,
@@ -24,10 +24,10 @@ final class ReturnTest: XCTestCase {
 
     func testReturnNoExpr() throws {
         do {
-            _ = try parse(tokens: [
+            _ = try Parser(tokens: [
                 .keyword(.return, sourceIndex: 0),
                 .reserved(.semicolon, sourceIndex: 7),
-            ])
+            ]).stmt()
         } catch let error as ParseError {
             XCTAssertEqual(error, .invalidSyntax(index: 7))
         }

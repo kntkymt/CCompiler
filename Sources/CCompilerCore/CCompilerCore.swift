@@ -27,7 +27,7 @@ public func compile(_ source: String) throws -> String {
     }()
     let nodes = try {
         do {
-            return try parse(tokens: tokens)
+            return try Parser(tokens: tokens).parse()
         } catch let error as ParseError {
             switch error {
             case .invalidSyntax(let index):
