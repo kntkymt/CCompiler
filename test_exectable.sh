@@ -50,6 +50,7 @@ assert 10 "main(){a=0;for(;;a=a+1)if(a>=10)return a;}"
 assert 20 "main(){a=1;if (1) { a=a+1; a=a*10; } return a;}"
 assert 30 "main(){a=0;b=0;for(i=0;i<10;i=i+1) { a=a+3; b=a; } return b;}"
 assert 12 "main(){a = 0;while (a < 10) { a=a+3; } return a;}"
-assert 1 "sub() { a = 5; return 0; } main() { a=1; sub(); return a; }"
+assert 5 "sub() { return 5; } main() { return sub(); }"
+assert 6 "sub() { return 5; } main() { a=1; b = sub(); return a + b; }"
 
 echo OK

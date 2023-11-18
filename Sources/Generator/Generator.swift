@@ -75,6 +75,9 @@ public final class Generator {
             let functionLabel = casted.functionName == "main" ? "_main" : casted.functionName
             result += "    bl \(functionLabel)\n"
 
+            // 帰り値をpush
+            result += "    str x0, [sp, #-16]!\n"
+
             return result
 
         case .functionDecl:
