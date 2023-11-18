@@ -100,7 +100,7 @@ public final class Parser {
         return SourceFileNode(functions: functionDecls, sourceTokens: tokens)
     }
 
-    // functionDecl = ident "(" ")" block
+    // functionDecl = ident "(" functionParameters? ")" block
     func functionDecl() throws -> FunctionDeclNode {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
@@ -109,9 +109,36 @@ public final class Parser {
 
         let functionName = try consumeIdentifierToken()
         try consumeReservedToken(.parenthesisLeft)
+
+        var parameters: [IdentifierNode] = []
+        if index < tokens.count, case .identifier = tokens[index] {
+            parameters = try functionParameters()
+        }
+
         try consumeReservedToken(.parenthesisRight)
 
-        return FunctionDeclNode(token: functionName, block: try block(), sourceTokens: Array(tokens[startIndex..<index]))
+        return FunctionDeclNode(token: functionName, block: try block(), parameters: parameters, sourceTokens: Array(tokens[startIndex..<index]))
+    }
+
+    // functionParameters = ident ("," ident)*
+    func functionParameters() throws -> [IdentifierNode] {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+        var results: [IdentifierNode] = []
+        results.append(IdentifierNode(token: try consumeIdentifierToken()))
+
+        while index < tokens.count {
+            if case .reserved(.parenthesisRight, _) = tokens[index] {
+                break
+            }
+
+            try consumeReservedToken(.comma)
+
+            results.append(IdentifierNode(token: try consumeIdentifierToken()))
+        }
+
+        return results
     }
 
     // stmt    = expr ";"

@@ -48,6 +48,7 @@ public final class AnyNode: NodeProtocol {
     public static func == (lhs: AnyNode, rhs: AnyNode) -> Bool {
         lhs.kind == rhs.kind 
         && lhs.sourceTokens == rhs.sourceTokens
+        && lhs.children.count == rhs.children.count
         && zip(lhs.children, rhs.children).allSatisfy { lhsChild, rhsChild in
             AnyNode(lhsChild) == AnyNode(rhsChild)
         }

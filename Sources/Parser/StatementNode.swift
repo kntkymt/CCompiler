@@ -132,10 +132,11 @@ public class FunctionDeclNode: NodeProtocol {
 
     public var kind: NodeKind = .functionDecl
     public let sourceTokens: [Token]
-    public var children: [any NodeProtocol] { [block] }
+    public var children: [any NodeProtocol] { [block] + parameters }
 
     public let token: Token
     public let block: BlockStatementNode
+    public let parameters: [IdentifierNode]
 
     public var functionName: String {
         token.value
@@ -143,9 +144,10 @@ public class FunctionDeclNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(token: Token, block: BlockStatementNode, sourceTokens: [Token]) {
+    init(token: Token, block: BlockStatementNode, parameters: [IdentifierNode], sourceTokens: [Token]) {
         self.token = token
         self.block = block
+        self.parameters = parameters
         self.sourceTokens = sourceTokens
     }
 }
