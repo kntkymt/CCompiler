@@ -52,6 +52,9 @@ public enum Token: Equatable {
         /// `/`
         case div = "/"
 
+        /// `&`
+        case and = "&"
+
         /// `(`
         case parenthesisLeft = "("
 

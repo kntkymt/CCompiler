@@ -50,6 +50,17 @@ final class TokensTest: XCTestCase {
         )
     }
 
+    func testAnd() throws {
+        let tokens = try tokenize(source: "&a")
+        XCTAssertEqual(
+            tokens,
+            [
+                .reserved(.and, sourceIndex: 0),
+                .identifier("a", sourceIndex: 1)
+            ]
+        )
+    }
+
     func testParenthesis() throws {
         let tokens = try tokenize(source: "(1)")
         XCTAssertEqual(
