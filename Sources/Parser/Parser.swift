@@ -450,6 +450,7 @@ public final class Parser {
     }
 
     // unary = ("+" | "-")? primary
+    //       | ("*" | "&") unary
     func unary() throws -> any NodeProtocol {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
@@ -474,6 +475,26 @@ public final class Parser {
             return InfixOperatorExpressionNode(
                 operator: BinaryOperatorNode(token: subToken),
                 left: left,
+                right: right,
+                sourceTokens: Array(tokens[startIndex..<index])
+            )
+
+        case .reserved(.mul, _):
+            let mulToken = try consumeReservedToken(.mul)
+            let right = try unary()
+
+            return PrefixOperatorExpressionNode(
+                operator: mulToken,
+                right: right,
+                sourceTokens: Array(tokens[startIndex..<index])
+            )
+
+        case .reserved(.and, _):
+            let andToken = try consumeReservedToken(.and)
+            let right = try unary()
+
+            return PrefixOperatorExpressionNode(
+                operator: andToken,
                 right: right,
                 sourceTokens: Array(tokens[startIndex..<index])
             )

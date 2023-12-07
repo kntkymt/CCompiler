@@ -7,6 +7,7 @@ public enum NodeKind {
     case binaryOperator
     case assign
 
+    case prefixOperatorExpr
     case infixOperatorExpr
     case functionCallExpr
 
@@ -222,6 +223,48 @@ public class InfixOperatorExpressionNode: NodeProtocol {
     init(operator: any NodeProtocol, left: any NodeProtocol, right: any NodeProtocol, sourceTokens: [Token]) {
         self.operator = `operator`
         self.left = left
+        self.right = right
+        self.sourceTokens = sourceTokens
+    }
+}
+
+public class PrefixOperatorExpressionNode: NodeProtocol {
+
+    public enum OperatorKind {
+        /// `*`
+        case reference
+
+        /// `&`
+        case address
+    }
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .prefixOperatorExpr
+
+    public var operatorKind: OperatorKind {
+        switch `operator` {
+        case .reserved(.mul, _):
+            return .reference
+            
+        case .reserved(.and, _):
+            return .address
+
+        default:
+            fatalError()
+        }
+    }
+
+    public let sourceTokens: [Token]
+    public var children: [any NodeProtocol] { [right] }
+    public let `operator`: Token
+
+    public let right: any NodeProtocol
+
+    // MARK: - Initializer
+
+    init(operator: Token, right: any NodeProtocol, sourceTokens: [Token]) {
+        self.operator = `operator`
         self.right = right
         self.sourceTokens = sourceTokens
     }
