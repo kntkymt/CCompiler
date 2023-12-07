@@ -144,18 +144,14 @@ public final class Parser {
         )
     }
 
-    // functionParameters = type ident ("," type ident)*
+    // functionParameters = variableDecl ("," variableDecl)*
     func functionParameters() throws -> [VariableDeclNode] {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
         var results: [VariableDeclNode] = []
 
-        let variableDecl = VariableDeclNode(
-            typeToken: try consumeTypeToken(),
-            identifierToken: try consumeIdentifierToken()
-        )
-        results.append(variableDecl)
+        results.append(try variableDecl())
 
         while index < tokens.count {
             if case .reserved(.parenthesisRight, _) = tokens[index] {
@@ -164,11 +160,7 @@ public final class Parser {
 
             try consumeReservedToken(.comma)
 
-            let variableDecl = VariableDeclNode(
-                typeToken: try consumeTypeToken(),
-                identifierToken: try consumeIdentifierToken()
-            )
-            results.append(variableDecl)
+            results.append(try variableDecl())
         }
 
         return results
@@ -176,6 +168,7 @@ public final class Parser {
 
     // stmt    = expr ";"
     //         | block
+    //         | variableDecl ";"
     //         | "if" "(" expr ")" stmt ("else" stmt)?
     //         | "while" "(" expr ")" stmt
     //         | "for" "(" expr? ";" expr? ";" expr? ")" stmt
@@ -189,6 +182,12 @@ public final class Parser {
         switch tokens[index] {
         case .reserved(.braceLeft, _):
             return try block()
+
+        case .type:
+            let variableDecl = try variableDecl()
+            try consumeReservedToken(.semicolon)
+
+            return variableDecl
 
         case .keyword(.if, _):
             let ifToken = try consumeKeywordToken(.if)
@@ -280,6 +279,14 @@ public final class Parser {
         }
 
         return BlockStatementNode(statements: statements, sourceTokens: Array(tokens[startIndex..<index]))
+    }
+
+    // variableDecl = type identifier
+    func variableDecl() throws -> VariableDeclNode {
+        VariableDeclNode(
+            typeToken: try consumeTypeToken(),
+            identifierToken: try consumeIdentifierToken()
+        )
     }
 
     // expr = assign
