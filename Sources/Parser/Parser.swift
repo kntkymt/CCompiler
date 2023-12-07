@@ -128,8 +128,8 @@ public final class Parser {
         let functionName = try consumeIdentifierToken()
         try consumeReservedToken(.parenthesisLeft)
 
-        var parameters: [IdentifierNode] = []
-        if index < tokens.count, case .identifier = tokens[index] {
+        var parameters: [VariableDeclNode] = []
+        if index < tokens.count, case .type = tokens[index] {
             parameters = try functionParameters()
         }
 
@@ -144,13 +144,18 @@ public final class Parser {
         )
     }
 
-    // functionParameters = ident ("," ident)*
-    func functionParameters() throws -> [IdentifierNode] {
+    // functionParameters = type ident ("," type ident)*
+    func functionParameters() throws -> [VariableDeclNode] {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
-        var results: [IdentifierNode] = []
-        results.append(IdentifierNode(token: try consumeIdentifierToken()))
+        var results: [VariableDeclNode] = []
+
+        let variableDecl = VariableDeclNode(
+            typeToken: try consumeTypeToken(),
+            identifierToken: try consumeIdentifierToken()
+        )
+        results.append(variableDecl)
 
         while index < tokens.count {
             if case .reserved(.parenthesisRight, _) = tokens[index] {
@@ -159,7 +164,11 @@ public final class Parser {
 
             try consumeReservedToken(.comma)
 
-            results.append(IdentifierNode(token: try consumeIdentifierToken()))
+            let variableDecl = VariableDeclNode(
+                typeToken: try consumeTypeToken(),
+                identifierToken: try consumeIdentifierToken()
+            )
+            results.append(variableDecl)
         }
 
         return results

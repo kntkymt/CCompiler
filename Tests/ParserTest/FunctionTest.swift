@@ -57,14 +57,16 @@ final class FunctionTest: XCTestCase {
             .type(.int, sourceIndex: 0),
             .identifier("main", sourceIndex: 4),
             .reserved(.parenthesisLeft, sourceIndex: 8),
-            .identifier("a", sourceIndex: 9),
-            .reserved(.comma, sourceIndex: 10),
-            .identifier("b", sourceIndex: 11),
-            .reserved(.parenthesisRight, sourceIndex: 12),
-            .reserved(.braceLeft, sourceIndex: 13),
-            .number("1", sourceIndex: 14),
-            .reserved(.semicolon, sourceIndex: 15),
-            .reserved(.braceRight, sourceIndex: 16)
+            .type(.int, sourceIndex: 9),
+            .identifier("a", sourceIndex: 13),
+            .reserved(.comma, sourceIndex: 14),
+            .type(.int, sourceIndex: 15),
+            .identifier("b", sourceIndex: 19),
+            .reserved(.parenthesisRight, sourceIndex: 20),
+            .reserved(.braceLeft, sourceIndex: 21),
+            .number("1", sourceIndex: 22),
+            .reserved(.semicolon, sourceIndex: 23),
+            .reserved(.braceRight, sourceIndex: 24)
         ]
         let node = try Parser(tokens: tokens).functionDecl()
 
@@ -75,13 +77,13 @@ final class FunctionTest: XCTestCase {
                 token: tokens[1],
                 block: BlockStatementNode(
                     statements: [
-                        IntegerLiteralNode(token: tokens[8])
+                        IntegerLiteralNode(token: tokens[10])
                     ],
-                    sourceTokens: Array(tokens[7...10])
+                    sourceTokens: Array(tokens[9...12])
                 ),
                 parameters: [
-                    IdentifierNode(token: tokens[3]),
-                    IdentifierNode(token: tokens[5])
+                    VariableDeclNode(typeToken: tokens[3], identifierToken: tokens[4]),
+                    VariableDeclNode(typeToken: tokens[6], identifierToken: tokens[7])
                 ],
                 sourceTokens: tokens
             )
