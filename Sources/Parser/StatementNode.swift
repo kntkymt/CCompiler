@@ -134,9 +134,24 @@ public class FunctionDeclNode: NodeProtocol {
     public let sourceTokens: [Token]
     public var children: [any NodeProtocol] { [block] + parameters }
 
+    public let returnTypeToken: Token
     public let token: Token
     public let block: BlockStatementNode
     public let parameters: [IdentifierNode]
+
+    public var returnTypeName: String {
+        returnTypeToken.value
+    }
+
+    public var returnTypeKind: Token.TypeKind {
+        switch returnTypeToken {
+        case .type(let kind, _):
+            return kind
+
+        default:
+            fatalError()
+        }
+    }
 
     public var functionName: String {
         token.value
@@ -144,7 +159,8 @@ public class FunctionDeclNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(token: Token, block: BlockStatementNode, parameters: [IdentifierNode], sourceTokens: [Token]) {
+    init(returnTypeToken: Token, token: Token, block: BlockStatementNode, parameters: [IdentifierNode], sourceTokens: [Token]) {
+        self.returnTypeToken = returnTypeToken
         self.token = token
         self.block = block
         self.parameters = parameters

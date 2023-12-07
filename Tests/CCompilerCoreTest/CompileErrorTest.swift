@@ -5,41 +5,41 @@ final class CompileErrorTest: XCTestCase {
 
     func testInvalidSyntax1() throws {
         do {
-            _ = try compile("main(){5 ++}")
+            _ = try compile("int main(){5 ++}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 11))
+            XCTAssertEqual(error, .invalidSyntax(index: 15))
         }
     }
 
     func testInvalidSyntax2() throws {
         do {
-            _ = try compile("a = 0")
+            _ = try compile("main(){5++}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 2))
+            XCTAssertEqual(error, .invalidSyntax(index: 0))
         }
     }
 
     func testInvalidSyntax3() throws {
         do {
-            _ = try compile("main(){5 +}")
+            _ = try compile("int main(){5 +}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 10))
+            XCTAssertEqual(error, .invalidSyntax(index: 14))
         }
     }
 
     func testInvalidSyntax4() throws {
         do {
-            _ = try compile("main(){+}")
+            _ = try compile("int main(){+}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 8))
+            XCTAssertEqual(error, .invalidSyntax(index: 12))
         }
     }
 
     func testInvalidToken() throws {
         do {
-            _ = try compile("main(){5     ^}")
+            _ = try compile("int main(){5     ^}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidToken(index: 13))
+            XCTAssertEqual(error, .invalidToken(index: 17))
         }
     }
 }
