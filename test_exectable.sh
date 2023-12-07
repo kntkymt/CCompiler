@@ -55,5 +55,7 @@ assert 6 "sub() { return 5; } main() { a=1; b = sub(); return a + b; }"
 assert 3 "sum(a,b) { return a + b; } main() { return sum(1, 2); }"
 assert 12 "sum(a,b) { return a * 10 + b; } main() { return sum(1, 2); }"
 assert 74 "sum(a,b,c) { d = 10; return a * 2 + b * 3 + c * 4 + d * 5; } main() { a = 1; return sum(a * 3, 2, 3); }"
+assert 5 "main() { a = 5; b = &a; return *b; }"
+assert 5 "main() { a = 5; return *&a; }"
 
 echo OK

@@ -249,6 +249,32 @@ public final class Generator {
 
             return result
 
+        case .prefixOperatorExpr:
+            let casted = try node.casted(PrefixOperatorExpressionNode.self)
+
+            switch casted.operatorKind {
+            case .reference:
+                // *のあとはどんな値でも良い
+                result += try generate(node: casted.right)
+
+                // アドレスの値をロードしてpush
+                result += "    ldr x0, [sp]\n"
+                result += "    add sp, sp, #16\n"
+
+                result += "    ldr x0, [x0]\n"
+                result += "    str x0, [sp, #-16]!\n"
+
+            case .address:
+                // &のあとは変数しか入らない（はず？）
+                if let right = casted.right as? IdentifierNode {
+                    result += try generatePushLocalVariableAddress(node: right)
+                } else {
+                    throw GenerateError.invalidSyntax(index: node.sourceTokens[0].sourceIndex)
+                }
+            }
+
+            return result
+
         case .infixOperatorExpr:
             let casted = try node.casted(InfixOperatorExpressionNode.self)
 
