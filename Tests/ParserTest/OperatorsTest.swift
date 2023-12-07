@@ -117,6 +117,42 @@ final class OperatorsTest: XCTestCase {
         )
     }
 
+    func testUnaryAddress() throws {
+        let tokens: [Token] = [
+            .reserved(.and, sourceIndex: 0),
+            .identifier("a", sourceIndex: 1),
+            .reserved(.semicolon, sourceIndex: 2)
+        ]
+        let node = try Parser(tokens: tokens).stmt()
+
+        XCTAssertEqual(
+            node as! PrefixOperatorExpressionNode,
+            PrefixOperatorExpressionNode(
+                operator: tokens[0],
+                right: IdentifierNode(token: tokens[1]),
+                sourceTokens: Array(tokens[0...1])
+            )
+        )
+    }
+
+    func testUnaryReference() throws {
+        let tokens: [Token] = [
+            .reserved(.mul, sourceIndex: 0),
+            .identifier("a", sourceIndex: 1),
+            .reserved(.semicolon, sourceIndex: 2)
+        ]
+        let node = try Parser(tokens: tokens).stmt()
+
+        XCTAssertEqual(
+            node as! PrefixOperatorExpressionNode,
+            PrefixOperatorExpressionNode(
+                operator: tokens[0],
+                right: IdentifierNode(token: tokens[1]),
+                sourceTokens: Array(tokens[0...1])
+            )
+        )
+    }
+
     func testEqual() throws {
         let tokens: [Token] = [
             .number("1", sourceIndex: 0),
