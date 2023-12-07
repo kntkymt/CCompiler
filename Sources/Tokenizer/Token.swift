@@ -6,6 +6,7 @@ public enum Token: Equatable {
     case keyword(_ kind: KeywordKind, sourceIndex: Int)
     case number(_ value: String, sourceIndex: Int)
     case identifier(_ value: String, sourceIndex: Int)
+    case type(_ kind: TypeKind, sourceIndex: Int)
 
     public var value: String {
         switch self {
@@ -20,6 +21,9 @@ public enum Token: Equatable {
 
         case .identifier(let value, _):
             return value
+
+        case .type(let kind, _):
+            return kind.rawValue
         }
     }
 
@@ -35,6 +39,9 @@ public enum Token: Equatable {
             return sourceIndex
 
         case .identifier(_, let sourceIndex):
+            return sourceIndex
+
+        case .type(_, let sourceIndex):
             return sourceIndex
         }
     }
@@ -101,5 +108,9 @@ public enum Token: Equatable {
         case `else`
         case `while`
         case `for`
+    }
+
+    public enum TypeKind: String, CaseIterable {
+        case int
     }
 }

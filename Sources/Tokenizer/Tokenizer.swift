@@ -46,6 +46,7 @@ public func tokenize(source: String) throws -> [Token] {
     // 例: <= の時に<を先にチェックすると<, =の2つのトークンになってしまう
     let reservedKinds = Token.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
     let keywordKinds = Token.KeywordKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    let typeKinds = Token.TypeKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
 
 root:
     while index < charactors.count {
@@ -83,6 +84,24 @@ root:
 
                 tokens.append(.keyword(keywordKind, sourceIndex: index))
                 index += keywordString.count
+
+                continue root
+            }
+        }
+
+        for typeKind in typeKinds {
+            let typeString = typeKind.rawValue
+            if index + (typeString.count - 1) < charactors.count,
+               String(charactors[index..<index+typeString.count]) == typeString {
+
+                // typeの次がidentifierの文字だった場合はkeywordではなくidentifier
+                if index + (typeString.count - 1) + 1 < charactors.count,
+                   charactors[index + typeString.count].isIdentifierCharactor {
+                    break
+                }
+
+                tokens.append(.type(typeKind, sourceIndex: index))
+                index += typeString.count
 
                 continue root
             }
