@@ -108,6 +108,8 @@ public enum Token: Equatable {
         case `else`
         case `while`
         case `for`
+
+        case sizeOf
     }
 
     public enum TypeKind: String, CaseIterable {
