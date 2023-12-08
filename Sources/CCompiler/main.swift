@@ -29,6 +29,10 @@ struct CCompiler {
             case .invalidToken(let index):
                 print(source)
                 print(String(repeating: " ", count: index) + "^不正な文字です")
+            case .noSuchVariable(let variableName, let index):
+                print(source)
+                print(String(repeating: " ", count: index) + "^変数\(variableName)は存在しません")
+
             case .unknown:
                 print("不明なコンパイルエラー")
             }

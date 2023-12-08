@@ -77,6 +77,22 @@ public final class Parser {
         }
     }
 
+    @discardableResult
+    func consumeTypeToken() throws -> Token {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+
+        if case .type = tokens[index] {
+            let token = tokens[index]
+            index += 1
+            return token
+        } else {
+            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+        }
+    }
+
+
     // MARK: - Public
 
     public func parse() throws -> SourceFileNode {
@@ -100,33 +116,42 @@ public final class Parser {
         return SourceFileNode(functions: functionDecls, sourceTokens: tokens)
     }
 
-    // functionDecl = ident "(" functionParameters? ")" block
+    // functionDecl = type ident "(" functionParameters? ")" block
     func functionDecl() throws -> FunctionDeclNode {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
         let startIndex = index
 
+        let returnType = try consumeTypeToken()
+
         let functionName = try consumeIdentifierToken()
         try consumeReservedToken(.parenthesisLeft)
 
-        var parameters: [IdentifierNode] = []
-        if index < tokens.count, case .identifier = tokens[index] {
+        var parameters: [VariableDeclNode] = []
+        if index < tokens.count, case .type = tokens[index] {
             parameters = try functionParameters()
         }
 
         try consumeReservedToken(.parenthesisRight)
 
-        return FunctionDeclNode(token: functionName, block: try block(), parameters: parameters, sourceTokens: Array(tokens[startIndex..<index]))
+        return FunctionDeclNode(
+            returnTypeToken: returnType,
+            token: functionName,
+            block: try block(),
+            parameters: parameters,
+            sourceTokens: Array(tokens[startIndex..<index])
+        )
     }
 
-    // functionParameters = ident ("," ident)*
-    func functionParameters() throws -> [IdentifierNode] {
+    // functionParameters = variableDecl ("," variableDecl)*
+    func functionParameters() throws -> [VariableDeclNode] {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
-        var results: [IdentifierNode] = []
-        results.append(IdentifierNode(token: try consumeIdentifierToken()))
+        var results: [VariableDeclNode] = []
+
+        results.append(try variableDecl())
 
         while index < tokens.count {
             if case .reserved(.parenthesisRight, _) = tokens[index] {
@@ -135,7 +160,7 @@ public final class Parser {
 
             try consumeReservedToken(.comma)
 
-            results.append(IdentifierNode(token: try consumeIdentifierToken()))
+            results.append(try variableDecl())
         }
 
         return results
@@ -143,6 +168,7 @@ public final class Parser {
 
     // stmt    = expr ";"
     //         | block
+    //         | variableDecl ";"
     //         | "if" "(" expr ")" stmt ("else" stmt)?
     //         | "while" "(" expr ")" stmt
     //         | "for" "(" expr? ";" expr? ";" expr? ")" stmt
@@ -156,6 +182,12 @@ public final class Parser {
         switch tokens[index] {
         case .reserved(.braceLeft, _):
             return try block()
+
+        case .type:
+            let variableDecl = try variableDecl()
+            try consumeReservedToken(.semicolon)
+
+            return variableDecl
 
         case .keyword(.if, _):
             let ifToken = try consumeKeywordToken(.if)
@@ -247,6 +279,14 @@ public final class Parser {
         }
 
         return BlockStatementNode(statements: statements, sourceTokens: Array(tokens[startIndex..<index]))
+    }
+
+    // variableDecl = type identifier
+    func variableDecl() throws -> VariableDeclNode {
+        VariableDeclNode(
+            typeToken: try consumeTypeToken(),
+            identifierToken: try consumeIdentifierToken()
+        )
     }
 
     // expr = assign

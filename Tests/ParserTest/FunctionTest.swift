@@ -6,29 +6,31 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionDecl() throws {
         let tokens: [Token] = [
-            .identifier("main", sourceIndex: 0),
-            .reserved(.parenthesisLeft, sourceIndex: 4),
-            .reserved(.parenthesisRight, sourceIndex: 5),
-            .reserved(.braceLeft, sourceIndex: 6),
-            .number("1", sourceIndex: 7),
-            .reserved(.semicolon, sourceIndex: 8),
-            .number("2", sourceIndex: 9),
-            .reserved(.semicolon, sourceIndex: 10),
-            .reserved(.braceRight, sourceIndex: 11)
+            .type(.int, sourceIndex: 0),
+            .identifier("main", sourceIndex: 4),
+            .reserved(.parenthesisLeft, sourceIndex: 8),
+            .reserved(.parenthesisRight, sourceIndex: 9),
+            .reserved(.braceLeft, sourceIndex: 10),
+            .number("1", sourceIndex: 11),
+            .reserved(.semicolon, sourceIndex: 12),
+            .number("2", sourceIndex: 13),
+            .reserved(.semicolon, sourceIndex: 14),
+            .reserved(.braceRight, sourceIndex: 15)
         ]
         let node = try Parser(tokens: tokens).functionDecl()
 
         XCTAssertEqual(
             node,
             FunctionDeclNode(
-                token: tokens[0],
+                returnTypeToken: tokens[0],
+                token: tokens[1],
                 block: BlockStatementNode(
                     statements: [
-                        IntegerLiteralNode(token: tokens[4]),
-                        IntegerLiteralNode(token: tokens[6])
+                        IntegerLiteralNode(token: tokens[5]),
+                        IntegerLiteralNode(token: tokens[7])
                     ],
-                    sourceTokens: Array(tokens[3...8])
-                ), 
+                    sourceTokens: Array(tokens[4...9])
+                ),
                 parameters: [],
                 sourceTokens: tokens
             )
@@ -52,34 +54,36 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionDeclWithParameter() throws {
         let tokens: [Token] = [
-            .identifier("main", sourceIndex: 0),
-            .reserved(.parenthesisLeft, sourceIndex: 4),
-            .identifier("a", sourceIndex: 5),
-            .reserved(.comma, sourceIndex: 6),
-            .identifier("b", sourceIndex: 7),
-            .reserved(.parenthesisRight, sourceIndex: 8),
-            .reserved(.braceLeft, sourceIndex: 9),
-            .number("1", sourceIndex: 10),
-            .reserved(.semicolon, sourceIndex: 11),
-            .reserved(.braceRight, sourceIndex: 12)
+            .type(.int, sourceIndex: 0),
+            .identifier("main", sourceIndex: 4),
+            .reserved(.parenthesisLeft, sourceIndex: 8),
+            .type(.int, sourceIndex: 9),
+            .identifier("a", sourceIndex: 13),
+            .reserved(.comma, sourceIndex: 14),
+            .type(.int, sourceIndex: 15),
+            .identifier("b", sourceIndex: 19),
+            .reserved(.parenthesisRight, sourceIndex: 20),
+            .reserved(.braceLeft, sourceIndex: 21),
+            .number("1", sourceIndex: 22),
+            .reserved(.semicolon, sourceIndex: 23),
+            .reserved(.braceRight, sourceIndex: 24)
         ]
         let node = try Parser(tokens: tokens).functionDecl()
-
-        print(node.parameters.count)
 
         XCTAssertEqual(
             node,
             FunctionDeclNode(
-                token: tokens[0],
+                returnTypeToken: tokens[0],
+                token: tokens[1],
                 block: BlockStatementNode(
                     statements: [
-                        IntegerLiteralNode(token: tokens[7])
+                        IntegerLiteralNode(token: tokens[10])
                     ],
-                    sourceTokens: Array(tokens[6...9])
+                    sourceTokens: Array(tokens[9...12])
                 ),
                 parameters: [
-                    IdentifierNode(token: tokens[2]),
-                    IdentifierNode(token: tokens[4])
+                    VariableDeclNode(typeToken: tokens[3], identifierToken: tokens[4]),
+                    VariableDeclNode(typeToken: tokens[6], identifierToken: tokens[7])
                 ],
                 sourceTokens: tokens
             )
@@ -113,20 +117,22 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionDecls() throws {
         let tokens: [Token] = [
-            .identifier("main", sourceIndex: 0),
-            .reserved(.parenthesisLeft, sourceIndex: 4),
-            .reserved(.parenthesisRight, sourceIndex: 5),
-            .reserved(.braceLeft, sourceIndex: 6),
-            .number("1", sourceIndex: 7),
-            .reserved(.semicolon, sourceIndex: 8),
-            .reserved(.braceRight, sourceIndex: 9),
-            .identifier("fuga", sourceIndex: 10),
-            .reserved(.parenthesisLeft, sourceIndex: 14),
-            .reserved(.parenthesisRight, sourceIndex: 15),
-            .reserved(.braceLeft, sourceIndex: 16),
-            .number("1", sourceIndex: 17),
-            .reserved(.semicolon, sourceIndex: 18),
-            .reserved(.braceRight, sourceIndex: 19)
+            .type(.int, sourceIndex: 0),
+            .identifier("main", sourceIndex: 4),
+            .reserved(.parenthesisLeft, sourceIndex: 8),
+            .reserved(.parenthesisRight, sourceIndex: 9),
+            .reserved(.braceLeft, sourceIndex: 10),
+            .number("1", sourceIndex: 11),
+            .reserved(.semicolon, sourceIndex: 12),
+            .reserved(.braceRight, sourceIndex: 13),
+            .type(.int, sourceIndex: 14),
+            .identifier("fuga", sourceIndex: 18),
+            .reserved(.parenthesisLeft, sourceIndex: 22),
+            .reserved(.parenthesisRight, sourceIndex: 23),
+            .reserved(.braceLeft, sourceIndex: 24),
+            .number("1", sourceIndex: 25),
+            .reserved(.semicolon, sourceIndex: 26),
+            .reserved(.braceRight, sourceIndex: 27)
         ]
         let nodes = try Parser(tokens: tokens).parse()
 
@@ -135,26 +141,28 @@ final class FunctionTest: XCTestCase {
             SourceFileNode(
                 functions: [
                     FunctionDeclNode(
-                        token: tokens[0],
+                        returnTypeToken: tokens[0],
+                        token: tokens[1],
                         block: BlockStatementNode(
                             statements: [
-                                IntegerLiteralNode(token: tokens[4])
+                                IntegerLiteralNode(token: tokens[5])
                             ],
-                            sourceTokens: Array(tokens[3...6])
-                        ), 
+                            sourceTokens: Array(tokens[4...7])
+                        ),
                         parameters: [],
-                        sourceTokens: Array(tokens[0...6])
+                        sourceTokens: Array(tokens[0...7])
                     ),
                     FunctionDeclNode(
-                        token: tokens[7],
+                        returnTypeToken: tokens[8],
+                        token: tokens[9],
                         block: BlockStatementNode(
                             statements: [
-                                IntegerLiteralNode(token: tokens[11])
+                                IntegerLiteralNode(token: tokens[13])
                             ],
-                            sourceTokens: Array(tokens[10...13])
-                        ), 
+                            sourceTokens: Array(tokens[12...15])
+                        ),
                         parameters: [],
-                        sourceTokens: Array(tokens[7...13])
+                        sourceTokens: Array(tokens[8...15])
                     )
                 ],
                 sourceTokens: tokens
