@@ -42,4 +42,12 @@ final class CompileErrorTest: XCTestCase {
             XCTAssertEqual(error, .invalidToken(index: 17))
         }
     }
+
+    func testNoSuchVariable() throws {
+        do {
+            _ = try compile("int main(){a = 0;}")
+        } catch let error as CompileError {
+            XCTAssertEqual(error, .noSuchVariable(variableName: "a", index: 11))
+        }
+    }
 }

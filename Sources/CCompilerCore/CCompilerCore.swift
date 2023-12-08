@@ -5,6 +5,7 @@ import Tokenizer
 public enum CompileError: Error, Equatable {
     case invalidSyntax(index: Int)
     case invalidToken(index: Int)
+    case noSuchVariable(variableName: String, index: Int)
     case unknown
 }
 
@@ -28,6 +29,10 @@ public func compile(_ source: String) throws -> String {
         switch error {
         case .invalidSyntax(let index):
             throw CompileError.invalidSyntax(index: index)
+
+        case .noSuchVariable(let variableName, let index):
+            throw CompileError.noSuchVariable(variableName: variableName, index: index)
+
         }
     } catch {
         throw CompileError.unknown

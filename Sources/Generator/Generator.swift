@@ -2,6 +2,7 @@ import Parser
 
 public enum GenerateError: Error {
     case invalidSyntax(index: Int)
+    case noSuchVariable(varibaleName: String, index: Int)
 }
 
 extension NodeProtocol {
@@ -25,7 +26,7 @@ public final class Generator {
     }
 
     private var variableAddressOffset: [String: Int] = [:]
-    private var functions: Set<String> = Set()
+    private var functionLabels: Set<String> = Set()
 
     public init() {
     }
@@ -38,7 +39,7 @@ public final class Generator {
             result += try generate(node: functionDecl)
         }
 
-        let functionMeta = ".globl \(functions.joined(separator: ", "))\n"
+        let functionMeta = ".globl \(functionLabels.joined(separator: ", "))\n"
 
         return functionMeta + result
     }
@@ -96,31 +97,52 @@ public final class Generator {
         case .functionDecl:
             let casted = try node.casted(FunctionDeclNode.self)
 
+            // 関数定義ごとに作り直す
+            variableAddressOffset = [:]
+
             let functionLabel = casted.functionName == "main" ? "_main" : casted.functionName
-            functions.insert(functionLabel)
+            functionLabels.insert(functionLabel)
             result += "\(functionLabel):\n"
 
             // プロローグ
+            var prologue = ""
             // push 古いBR, 呼び出し元LR
-            result += "    stp x29, x30, [sp, #-16]!\n"
+            prologue += "    stp x29, x30, [sp, #-16]!\n"
             // 今のスタックのトップをBRに（新しい関数フレームを宣言）
-            result += "    mov x29, sp\n"
+            prologue += "    mov x29, sp\n"
 
-            // FIXME: ここの確保数を実際の数にしたいが、Parserで調べるのかGenで調べるのかわからないので保留
-            // 26個分の変数を確保
-            result += "    sub sp, sp, #208\n"
-
+            var parameterDecl = ""
             // 引数をローカル変数として保存し直す
             for (index, parameter) in casted.parameters.enumerated() {
                 let offset = (variableAddressOffset.count + 1) * 8
                 variableAddressOffset[parameter.identifierName] = offset
 
-                result += "    str x\(index), [x29, #-\(offset)]\n"
+                parameterDecl += "    str x\(index), [x29, #-\(offset)]\n"
             }
 
-            result += try generate(node: casted.block)
+            let body = try generate(node: casted.block)
+
+            // 確保するスタックの量はbodyを見てからじゃないとわからない
+            result += prologue
+
+            if !variableAddressOffset.isEmpty {
+                // FIXME: スタックのサイズは16の倍数...のはずだが32じゃないとダメっぽい？
+                let variableSize = 32 * variableAddressOffset.count
+                result += "    sub sp, sp, #\(variableSize)\n"
+            }
+
+            result += parameterDecl
+            result += body
 
             return result
+
+        case .variableDecl:
+            let casted = try node.casted(VariableDeclNode.self)
+
+            let offset = (variableAddressOffset.count + 1) * 8
+            variableAddressOffset[casted.identifierName] = offset
+
+            return ""
 
         case .blockStatement:
             let casted = try node.casted(BlockStatementNode.self)
@@ -363,16 +385,10 @@ public final class Generator {
     private func generatePushLocalVariableAddress(node: IdentifierNode) throws -> String {
         var result = ""
 
-        let offset: Int = {
-            if let offset = variableAddressOffset[node.identifierName] {
-                return offset
-            } else {
-                let offset = (variableAddressOffset.count + 1) * 8
-                variableAddressOffset[node.identifierName] = offset
+        guard let offset = variableAddressOffset[node.identifierName] else {
+            throw GenerateError.noSuchVariable(varibaleName: node.identifierName, index: node.token.sourceIndex)
+        }
 
-                return offset
-            }
-        }()
         result += "    sub x0, x29, #\(offset)\n"
         result += "    str x0, [sp, #-16]!\n"
 
