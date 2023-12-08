@@ -144,6 +144,13 @@ public final class Generator {
 
             return ""
 
+        case .pointerType:
+            // 今は型の一致を見ていない
+            fatalError()
+
+        case .type:
+            fatalError()
+
         case .blockStatement:
             let casted = try node.casted(BlockStatementNode.self)
 
