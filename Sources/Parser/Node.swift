@@ -4,6 +4,9 @@ public enum NodeKind {
     case integerLiteral
     case identifier
 
+    case type
+    case pointerType
+
     case binaryOperator
     case assign
 
@@ -291,5 +294,41 @@ public class FunctionCallExpressionNode: NodeProtocol {
         self.token = token
         self.arguments = arguments
         self.sourceTokens = sourceTokens
+    }
+}
+
+public class TypeNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public let kind: NodeKind = .type
+    public var sourceTokens: [Token] { [typeToken] }
+    public let children: [any NodeProtocol] = []
+
+    public let typeToken: Token
+
+    // MARK: - Initializer
+
+    public init(typeToken: Token) {
+        self.typeToken = typeToken
+    }
+}
+
+public class PointerTypeNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public let kind: NodeKind = .pointerType
+    public var sourceTokens: [Token] { referenceType.sourceTokens + [pointerToken] }
+    public var children: [any NodeProtocol] { [referenceType] }
+    public let referenceType: any NodeProtocol
+
+    public let pointerToken: Token
+
+    // MARK: - Initializer
+
+    init(referenceType: any NodeProtocol, pointerToken: Token) {
+        self.referenceType = referenceType
+        self.pointerToken = pointerToken
     }
 }

@@ -144,6 +144,13 @@ public final class Generator {
 
             return ""
 
+        case .pointerType:
+            // 今は型の一致を見ていない
+            fatalError()
+
+        case .type:
+            fatalError()
+
         case .blockStatement:
             let casted = try node.casted(BlockStatementNode.self)
 
@@ -279,10 +286,11 @@ public final class Generator {
                 // *のあとはどんな値でも良い
                 result += try generate(node: casted.right)
 
-                // アドレスの値をロードしてpush
+                // 値をロードしてpush
                 result += "    ldr x0, [sp]\n"
                 result += "    add sp, sp, #16\n"
 
+                // 値をアドレスとして読み、アドレスが指す値をロード
                 result += "    ldr x0, [x0]\n"
                 result += "    str x0, [sp, #-16]!\n"
 
@@ -301,7 +309,15 @@ public final class Generator {
             let casted = try node.casted(InfixOperatorExpressionNode.self)
 
             if casted.operator is AssignNode {
-                result += try generatePushLocalVariableAddress(node: casted.left.casted(IdentifierNode.self))
+                // 左辺は変数か、`*変数`
+                if let identifier = casted.left as? IdentifierNode {
+                    result += try generatePushLocalVariableAddress(node: casted.left.casted(IdentifierNode.self))
+                } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference {
+                    result += try generate(node: pointer.right)
+                } else {
+                    throw GenerateError.invalidSyntax(index: casted.left.sourceTokens[0].sourceIndex)
+                }
+
                 result += try generate(node: casted.right)
 
                 // 両方のノードの結果をpop
@@ -315,7 +331,6 @@ public final class Generator {
                 result += "    str x0, [x1]\n"
 
                 result += "    str x0, [sp, #-16]!\n"
-
 
             } else if let binaryOperator = casted.operator as? BinaryOperatorNode {
                 result += try generate(node: casted.left)

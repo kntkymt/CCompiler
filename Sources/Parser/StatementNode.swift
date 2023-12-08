@@ -134,24 +134,10 @@ public class FunctionDeclNode: NodeProtocol {
     public let sourceTokens: [Token]
     public var children: [any NodeProtocol] { [block] + parameters }
 
-    public let returnTypeToken: Token
+    public let returnType: any NodeProtocol
     public let token: Token
     public let block: BlockStatementNode
     public let parameters: [VariableDeclNode]
-
-    public var returnTypeName: String {
-        returnTypeToken.value
-    }
-
-    public var returnTypeKind: Token.TypeKind {
-        switch returnTypeToken {
-        case .type(let kind, _):
-            return kind
-
-        default:
-            fatalError()
-        }
-    }
 
     public var functionName: String {
         token.value
@@ -159,8 +145,8 @@ public class FunctionDeclNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(returnTypeToken: Token, token: Token, block: BlockStatementNode, parameters: [VariableDeclNode], sourceTokens: [Token]) {
-        self.returnTypeToken = returnTypeToken
+    init(returnType: any NodeProtocol, token: Token, block: BlockStatementNode, parameters: [VariableDeclNode], sourceTokens: [Token]) {
+        self.returnType = returnType
         self.token = token
         self.block = block
         self.parameters = parameters
@@ -172,34 +158,23 @@ public class VariableDeclNode: NodeProtocol {
 
     // MARK: - Property
 
-
     public var kind: NodeKind = .variableDecl
     public var sourceTokens: [Token] {
-        [typeToken, identifierToken]
+        type.sourceTokens + [identifierToken]
     }
     public let children: [any NodeProtocol] = []
 
-    public let typeToken: Token
+    public let type: any NodeProtocol
     public let identifierToken: Token
 
     public var identifierName: String {
         identifierToken.value
     }
 
-    public var typeKind: Token.TypeKind {
-        switch typeToken {
-        case .type(let kind, _):
-            return kind
-
-        default:
-            fatalError()
-        }
-    }
-
     // MARK: - Initializer
 
-    init(typeToken: Token, identifierToken: Token) {
-        self.typeToken = typeToken
+    init(type: any NodeProtocol, identifierToken: Token) {
+        self.type = type
         self.identifierToken = identifierToken
     }
 }

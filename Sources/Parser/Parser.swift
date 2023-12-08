@@ -123,7 +123,7 @@ public final class Parser {
         }
         let startIndex = index
 
-        let returnType = try consumeTypeToken()
+        let returnType = try type()
 
         let functionName = try consumeIdentifierToken()
         try consumeReservedToken(.parenthesisLeft)
@@ -136,7 +136,7 @@ public final class Parser {
         try consumeReservedToken(.parenthesisRight)
 
         return FunctionDeclNode(
-            returnTypeToken: returnType,
+            returnType: returnType,
             token: functionName,
             block: try block(),
             parameters: parameters,
@@ -284,9 +284,25 @@ public final class Parser {
     // variableDecl = type identifier
     func variableDecl() throws -> VariableDeclNode {
         VariableDeclNode(
-            typeToken: try consumeTypeToken(),
+            type: try type(),
             identifierToken: try consumeIdentifierToken()
         )
+    }
+
+    // type = typeIdentifier "*"*
+    func type() throws -> any NodeProtocol {
+        var node: any NodeProtocol = TypeNode(typeToken: try consumeTypeToken())
+
+        while index < tokens.count {
+            if case .reserved(.mul, _) = tokens[index] {
+                let mulToken = try consumeReservedToken(.mul)
+                node = PointerTypeNode(referenceType: node, pointerToken: mulToken)
+            } else {
+                break
+            }
+        }
+
+        return node
     }
 
     // expr = assign

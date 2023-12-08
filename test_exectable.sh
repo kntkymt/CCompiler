@@ -58,5 +58,8 @@ assert 74 "int sum(int a, int b, int c) { int d; d = 10; return a * 2 + b * 3 + 
 assert 5 "int main() { int a; int b; a = 5; b = &a; return *b; }"
 assert 5 "int main() { int a; a = 5; return *&a; }"
 assert 5 "int sub() { int a; a = 5; return a; } int main() { int a; a = 10; return sub(); }"
+assert 10 "int main() { int a; int* b; a = 5; b = &a; *b = 10; return a; }"
+assert 20 "int main() { int a; int* b; int** c; a = 5; b = &a; c = &b; **c = 20; return a; }"
+assert 30 "int main() { int a; int d; int* b; int** c; a = 5; d = 10; b = &a; c = &b; *c = &d; **c = 30; return d; }"
 
 echo OK
