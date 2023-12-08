@@ -61,5 +61,8 @@ assert 5 "int sub() { int a; a = 5; return a; } int main() { int a; a = 10; retu
 assert 10 "int main() { int a; int* b; a = 5; b = &a; *b = 10; return a; }"
 assert 20 "int main() { int a; int* b; int** c; a = 5; b = &a; c = &b; **c = 20; return a; }"
 assert 30 "int main() { int a; int d; int* b; int** c; a = 5; d = 10; b = &a; c = &b; *c = &d; **c = 30; return d; }"
+assert 5 "int main() { int a; int b; int* c; a = 5; b = 10; c = &b; c = c + 1; return *c; }"
+assert 10 "int main() { int a; int b; int* c; a = 5; b = 10; c = &a; c = c - 1; return *c; }"
+assert 15 "int main() { int a; int b; int* c; a = 5; b = 10; c = &b; c = c + 1; *c = 15; return a; }"
 
 echo OK
