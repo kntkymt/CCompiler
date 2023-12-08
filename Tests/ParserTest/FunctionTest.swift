@@ -22,7 +22,7 @@ final class FunctionTest: XCTestCase {
         XCTAssertEqual(
             node,
             FunctionDeclNode(
-                returnTypeToken: tokens[0],
+                returnType: TypeNode(typeToken: tokens[0]),
                 token: tokens[1],
                 block: BlockStatementNode(
                     statements: [
@@ -30,6 +30,40 @@ final class FunctionTest: XCTestCase {
                         IntegerLiteralNode(token: tokens[7])
                     ],
                     sourceTokens: Array(tokens[4...9])
+                ),
+                parameters: [],
+                sourceTokens: tokens
+            )
+        )
+    }
+
+    func testFunctionDeclPointer() throws {
+        let tokens: [Token] = [
+            .type(.int, sourceIndex: 0),
+            .reserved(.mul, sourceIndex: 3),
+            .identifier("main", sourceIndex: 5),
+            .reserved(.parenthesisLeft, sourceIndex: 9),
+            .reserved(.parenthesisRight, sourceIndex: 10),
+            .reserved(.braceLeft, sourceIndex: 11),
+            .number("1", sourceIndex: 12),
+            .reserved(.semicolon, sourceIndex: 13),
+            .number("2", sourceIndex: 14),
+            .reserved(.semicolon, sourceIndex: 15),
+            .reserved(.braceRight, sourceIndex: 16)
+        ]
+        let node = try Parser(tokens: tokens).functionDecl()
+
+        XCTAssertEqual(
+            node,
+            FunctionDeclNode(
+                returnType: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]),
+                token: tokens[2],
+                block: BlockStatementNode(
+                    statements: [
+                        IntegerLiteralNode(token: tokens[6]),
+                        IntegerLiteralNode(token: tokens[8])
+                    ],
+                    sourceTokens: Array(tokens[5...10])
                 ),
                 parameters: [],
                 sourceTokens: tokens
@@ -73,7 +107,7 @@ final class FunctionTest: XCTestCase {
         XCTAssertEqual(
             node,
             FunctionDeclNode(
-                returnTypeToken: tokens[0],
+                returnType: TypeNode(typeToken: tokens[0]),
                 token: tokens[1],
                 block: BlockStatementNode(
                     statements: [
@@ -82,8 +116,8 @@ final class FunctionTest: XCTestCase {
                     sourceTokens: Array(tokens[9...12])
                 ),
                 parameters: [
-                    VariableDeclNode(typeToken: tokens[3], identifierToken: tokens[4]),
-                    VariableDeclNode(typeToken: tokens[6], identifierToken: tokens[7])
+                    VariableDeclNode(type: TypeNode(typeToken: tokens[3]), identifierToken: tokens[4]),
+                    VariableDeclNode(type: TypeNode(typeToken: tokens[6]), identifierToken: tokens[7])
                 ],
                 sourceTokens: tokens
             )
@@ -141,7 +175,7 @@ final class FunctionTest: XCTestCase {
             SourceFileNode(
                 functions: [
                     FunctionDeclNode(
-                        returnTypeToken: tokens[0],
+                        returnType: TypeNode(typeToken: tokens[0]),
                         token: tokens[1],
                         block: BlockStatementNode(
                             statements: [
@@ -153,7 +187,7 @@ final class FunctionTest: XCTestCase {
                         sourceTokens: Array(tokens[0...7])
                     ),
                     FunctionDeclNode(
-                        returnTypeToken: tokens[8],
+                        returnType: TypeNode(typeToken: tokens[8]),
                         token: tokens[9],
                         block: BlockStatementNode(
                             statements: [
