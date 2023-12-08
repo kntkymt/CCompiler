@@ -25,7 +25,12 @@ public final class Generator {
         return id.description
     }
 
-    private var variableAddressOffset: [String: Int] = [:]
+    struct VariableInfo {
+        var type: any NodeProtocol
+        var addressOffset: Int
+    }
+
+    private var variables: [String: VariableInfo] = [:]
     private var functionLabels: Set<String> = Set()
 
     public init() {
@@ -98,7 +103,7 @@ public final class Generator {
             let casted = try node.casted(FunctionDeclNode.self)
 
             // 関数定義ごとに作り直す
-            variableAddressOffset = [:]
+            variables = [:]
 
             let functionLabel = casted.functionName == "main" ? "_main" : casted.functionName
             functionLabels.insert(functionLabel)
@@ -114,8 +119,8 @@ public final class Generator {
             var parameterDecl = ""
             // 引数をローカル変数として保存し直す
             for (index, parameter) in casted.parameters.enumerated() {
-                let offset = (variableAddressOffset.count + 1) * 8
-                variableAddressOffset[parameter.identifierName] = offset
+                let offset = (variables.count + 1) * 8
+                variables[parameter.identifierName] = VariableInfo(type: parameter.type, addressOffset: offset)
 
                 parameterDecl += "    str x\(index), [x29, #-\(offset)]\n"
             }
@@ -125,9 +130,9 @@ public final class Generator {
             // 確保するスタックの量はbodyを見てからじゃないとわからない
             result += prologue
 
-            if !variableAddressOffset.isEmpty {
+            if !variables.isEmpty {
                 // FIXME: スタックのサイズは16の倍数...のはずだが32じゃないとダメっぽい？
-                let variableSize = 32 * variableAddressOffset.count
+                let variableSize = 32 * variables.count
                 result += "    sub sp, sp, #\(variableSize)\n"
             }
 
@@ -139,8 +144,8 @@ public final class Generator {
         case .variableDecl:
             let casted = try node.casted(VariableDeclNode.self)
 
-            let offset = (variableAddressOffset.count + 1) * 8
-            variableAddressOffset[casted.identifierName] = offset
+            let offset = (variables.count + 1) * 8
+            variables[casted.identifierName] = VariableInfo(type: casted.type, addressOffset: offset)
 
             return ""
 
@@ -310,7 +315,7 @@ public final class Generator {
 
             if casted.operator is AssignNode {
                 // 左辺は変数か、`*変数`
-                if let identifier = casted.left as? IdentifierNode {
+                if casted.left is IdentifierNode {
                     result += try generatePushLocalVariableAddress(node: casted.left.casted(IdentifierNode.self))
                 } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference {
                     result += try generate(node: pointer.right)
@@ -342,6 +347,16 @@ public final class Generator {
                 result += "    add sp, sp, #16\n"
                 result += "    ldr x1, [sp]\n"
                 result += "    add sp, sp, #16\n"
+
+                if binaryOperator.operatorKind == .add || binaryOperator.operatorKind == .sub {
+                    // addまたはsubの時、一方が変数でポインタ型だったら、他方を8倍する
+                    // 8は8バイト（ポインタの指すサイズ、今は全部8バイトなので）
+                    if let identifier = casted.left as? IdentifierNode, variables[identifier.identifierName]?.type is PointerTypeNode {
+                        result += "    lsl x0, x0, #3\n"
+                    } else if let identifier = casted.right as? IdentifierNode, variables[identifier.identifierName]?.type is PointerTypeNode {
+                        result += "    lsl x1, x1, #3\n"
+                    }
+                }
 
                 switch binaryOperator.operatorKind {
                 case .add:
@@ -400,7 +415,7 @@ public final class Generator {
     private func generatePushLocalVariableAddress(node: IdentifierNode) throws -> String {
         var result = ""
 
-        guard let offset = variableAddressOffset[node.identifierName] else {
+        guard let offset = variables[node.identifierName]?.addressOffset else {
             throw GenerateError.noSuchVariable(varibaleName: node.identifierName, index: node.token.sourceIndex)
         }
 
