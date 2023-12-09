@@ -275,7 +275,7 @@ final class OperatorsTest: XCTestCase {
 
     func testSizeof() throws {
         let tokens: [Token] = [
-            .keyword(.sizeOf, sourceIndex: 0),
+            .keyword(.sizeof, sourceIndex: 0),
             .reserved(.parenthesisLeft, sourceIndex: 6),
             .number("1", sourceIndex: 7),
             .reserved(.parenthesisRight, sourceIndex: 8),
