@@ -516,11 +516,12 @@ public final class Parser {
         let startIndex = index
 
         switch tokens[index] {
-        case .keyword(.sizeOf, _):
-            try consumeKeywordToken(.sizeOf)
+        case .keyword(.sizeof, _):
+            try consumeKeywordToken(.sizeof)
 
             let unary = try unary()
 
+            // FIXME: どうやって式の型を判断する？
             return IntegerLiteralNode(token: .number("8", sourceIndex: unary.sourceTokens[0].sourceIndex))
 
         case .reserved(.add, _):
