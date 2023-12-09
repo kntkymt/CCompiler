@@ -505,7 +505,8 @@ public final class Parser {
         return node
     }
 
-    // unary = ("+" | "-")? primary
+    // unary = "sizeof" unary
+    //       | ("+" | "-")? primary
     //       | ("*" | "&") unary
     func unary() throws -> any NodeProtocol {
         if index >= tokens.count {
@@ -515,6 +516,13 @@ public final class Parser {
         let startIndex = index
 
         switch tokens[index] {
+        case .keyword(.sizeOf, _):
+            try consumeKeywordToken(.sizeOf)
+
+            let unary = try unary()
+
+            return IntegerLiteralNode(token: .number("8", sourceIndex: unary.sourceTokens[0].sourceIndex))
+
         case .reserved(.add, _):
             try consumeReservedToken(.add)
 
