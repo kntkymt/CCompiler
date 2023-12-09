@@ -99,4 +99,17 @@ final class KeywordsTest: XCTestCase {
             ]
         )
     }
+
+    func testSizeOf() throws {
+        let tokens = try tokenize(source: "sizeof(1)")
+        XCTAssertEqual(
+            tokens,
+            [
+                .keyword(.sizeof, sourceIndex: 0),
+                .reserved(.parenthesisLeft, sourceIndex: 6),
+                .number("1", sourceIndex: 7),
+                .reserved(.parenthesisRight, sourceIndex: 8),
+            ]
+        )
+    }
 }

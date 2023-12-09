@@ -64,5 +64,8 @@ assert 30 "int main() { int a; int d; int* b; int** c; a = 5; d = 10; b = &a; c 
 assert 5 "int main() { int a; int b; int* c; a = 5; b = 10; c = &b; c = c + 1; return *c; }"
 assert 10 "int main() { int a; int b; int* c; a = 5; b = 10; c = &a; c = c - 1; return *c; }"
 assert 15 "int main() { int a; int b; int* c; a = 5; b = 10; c = &b; c = c + 1; *c = 15; return a; }"
+assert 8 "int main() { return sizeof(1); }"
+assert 8 "int main() { int a; a = 10; return sizeof(a); }"
+assert 8 "int main() { int a; a = 10; return sizeof(a + 1); }"
 
 echo OK
