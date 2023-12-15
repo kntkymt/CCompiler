@@ -73,6 +73,18 @@ final class TokensTest: XCTestCase {
         )
     }
 
+    func testSquares() throws {
+        let tokens = try tokenize(source: "[1]")
+        XCTAssertEqual(
+            tokens,
+            [
+                .reserved(.squareLeft, sourceIndex: 0),
+                .number("1", sourceIndex: 1),
+                .reserved(.squareRight, sourceIndex: 2)
+            ]
+        )
+    }
+
     func testBraces() throws {
         let tokens = try tokenize(source: "{1;}")
         XCTAssertEqual(
