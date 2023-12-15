@@ -30,6 +30,7 @@ public final class Generator {
         var addressOffset: Int
     }
 
+    private var globalVariables: [String: any TypeNodeProtocol] = [:]
     private var variables: [String: VariableInfo] = [:]
     private var functionLabels: Set<String> = Set()
 
@@ -39,14 +40,31 @@ public final class Generator {
     // MARK: - Public
 
     public func generate(sourceFileNode: SourceFileNode) throws -> String {
-        var result = ""
+
+        var variableDeclResult = ""
+        for variableDecl in sourceFileNode.globalVariables {
+            variableDeclResult += try generateGlobalVariable(node: variableDecl)
+        }
+
+        var functionDeclResult = ""
         for functionDecl in sourceFileNode.functions {
-            result += try generate(node: functionDecl)
+            functionDeclResult += try generate(node: functionDecl)
         }
 
         let functionMeta = ".globl \(functionLabels.joined(separator: ", "))\n"
 
-        return functionMeta + result
+        return variableDeclResult + functionMeta + functionDeclResult
+    }
+
+    func generateGlobalVariable(node: VariableDeclNode) throws -> String {
+        var result = ""
+
+        result += "\(node.identifierName):\n"
+        result += "    .zero \(node.type.memorySize)\n"
+
+        globalVariables[node.identifierName] = node.type
+
+        return result
     }
 
     func generate(node: any NodeProtocol) throws -> String {

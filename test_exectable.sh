@@ -79,5 +79,6 @@ assert 17 "int main() { int a[3]; int b; b = 1; a[b] = 7; a[b+1] = 10; return a[
 assert 5 "int main() { int a[2]; a[1] = 5; int* p; p = a; return p[1]; }"
 assert 5 "int main() { int a[2]; a[1] = 5; return *(a+1); }"
 assert 1 "int main() { int a[2]; a[1] = 5; int* p; p = a; return p[1] == *(p+1); }"
+assert 1 "int g; int main() { return 1; }"
 
 echo OK
