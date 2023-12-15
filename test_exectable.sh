@@ -67,5 +67,11 @@ assert 15 "int main() { int a; int b; int* c; a = 5; b = 10; c = &b; c = c + 1; 
 assert 8 "int main() { return sizeof(1); }"
 assert 8 "int main() { int a; a = 10; return sizeof(a); }"
 assert 8 "int main() { int a; a = 10; return sizeof(a + 1); }"
+assert 80 "int main() { int a; int b[10]; return &a - &b; }"
+assert 1 "int main() { int a[2]; *a = 1; return *a; }"
+assert 2 "int main() { int a[2]; *(a + 1) = 2; return *(a + 1); }"
+assert 1 "int main() { int a[2]; int *p; p = a; return a == p; }"
+assert 5 "int main() { int a[2]; int *p; p = a; *(p + 1) = 5; return *(a + 1); }"
+assert 3 "int main() { int a[2]; *a = 1; *(a + 1) = 2; int *p; p = a; return *p + *(p + 1); }"
 
 echo OK

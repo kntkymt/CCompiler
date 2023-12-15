@@ -74,6 +74,12 @@ public enum Token: Equatable {
         /// `}`
         case braceRight = "}"
 
+        /// `[`
+        case squareLeft = "["
+
+        /// `]`
+        case squareRight = "]"
+
         /// `==`
         case equal = "=="
 

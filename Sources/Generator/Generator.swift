@@ -26,7 +26,7 @@ public final class Generator {
     }
 
     struct VariableInfo {
-        var type: any NodeProtocol
+        var type: any TypeNodeProtocol
         var addressOffset: Int
     }
 
@@ -62,16 +62,21 @@ public final class Generator {
 
         case .identifier:
             let casted = try node.casted(IdentifierNode.self)
+
             // アドレスをpush
             result += try generatePushLocalVariableAddress(node: casted)
 
-            // アドレスをpop
-            result += "    ldr x0, [sp]\n"
-            result += "    add sp, sp, #16\n"
+            // 配列の場合は先頭アドレスのまま返す
+            // 配列以外の場合はアドレスの中身を返す
+            if variables[casted.identifierName]?.type.kind != .arrayType {
+                // アドレスをpop
+                result += "    ldr x0, [sp]\n"
+                result += "    add sp, sp, #16\n"
 
-            // アドレスを値に変換してpush
-            result += "    ldr x0, [x0]\n"
-            result += "    str x0, [sp, #-16]!\n"
+                // アドレスを値に変換してpush
+                result += "    ldr x0, [x0]\n"
+                result += "    str x0, [sp, #-16]!\n"
+            }
 
             return result
 
@@ -132,8 +137,8 @@ public final class Generator {
 
             if !variables.isEmpty {
                 // FIXME: スタックのサイズは16の倍数...のはずだが32じゃないとダメっぽい？
-                let variableSize = 32 * variables.count
-                result += "    sub sp, sp, #\(variableSize)\n"
+                let variableSize = variables.reduce(0) { $0 + $1.value.type.memorySize }
+                result += "    sub sp, sp, #\(variableSize.isMultiple(of: 64) ? variableSize : (1 + variableSize / 128) * 128)\n"
             }
 
             result += parameterDecl
@@ -144,10 +149,13 @@ public final class Generator {
         case .variableDecl:
             let casted = try node.casted(VariableDeclNode.self)
 
-            let offset = (variables.count + 1) * 8
+            let offset = variables.reduce(0) { $0 + $1.value.type.memorySize } + casted.type.memorySize
             variables[casted.identifierName] = VariableInfo(type: casted.type, addressOffset: offset)
 
             return ""
+
+        case .arrayType:
+            fatalError()
 
         case .pointerType:
             // 今は型の一致を見ていない
@@ -314,7 +322,7 @@ public final class Generator {
             let casted = try node.casted(InfixOperatorExpressionNode.self)
 
             if casted.operator is AssignNode {
-                // 左辺は変数か、`*変数`
+                // 左辺は変数か、`*値`
                 if casted.left is IdentifierNode {
                     result += try generatePushLocalVariableAddress(node: casted.left.casted(IdentifierNode.self))
                 } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference {
@@ -349,11 +357,12 @@ public final class Generator {
                 result += "    add sp, sp, #16\n"
 
                 if binaryOperator.operatorKind == .add || binaryOperator.operatorKind == .sub {
-                    // addまたはsubの時、一方が変数でポインタ型だったら、他方を8倍する
+                    // addまたはsubの時、一方が変数でポインタ型または配列だったら、他方を8倍する
                     // 8は8バイト（ポインタの指すサイズ、今は全部8バイトなので）
-                    if let identifier = casted.left as? IdentifierNode, variables[identifier.identifierName]?.type is PointerTypeNode {
+                    if let identifier = casted.left as? IdentifierNode,
+                       variables[identifier.identifierName]?.type is PointerTypeNode || variables[identifier.identifierName]?.type is ArrayTypeNode {
                         result += "    lsl x0, x0, #3\n"
-                    } else if let identifier = casted.right as? IdentifierNode, variables[identifier.identifierName]?.type is PointerTypeNode {
+                    } else if let identifier = casted.right as? IdentifierNode, variables[identifier.identifierName]?.type is PointerTypeNode || variables[identifier.identifierName]?.type is ArrayTypeNode {
                         result += "    lsl x1, x1, #3\n"
                     }
                 }
