@@ -217,7 +217,7 @@ final class FunctionTest: XCTestCase {
         XCTAssertEqual(
             node as! SubscriptCallExpressionNode,
             SubscriptCallExpressionNode(
-                identifierToken: tokens[0],
+                identifierNode: IdentifierNode(token: tokens[0]),
                 squareLeftToken: tokens[1],
                 argument: IntegerLiteralNode(token: tokens[2]),
                 squareRightToken: tokens[3]
@@ -240,7 +240,7 @@ final class FunctionTest: XCTestCase {
         XCTAssertEqual(
             node as! SubscriptCallExpressionNode,
             SubscriptCallExpressionNode(
-                identifierToken: tokens[0],
+                identifierNode: IdentifierNode(token: tokens[0]),
                 squareLeftToken: tokens[1],
                 argument: InfixOperatorExpressionNode(
                     operator: BinaryOperatorNode(token: tokens[3]),

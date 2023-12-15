@@ -154,6 +154,19 @@ public final class Generator {
 
             return ""
 
+        case .subscriptCallExpr:
+            let casted = try node.casted(SubscriptCallExpressionNode.self)
+
+            result += try generatePushLocalArrayElementAddress(node: casted)
+
+            // 結果のアドレスの値をロードしてスタックに積む
+            result += "    ldr x0, [sp]\n"
+            result += "    add sp, sp, #16\n"
+            result += "    ldr x0, [x0]\n"
+            result += "    str x0, [sp, #-16]!\n"
+
+            return  result
+
         case .arrayType:
             fatalError()
 
@@ -322,11 +335,13 @@ public final class Generator {
             let casted = try node.casted(InfixOperatorExpressionNode.self)
 
             if casted.operator is AssignNode {
-                // 左辺は変数か、`*値`
+                // 左辺は変数, `*値`, subscriptCall
                 if casted.left is IdentifierNode {
                     result += try generatePushLocalVariableAddress(node: casted.left.casted(IdentifierNode.self))
                 } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference {
                     result += try generate(node: pointer.right)
+                } else if let subscriptCall = casted.left as? SubscriptCallExpressionNode {
+                    result += try generatePushLocalArrayElementAddress(node: subscriptCall)
                 } else {
                     throw GenerateError.invalidSyntax(index: casted.left.sourceTokens[0].sourceIndex)
                 }
@@ -413,8 +428,14 @@ public final class Generator {
 
             return result
 
-        default:
-            throw GenerateError.invalidSyntax(index: node.sourceTokens[0].sourceIndex)
+        case .binaryOperator:
+            fatalError()
+
+        case .assign:
+            fatalError()
+
+        case .sourceFile:
+            fatalError()
         }
     }
 
@@ -429,6 +450,35 @@ public final class Generator {
         }
 
         result += "    sub x0, x29, #\(offset)\n"
+        result += "    str x0, [sp, #-16]!\n"
+
+        return result
+    }
+
+    private func generatePushLocalArrayElementAddress(node: SubscriptCallExpressionNode) throws -> String {
+        var result = ""
+
+        // 配列の先頭アドレス, subscriptの値をpush
+        result += try generatePushLocalVariableAddress(node: node.identifierNode)
+        result += try generate(node: node.argument)
+
+        result += "    ldr x0, [sp]\n"
+        result += "    add sp, sp, #16\n"
+        // subscriptの方は8倍
+        result += "    lsl x0, x0, 3\n"
+
+        result += "    ldr x1, [sp]\n"
+        result += "    add sp, sp, #16\n"
+
+        // identifierがポインタだった場合はアドレスが指す値にする
+        if variables[node.identifierNode.identifierName]?.type.kind == .pointerType {
+            result += "    ldr x1, [x1]\n"
+
+        }
+
+        // それらを足す
+        result += "    add x0, x1, x0\n"
+
         result += "    str x0, [sp, #-16]!\n"
 
         return result

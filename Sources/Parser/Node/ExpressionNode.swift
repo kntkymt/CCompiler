@@ -94,18 +94,18 @@ public class SubscriptCallExpressionNode: NodeProtocol {
     // MARK: - Property
 
     public var kind: NodeKind = .subscriptCallExpr
-    public var sourceTokens: [Token] { [identifierToken, squareLeftToken] + argument.sourceTokens + [squareRightToken] }
+    public var sourceTokens: [Token] { identifierNode.sourceTokens + [squareLeftToken] + argument.sourceTokens + [squareRightToken] }
     public var children: [any NodeProtocol] { [argument] }
 
-    public let identifierToken: Token
+    public let identifierNode: IdentifierNode
     public let squareLeftToken: Token
     public let argument: any NodeProtocol
     public let squareRightToken: Token
 
     // MARK: - Initializer
 
-    public init(identifierToken: Token, squareLeftToken: Token, argument: any NodeProtocol, squareRightToken: Token) {
-        self.identifierToken = identifierToken
+    public init(identifierNode: IdentifierNode, squareLeftToken: Token, argument: any NodeProtocol, squareRightToken: Token) {
+        self.identifierNode = identifierNode
         self.squareLeftToken = squareLeftToken
         self.argument = argument
         self.squareRightToken = squareRightToken

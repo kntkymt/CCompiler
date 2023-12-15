@@ -73,5 +73,11 @@ assert 2 "int main() { int a[2]; *(a + 1) = 2; return *(a + 1); }"
 assert 1 "int main() { int a[2]; int *p; p = a; return a == p; }"
 assert 5 "int main() { int a[2]; int *p; p = a; *(p + 1) = 5; return *(a + 1); }"
 assert 3 "int main() { int a[2]; *a = 1; *(a + 1) = 2; int *p; p = a; return *p + *(p + 1); }"
+assert 5 "int main() { int a[2]; a[0] = 5; return a[0]; }"
+assert 8 "int main() { int a; int* b; a = b + 1; int c; c = b; return a - c; }"
+assert 17 "int main() { int a[3]; int b; b = 1; a[b] = 7; a[b+1] = 10; return a[b] + a[b+1]; }"
+assert 5 "int main() { int a[2]; a[1] = 5; int* p; p = a; return p[1]; }"
+assert 5 "int main() { int a[2]; a[1] = 5; return *(a+1); }"
+assert 1 "int main() { int a[2]; a[1] = 5; int* p; p = a; return p[1] == *(p+1); }"
 
 echo OK

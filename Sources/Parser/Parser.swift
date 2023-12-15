@@ -627,7 +627,7 @@ public final class Parser {
                 return FunctionCallExpressionNode(token: identifierToken, arguments: argments, sourceTokens: Array(tokens[startIndex..<index]))
             } else if index < tokens.count, case .reserved(.squareLeft, _) = tokens[index] {
                 return SubscriptCallExpressionNode(
-                    identifierToken: identifierToken,
+                    identifierNode: IdentifierNode(token: identifierToken),
                     squareLeftToken: try consumeReservedToken(.squareLeft),
                     argument: try expr(),
                     squareRightToken: try consumeReservedToken(.squareRight)
