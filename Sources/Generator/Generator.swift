@@ -123,7 +123,7 @@ public final class Generator {
 
             var parameterDecl = ""
             // 引数をローカル変数として保存し直す
-            for (index, parameter) in casted.parameters.enumerated() {
+            for (index, parameter) in casted.parameterNodes.enumerated() {
                 let offset = (variables.count + 1) * 8
                 variables[parameter.identifierName] = VariableInfo(type: parameter.type, addressOffset: offset)
 

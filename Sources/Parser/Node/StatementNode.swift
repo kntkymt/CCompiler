@@ -131,26 +131,42 @@ public class FunctionDeclNode: NodeProtocol {
     // MARK: - Property
 
     public var kind: NodeKind = .functionDecl
-    public let sourceTokens: [Token]
-    public var children: [any NodeProtocol] { [block] + parameters }
+    public var sourceTokens: [Token] {
+        returnTypeNode.sourceTokens +
+        [functionNameToken, parenthesisLeftToken] +
+        parameterNodes.flatMap { $0.sourceTokens } +
+        [parenthesisRightToken] +
+        block.sourceTokens
+    }
+    public var children: [any NodeProtocol] { [returnTypeNode] + parameterNodes + [block] }
 
-    public let returnType: any NodeProtocol
-    public let token: Token
+    public let returnTypeNode: any NodeProtocol
+    public let functionNameToken: Token
+    public let parenthesisLeftToken: Token
+    public let parameterNodes: [VariableDeclNode]
+    public let parenthesisRightToken: Token
     public let block: BlockStatementNode
-    public let parameters: [VariableDeclNode]
 
     public var functionName: String {
-        token.value
+        functionNameToken.value
     }
 
     // MARK: - Initializer
 
-    init(returnType: any NodeProtocol, token: Token, block: BlockStatementNode, parameters: [VariableDeclNode], sourceTokens: [Token]) {
-        self.returnType = returnType
-        self.token = token
+    init(
+        returnTypeNode: any NodeProtocol,
+        functionNameToken: Token,
+        parenthesisLeftToken: Token,
+        parameterNodes: [VariableDeclNode],
+        parenthesisRightToken: Token,
+        block: BlockStatementNode
+    ) {
+        self.returnTypeNode = returnTypeNode
+        self.functionNameToken = functionNameToken
+        self.parenthesisLeftToken = parenthesisLeftToken
+        self.parameterNodes = parameterNodes
+        self.parenthesisRightToken = parenthesisRightToken
         self.block = block
-        self.parameters = parameters
-        self.sourceTokens = sourceTokens
     }
 }
 
@@ -162,7 +178,7 @@ public class VariableDeclNode: NodeProtocol {
     public var sourceTokens: [Token] {
         type.sourceTokens + [identifierToken]
     }
-    public let children: [any NodeProtocol] = []
+    public var children: [any NodeProtocol] { [type] }
 
     public let type: any TypeNodeProtocol
     public let identifierToken: Token
@@ -184,15 +200,21 @@ public class SourceFileNode: NodeProtocol {
     // MARK: - Property
 
     public var kind: NodeKind = .sourceFile
-    public let sourceTokens: [Token]
-    public var children: [any NodeProtocol] { functions }
+    public var sourceTokens: [Token] {
+        functions.flatMap { $0.sourceTokens } + globalVariables.flatMap { $0.sourceTokens }
+    }
+
+    public var children: [any NodeProtocol] {
+        functions + globalVariables
+    }
 
     public let functions: [FunctionDeclNode]
+    public let globalVariables: [VariableDeclNode]
 
     // MARK: - Initializer
 
-    init(functions: [FunctionDeclNode], sourceTokens: [Token]) {
+    init(functions: [FunctionDeclNode], globalVariables: [VariableDeclNode]) {
         self.functions = functions
-        self.sourceTokens = sourceTokens
+        self.globalVariables = globalVariables
     }
 }

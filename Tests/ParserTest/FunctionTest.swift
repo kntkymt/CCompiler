@@ -17,22 +17,28 @@ final class FunctionTest: XCTestCase {
             .reserved(.semicolon, sourceIndex: 14),
             .reserved(.braceRight, sourceIndex: 15)
         ]
-        let node = try Parser(tokens: tokens).functionDecl()
+        let node = try Parser(tokens: tokens).parse()
 
         XCTAssertEqual(
             node,
-            FunctionDeclNode(
-                returnType: TypeNode(typeToken: tokens[0]),
-                token: tokens[1],
-                block: BlockStatementNode(
-                    statements: [
-                        IntegerLiteralNode(token: tokens[5]),
-                        IntegerLiteralNode(token: tokens[7])
-                    ],
-                    sourceTokens: Array(tokens[4...9])
-                ),
-                parameters: [],
-                sourceTokens: tokens
+            SourceFileNode(
+                functions: [
+                    FunctionDeclNode(
+                        returnTypeNode: TypeNode(typeToken: tokens[0]),
+                        functionNameToken: tokens[1],
+                        parenthesisLeftToken: tokens[2],
+                        parameterNodes: [],
+                        parenthesisRightToken: tokens[3],
+                        block: BlockStatementNode(
+                            statements: [
+                                IntegerLiteralNode(token: tokens[5]),
+                                IntegerLiteralNode(token: tokens[7])
+                            ],
+                            sourceTokens: Array(tokens[4...9])
+                        )
+                    )
+                ],
+                globalVariables: []
             )
         )
     }
@@ -51,22 +57,28 @@ final class FunctionTest: XCTestCase {
             .reserved(.semicolon, sourceIndex: 15),
             .reserved(.braceRight, sourceIndex: 16)
         ]
-        let node = try Parser(tokens: tokens).functionDecl()
+        let node = try Parser(tokens: tokens).parse()
 
         XCTAssertEqual(
             node,
-            FunctionDeclNode(
-                returnType: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]),
-                token: tokens[2],
-                block: BlockStatementNode(
-                    statements: [
-                        IntegerLiteralNode(token: tokens[6]),
-                        IntegerLiteralNode(token: tokens[8])
-                    ],
-                    sourceTokens: Array(tokens[5...10])
-                ),
-                parameters: [],
-                sourceTokens: tokens
+            SourceFileNode(
+                functions: [
+                    FunctionDeclNode(
+                        returnTypeNode: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]),
+                        functionNameToken: tokens[2],
+                        parenthesisLeftToken: tokens[3],
+                        parameterNodes: [],
+                        parenthesisRightToken: tokens[4],
+                        block: BlockStatementNode(
+                            statements: [
+                                IntegerLiteralNode(token: tokens[6]),
+                                IntegerLiteralNode(token: tokens[8])
+                            ],
+                            sourceTokens: Array(tokens[5...10])
+                        )
+                    )
+                ],
+                globalVariables: []
             )
         )
     }
@@ -102,24 +114,30 @@ final class FunctionTest: XCTestCase {
             .reserved(.semicolon, sourceIndex: 23),
             .reserved(.braceRight, sourceIndex: 24)
         ]
-        let node = try Parser(tokens: tokens).functionDecl()
+        let node = try Parser(tokens: tokens).parse()
 
         XCTAssertEqual(
             node,
-            FunctionDeclNode(
-                returnType: TypeNode(typeToken: tokens[0]),
-                token: tokens[1],
-                block: BlockStatementNode(
-                    statements: [
-                        IntegerLiteralNode(token: tokens[10])
-                    ],
-                    sourceTokens: Array(tokens[9...12])
-                ),
-                parameters: [
-                    VariableDeclNode(type: TypeNode(typeToken: tokens[3]), identifierToken: tokens[4]),
-                    VariableDeclNode(type: TypeNode(typeToken: tokens[6]), identifierToken: tokens[7])
+            SourceFileNode(
+                functions: [
+                    FunctionDeclNode(
+                        returnTypeNode: TypeNode(typeToken: tokens[0]),
+                        functionNameToken: tokens[1],
+                        parenthesisLeftToken: tokens[2],
+                        parameterNodes: [
+                            VariableDeclNode(type: TypeNode(typeToken: tokens[3]), identifierToken: tokens[4]),
+                            VariableDeclNode(type: TypeNode(typeToken: tokens[6]), identifierToken: tokens[7])
+                        ],
+                        parenthesisRightToken: tokens[8],
+                        block: BlockStatementNode(
+                            statements: [
+                                IntegerLiteralNode(token: tokens[10])
+                            ],
+                            sourceTokens: Array(tokens[9...12])
+                        )
+                    )
                 ],
-                sourceTokens: tokens
+                globalVariables: []
             )
         )
     }
@@ -175,31 +193,33 @@ final class FunctionTest: XCTestCase {
             SourceFileNode(
                 functions: [
                     FunctionDeclNode(
-                        returnType: TypeNode(typeToken: tokens[0]),
-                        token: tokens[1],
+                        returnTypeNode: TypeNode(typeToken: tokens[0]),
+                        functionNameToken: tokens[1],
+                        parenthesisLeftToken: tokens[2],
+                        parameterNodes: [],
+                        parenthesisRightToken: tokens[3],
                         block: BlockStatementNode(
                             statements: [
                                 IntegerLiteralNode(token: tokens[5])
                             ],
                             sourceTokens: Array(tokens[4...7])
-                        ),
-                        parameters: [],
-                        sourceTokens: Array(tokens[0...7])
+                        )
                     ),
                     FunctionDeclNode(
-                        returnType: TypeNode(typeToken: tokens[8]),
-                        token: tokens[9],
+                        returnTypeNode: TypeNode(typeToken: tokens[8]),
+                        functionNameToken: tokens[9],
+                        parenthesisLeftToken: tokens[10],
+                        parameterNodes: [],
+                        parenthesisRightToken: tokens[11],
                         block: BlockStatementNode(
                             statements: [
                                 IntegerLiteralNode(token: tokens[13])
                             ],
                             sourceTokens: Array(tokens[12...15])
-                        ),
-                        parameters: [],
-                        sourceTokens: Array(tokens[8...15])
+                        )
                     )
                 ],
-                sourceTokens: tokens
+                globalVariables: []
             )
         )
     }

@@ -105,43 +105,44 @@ public final class Parser {
 
     // MARK: - Syntax
 
-    // program = functionDecl*
+    // program = (functionDecl | variableDecl ";")*
     func program() throws -> SourceFileNode {
         var functionDecls: [FunctionDeclNode] = []
+        var globalVariableDecls: [VariableDeclNode] = []
 
         while index < tokens.count {
-            functionDecls.append(try functionDecl())
+
+            let type = try type()
+            let identifier = try consumeIdentifierToken()
+
+            // functionDecl = type ident "(" functionParameters? ")" block
+            if index < tokens.count, case .reserved(.parenthesisLeft, _) = tokens[index] {
+                let parenthesisLeft = try consumeReservedToken(.parenthesisLeft)
+
+                var parameters: [VariableDeclNode] = []
+                if index < tokens.count, case .type = tokens[index] {
+                    parameters = try functionParameters()
+                }
+
+                let parenthesisRight = try consumeReservedToken(.parenthesisRight)
+
+                let function = FunctionDeclNode(
+                    returnTypeNode: type,
+                    functionNameToken: identifier,
+                    parenthesisLeftToken: parenthesisLeft,
+                    parameterNodes: parameters,
+                    parenthesisRightToken: parenthesisRight,
+                    block: try block()
+                )
+                functionDecls.append(function)
+            } else {
+                let variable = try variableDecl(variableType: type, identifier: identifier)
+                try consumeReservedToken(.semicolon)
+                globalVariableDecls.append(variable)
+            }
         }
 
-        return SourceFileNode(functions: functionDecls, sourceTokens: tokens)
-    }
-
-    // functionDecl = type ident "(" functionParameters? ")" block
-    func functionDecl() throws -> FunctionDeclNode {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
-        }
-        let startIndex = index
-
-        let returnType = try type()
-
-        let functionName = try consumeIdentifierToken()
-        try consumeReservedToken(.parenthesisLeft)
-
-        var parameters: [VariableDeclNode] = []
-        if index < tokens.count, case .type = tokens[index] {
-            parameters = try functionParameters()
-        }
-
-        try consumeReservedToken(.parenthesisRight)
-
-        return FunctionDeclNode(
-            returnType: returnType,
-            token: functionName,
-            block: try block(),
-            parameters: parameters,
-            sourceTokens: Array(tokens[startIndex..<index])
-        )
+        return SourceFileNode(functions: functionDecls, globalVariables: globalVariableDecls)
     }
 
     // functionParameters = variableDecl ("," variableDecl)*
@@ -282,9 +283,9 @@ public final class Parser {
     }
 
     // variableDecl = type identifier ("[" num "]")?
-    func variableDecl() throws -> VariableDeclNode {
-        var type = try type()
-        let identifier = try consumeIdentifierToken()
+    func variableDecl(variableType: (any TypeNodeProtocol)? = nil, identifier: Token? = nil) throws -> VariableDeclNode {
+        var type = if let variableType { variableType } else { try type() }
+        let identifier = if let identifier { identifier } else { try consumeIdentifierToken() }
 
         if index < tokens.count, case .reserved(.squareLeft, _) = tokens[index] {
             type = ArrayTypeNode(
