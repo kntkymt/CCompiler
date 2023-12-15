@@ -26,7 +26,7 @@ public final class Generator {
     }
 
     struct VariableInfo {
-        var type: any NodeProtocol
+        var type: any TypeNodeProtocol
         var addressOffset: Int
     }
 
@@ -132,8 +132,8 @@ public final class Generator {
 
             if !variables.isEmpty {
                 // FIXME: スタックのサイズは16の倍数...のはずだが32じゃないとダメっぽい？
-                let variableSize = 32 * variables.count
-                result += "    sub sp, sp, #\(variableSize)\n"
+                let variableSize = variables.reduce(0) { $0 + $1.value.type.memorySize }
+                result += "    sub sp, sp, #\(variableSize.isMultiple(of: 64) ? variableSize : (1 + variableSize / 128) * 128)\n"
             }
 
             result += parameterDecl
@@ -144,10 +144,13 @@ public final class Generator {
         case .variableDecl:
             let casted = try node.casted(VariableDeclNode.self)
 
-            let offset = (variables.count + 1) * 8
+            let offset = variables.reduce(0) { $0 + $1.value.type.memorySize } + casted.type.memorySize
             variables[casted.identifierName] = VariableInfo(type: casted.type, addressOffset: offset)
 
             return ""
+
+        case .arrayType:
+            fatalError()
 
         case .pointerType:
             // 今は型の一致を見ていない

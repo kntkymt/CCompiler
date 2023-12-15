@@ -302,8 +302,8 @@ public final class Parser {
     }
 
     // type = typeIdentifier "*"*
-    func type() throws -> any NodeProtocol {
-        var node: any NodeProtocol = TypeNode(typeToken: try consumeTypeToken())
+    func type() throws -> any TypeNodeProtocol {
+        var node: any TypeNodeProtocol = TypeNode(typeToken: try consumeTypeToken())
 
         while index < tokens.count {
             if case .reserved(.mul, _) = tokens[index] {
