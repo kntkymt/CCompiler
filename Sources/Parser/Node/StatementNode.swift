@@ -164,7 +164,7 @@ public class VariableDeclNode: NodeProtocol {
     }
     public let children: [any NodeProtocol] = []
 
-    public let type: any NodeProtocol
+    public let type: any TypeNodeProtocol
     public let identifierToken: Token
 
     public var identifierName: String {
@@ -173,7 +173,7 @@ public class VariableDeclNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(type: any NodeProtocol, identifierToken: Token) {
+    init(type: any TypeNodeProtocol, identifierToken: Token) {
         self.type = type
         self.identifierToken = identifierToken
     }
