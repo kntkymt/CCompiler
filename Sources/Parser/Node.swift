@@ -6,6 +6,7 @@ public enum NodeKind {
 
     case type
     case pointerType
+    case arrayType
 
     case binaryOperator
     case assign
@@ -330,5 +331,27 @@ public class PointerTypeNode: NodeProtocol {
     init(referenceType: any NodeProtocol, pointerToken: Token) {
         self.referenceType = referenceType
         self.pointerToken = pointerToken
+    }
+}
+
+public class ArrayTypeNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .arrayType
+
+    public var sourceTokens: [Token] { [squareLeftToken] + elementType.sourceTokens + [squareRightToken] }
+    public var children: [any NodeProtocol] { [elementType] }
+    public let elementType: any NodeProtocol
+
+    public let squareLeftToken: Token
+    public let arraySizeToken: Token
+    public let squareRightToken: Token
+
+    public init(elementType: any NodeProtocol, squareLeftToken: Token, arraySizeToken: Token, squareRightToken: Token) {
+        self.elementType = elementType
+        self.squareLeftToken = squareLeftToken
+        self.arraySizeToken = arraySizeToken
+        self.squareRightToken = squareRightToken
     }
 }

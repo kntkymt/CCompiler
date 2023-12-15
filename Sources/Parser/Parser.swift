@@ -281,11 +281,23 @@ public final class Parser {
         return BlockStatementNode(statements: statements, sourceTokens: Array(tokens[startIndex..<index]))
     }
 
-    // variableDecl = type identifier
+    // variableDecl = type identifier ("[" num "]")?
     func variableDecl() throws -> VariableDeclNode {
-        VariableDeclNode(
-            type: try type(),
-            identifierToken: try consumeIdentifierToken()
+        var type = try type()
+        let identifier = try consumeIdentifierToken()
+
+        if index < tokens.count, case .reserved(.squareLeft, _) = tokens[index] {
+            type = ArrayTypeNode(
+                elementType: type,
+                squareLeftToken: try consumeReservedToken(.squareLeft),
+                arraySizeToken: try consumeNumberToken(),
+                squareRightToken: try consumeReservedToken(.squareRight)
+            )
+        }
+
+        return VariableDeclNode(
+            type: type,
+            identifierToken: identifier
         )
     }
 
