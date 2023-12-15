@@ -581,7 +581,9 @@ public final class Parser {
         }
     }
 
-    // primary = num | ident ( "( exprList? )" )? | "(" expr ")"
+    // primary = num
+    //         | ident ( ("( exprList? )") | ("[" expr "]") )?
+    //         | "(" expr ")"
     func primary() throws -> any NodeProtocol {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
@@ -623,6 +625,13 @@ public final class Parser {
                 try consumeReservedToken(.parenthesisRight)
 
                 return FunctionCallExpressionNode(token: identifierToken, arguments: argments, sourceTokens: Array(tokens[startIndex..<index]))
+            } else if index < tokens.count, case .reserved(.squareLeft, _) = tokens[index] {
+                return SubscriptCallExpressionNode(
+                    identifierNode: IdentifierNode(token: identifierToken),
+                    squareLeftToken: try consumeReservedToken(.squareLeft),
+                    argument: try expr(),
+                    squareRightToken: try consumeReservedToken(.squareRight)
+                )
             } else {
                 return IdentifierNode(token: identifierToken)
             }
