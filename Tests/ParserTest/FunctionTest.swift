@@ -203,4 +203,53 @@ final class FunctionTest: XCTestCase {
             )
         )
     }
+
+    func testSubscriptCall() throws {
+        let tokens: [Token] = [
+            .identifier("a", sourceIndex: 0),
+            .reserved(.squareLeft, sourceIndex: 1),
+            .number("1", sourceIndex: 2),
+            .reserved(.squareRight, sourceIndex: 3),
+            .reserved(.semicolon, sourceIndex: 4)
+        ]
+        let node = try Parser(tokens: tokens).stmt()
+
+        XCTAssertEqual(
+            node as! SubscriptCallExpressionNode,
+            SubscriptCallExpressionNode(
+                identifierToken: tokens[0],
+                squareLeftToken: tokens[1],
+                argument: IntegerLiteralNode(token: tokens[2]),
+                squareRightToken: tokens[3]
+            )
+        )
+    }
+
+    func testSubscriptCall2() throws {
+        let tokens: [Token] = [
+            .identifier("a", sourceIndex: 0),
+            .reserved(.squareLeft, sourceIndex: 1),
+            .number("1", sourceIndex: 2),
+            .reserved(.add, sourceIndex: 3),
+            .identifier("b", sourceIndex: 4),
+            .reserved(.squareRight, sourceIndex: 5),
+            .reserved(.semicolon, sourceIndex: 6)
+        ]
+        let node = try Parser(tokens: tokens).stmt()
+
+        XCTAssertEqual(
+            node as! SubscriptCallExpressionNode,
+            SubscriptCallExpressionNode(
+                identifierToken: tokens[0],
+                squareLeftToken: tokens[1],
+                argument: InfixOperatorExpressionNode(
+                    operator: BinaryOperatorNode(token: tokens[3]),
+                    left: IntegerLiteralNode(token: tokens[2]),
+                    right: IdentifierNode(token: tokens[4]),
+                    sourceTokens: Array(tokens[2...4])
+                ),
+                squareRightToken: tokens[5]
+            )
+        )
+    }
 }
