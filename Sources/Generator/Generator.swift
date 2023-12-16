@@ -30,6 +30,7 @@ public final class Generator {
         var addressOffset: Int
     }
 
+    private var globalVariables: [String: any TypeNodeProtocol] = [:]
     private var variables: [String: VariableInfo] = [:]
     private var functionLabels: Set<String> = Set()
 
@@ -39,14 +40,31 @@ public final class Generator {
     // MARK: - Public
 
     public func generate(sourceFileNode: SourceFileNode) throws -> String {
-        var result = ""
+
+        var variableDeclResult = ""
+        for variableDecl in sourceFileNode.globalVariables {
+            variableDeclResult += try generateGlobalVariableDecl(node: variableDecl)
+        }
+
+        var functionDeclResult = ""
         for functionDecl in sourceFileNode.functions {
-            result += try generate(node: functionDecl)
+            functionDeclResult += try generate(node: functionDecl)
         }
 
         let functionMeta = ".globl \(functionLabels.joined(separator: ", "))\n"
 
-        return functionMeta + result
+        return variableDeclResult + functionMeta + functionDeclResult
+    }
+
+    func generateGlobalVariableDecl(node: VariableDeclNode) throws -> String {
+        var result = ""
+
+        // g: .zeroじゃApple Clangは動かない？
+        result += ".comm g,\(node.type.memorySize),8\n"
+
+        globalVariables[node.identifierName] = node.type
+
+        return result
     }
 
     func generate(node: any NodeProtocol) throws -> String {
@@ -64,7 +82,7 @@ public final class Generator {
             let casted = try node.casted(IdentifierNode.self)
 
             // アドレスをpush
-            result += try generatePushLocalVariableAddress(node: casted)
+            result += try generatePushVariableAddress(node: casted)
 
             // 配列の場合は先頭アドレスのまま返す
             // 配列以外の場合はアドレスの中身を返す
@@ -123,7 +141,7 @@ public final class Generator {
 
             var parameterDecl = ""
             // 引数をローカル変数として保存し直す
-            for (index, parameter) in casted.parameters.enumerated() {
+            for (index, parameter) in casted.parameterNodes.enumerated() {
                 let offset = (variables.count + 1) * 8
                 variables[parameter.identifierName] = VariableInfo(type: parameter.type, addressOffset: offset)
 
@@ -157,7 +175,7 @@ public final class Generator {
         case .subscriptCallExpr:
             let casted = try node.casted(SubscriptCallExpressionNode.self)
 
-            result += try generatePushLocalArrayElementAddress(node: casted)
+            result += try generatePushArrayElementAddress(node: casted)
 
             // 結果のアドレスの値をロードしてスタックに積む
             result += "    ldr x0, [sp]\n"
@@ -323,7 +341,7 @@ public final class Generator {
             case .address:
                 // &のあとは変数しか入らない（はず？）
                 if let right = casted.right as? IdentifierNode {
-                    result += try generatePushLocalVariableAddress(node: right)
+                    result += try generatePushVariableAddress(node: right)
                 } else {
                     throw GenerateError.invalidSyntax(index: node.sourceTokens[0].sourceIndex)
                 }
@@ -337,11 +355,11 @@ public final class Generator {
             if casted.operator is AssignNode {
                 // 左辺は変数, `*値`, subscriptCall
                 if casted.left is IdentifierNode {
-                    result += try generatePushLocalVariableAddress(node: casted.left.casted(IdentifierNode.self))
+                    result += try generatePushVariableAddress(node: casted.left.casted(IdentifierNode.self))
                 } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference {
                     result += try generate(node: pointer.right)
                 } else if let subscriptCall = casted.left as? SubscriptCallExpressionNode {
-                    result += try generatePushLocalArrayElementAddress(node: subscriptCall)
+                    result += try generatePushArrayElementAddress(node: subscriptCall)
                 } else {
                     throw GenerateError.invalidSyntax(index: casted.left.sourceTokens[0].sourceIndex)
                 }
@@ -442,24 +460,29 @@ public final class Generator {
     // MARK: - Private
 
     /// nameの変数のアドレスをスタックにpushするコードを生成する
-    private func generatePushLocalVariableAddress(node: IdentifierNode) throws -> String {
+    private func generatePushVariableAddress(node: IdentifierNode) throws -> String {
         var result = ""
 
-        guard let offset = variables[node.identifierName]?.addressOffset else {
+        if let localVariableInfo = variables[node.identifierName] {
+            result += "    sub x0, x29, #\(localVariableInfo.addressOffset)\n"
+        } else if globalVariables[node.identifierName] != nil {
+            // addじゃなくてldrであってる？
+            result += "    adrp x0, \(node.identifierName)@GOTPAGE\n"
+            result += "    ldr x0, [x0, \(node.identifierName)@GOTPAGEOFF]\n"
+        } else {
             throw GenerateError.noSuchVariable(varibaleName: node.identifierName, index: node.token.sourceIndex)
         }
 
-        result += "    sub x0, x29, #\(offset)\n"
         result += "    str x0, [sp, #-16]!\n"
 
         return result
     }
 
-    private func generatePushLocalArrayElementAddress(node: SubscriptCallExpressionNode) throws -> String {
+    private func generatePushArrayElementAddress(node: SubscriptCallExpressionNode) throws -> String {
         var result = ""
 
         // 配列の先頭アドレス, subscriptの値をpush
-        result += try generatePushLocalVariableAddress(node: node.identifierNode)
+        result += try generatePushVariableAddress(node: node.identifierNode)
         result += try generate(node: node.argument)
 
         result += "    ldr x0, [sp]\n"
