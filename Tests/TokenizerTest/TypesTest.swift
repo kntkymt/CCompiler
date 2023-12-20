@@ -23,4 +23,25 @@ final class TypesTest: XCTestCase {
             ]
         )
     }
+
+    func testChar() throws {
+        let tokens = try tokenize(source: "char a")
+        XCTAssertEqual(
+            tokens,
+            [
+                .type(.char, sourceIndex: 0),
+                .identifier("a", sourceIndex: 5)
+            ]
+        )
+    }
+
+    func testChar2() throws {
+        let tokens = try tokenize(source: "chara")
+        XCTAssertEqual(
+            tokens,
+            [
+                .identifier("chara", sourceIndex: 0)
+            ]
+        )
+    }
 }

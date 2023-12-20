@@ -120,5 +120,6 @@ public enum Token: Equatable {
 
     public enum TypeKind: String, CaseIterable {
         case int
+        case char
     }
 }
