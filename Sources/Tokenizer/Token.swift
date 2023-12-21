@@ -5,6 +5,7 @@ public enum Token: Equatable {
     case reserved(_ kind: ReservedKind, sourceIndex: Int)
     case keyword(_ kind: KeywordKind, sourceIndex: Int)
     case number(_ value: String, sourceIndex: Int)
+    case stringLiteral(_ value: String, sourceIndex: Int)
     case identifier(_ value: String, sourceIndex: Int)
     case type(_ kind: TypeKind, sourceIndex: Int)
 
@@ -17,6 +18,9 @@ public enum Token: Equatable {
             return kind.rawValue
 
         case .number(let value, _):
+            return value
+
+        case .stringLiteral(let value, _):
             return value
 
         case .identifier(let value, _):
@@ -36,6 +40,9 @@ public enum Token: Equatable {
             return sourceIndex
 
         case .number(_, let sourceIndex):
+            return sourceIndex
+
+        case .stringLiteral(_, let sourceIndex):
             return sourceIndex
 
         case .identifier(_, let sourceIndex):

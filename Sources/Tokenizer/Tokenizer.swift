@@ -25,6 +25,28 @@ public func tokenize(source: String) throws -> [Token] {
         return .number(string, sourceIndex: startIndex)
     }
 
+    func extractString() -> Token {
+        var string = ""
+        let startIndex = index
+
+        // 開始の"
+        index += 1
+
+        while index < charactors.count {
+            let nextToken = charactors[index]
+
+            if nextToken == "\"" {
+                index += 1
+                break
+            } else {
+                string += String(nextToken)
+                index += 1
+            }
+        }
+
+        return .stringLiteral(string, sourceIndex: startIndex)
+    }
+
     func extractIdentifier() -> Token {
         var string = ""
         let startIndex = index
@@ -57,6 +79,11 @@ root:
 
         if charactors[index].isNumber {
             tokens.append(extractNumber())
+            continue
+        }
+
+        if charactors[index] == "\"" {
+            tokens.append(extractString())
             continue
         }
 

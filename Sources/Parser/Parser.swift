@@ -48,6 +48,21 @@ public final class Parser {
     }
 
     @discardableResult
+    func consumeStringLiteralToken() throws -> Token {
+        if index >= tokens.count {
+            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+        }
+
+        if case .stringLiteral = tokens[index] {
+            let token = tokens[index]
+            index += 1
+            return token
+        } else {
+            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+        }
+    }
+
+    @discardableResult
     func consumeReservedToken(_ reservedKind: Token.ReservedKind) throws -> Token {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
@@ -583,6 +598,7 @@ public final class Parser {
     }
 
     // primary = num
+    //         | stringLiteral
     //         | ident ( ("( exprList? )") | ("[" expr "]") )?
     //         | "(" expr ")"
     func primary() throws -> any NodeProtocol {
@@ -607,6 +623,12 @@ public final class Parser {
             let numberNode = IntegerLiteralNode(token: numberToken)
 
             return numberNode
+
+        case .stringLiteral:
+            let stringToken = try consumeStringLiteralToken()
+            let stringLiteralNode = StringLiteralNode(token: stringToken)
+
+            return stringLiteralNode
 
         case .identifier:
             let identifierToken = try consumeIdentifierToken()
