@@ -20,6 +20,7 @@ public class TypeNode: TypeNodeProtocol {
         case .type(let typeKind, _):
             switch typeKind {
             case .int: 8
+            case .char: 1
             }
 
         default:

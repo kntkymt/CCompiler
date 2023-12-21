@@ -60,7 +60,8 @@ public final class Generator {
         var result = ""
 
         // g: .zeroじゃApple Clangは動かない？
-        result += ".comm g,\(node.type.memorySize),8\n"
+        let alignment = isElementOrReferenceTypeMemorySizeOf(1, identifierName: node.identifierName) ? 0 : 8
+        result += ".comm \(node.identifierName),\(node.type.memorySize),\(alignment)\n"
 
         globalVariables[node.identifierName] = node.type
 
@@ -86,13 +87,17 @@ public final class Generator {
 
             // 配列の場合は先頭アドレスのまま返す
             // 配列以外の場合はアドレスの中身を返す
-            if variables[casted.identifierName]?.type.kind != .arrayType {
+            if let variableType = getVariableType(name: casted.identifierName), variableType.kind != .arrayType {
                 // アドレスをpop
                 result += "    ldr x0, [sp]\n"
                 result += "    add sp, sp, #16\n"
 
                 // アドレスを値に変換してpush
-                result += "    ldr x0, [x0]\n"
+                if variableType.memorySize == 1 {
+                    result += "    ldrb w0, [x0]\n"
+                } else {
+                    result += "    ldr x0, [x0]\n"
+                }
                 result += "    str x0, [sp, #-16]!\n"
             }
 
@@ -180,7 +185,12 @@ public final class Generator {
             // 結果のアドレスの値をロードしてスタックに積む
             result += "    ldr x0, [sp]\n"
             result += "    add sp, sp, #16\n"
-            result += "    ldr x0, [x0]\n"
+
+            if isElementOrReferenceTypeMemorySizeOf(1, identifierName: casted.identifierNode.identifierName) {
+                result += "    ldrb w0, [x0]\n"
+            } else {
+                result += "    ldr x0, [x0]\n"
+            }
             result += "    str x0, [sp, #-16]!\n"
 
             return  result
@@ -335,7 +345,12 @@ public final class Generator {
                 result += "    add sp, sp, #16\n"
 
                 // 値をアドレスとして読み、アドレスが指す値をロード
-                result += "    ldr x0, [x0]\n"
+                if let identifier = casted.right as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
+                    result += "    ldrb w0, [x0]\n"
+                } else {
+                    result += "    ldr x0, [x0]\n"
+                }
+
                 result += "    str x0, [sp, #-16]!\n"
 
             case .address:
@@ -374,7 +389,16 @@ public final class Generator {
                 result += "    add sp, sp, #16\n"
 
                 // assign
-                result += "    str x0, [x1]\n"
+                if let identifier = casted.left as? IdentifierNode, getVariableType(name: identifier.identifierName)?.memorySize == 1 {
+                    result += "    strb w0, [x1]\n"
+                } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference, let identifier = pointer.right as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
+                    result += "    strb w0, [x1]\n"
+                } else if let subscriptCall = casted.left as? SubscriptCallExpressionNode,
+                          isElementOrReferenceTypeMemorySizeOf(1, identifierName: subscriptCall.identifierNode.identifierName) {
+                    result += "    strb w0, [x1]\n"
+                } else {
+                    result += "    str x0, [x1]\n"
+                }
 
                 result += "    str x0, [sp, #-16]!\n"
 
@@ -392,10 +416,9 @@ public final class Generator {
                 if binaryOperator.operatorKind == .add || binaryOperator.operatorKind == .sub {
                     // addまたはsubの時、一方が変数でポインタ型または配列だったら、他方を8倍する
                     // 8は8バイト（ポインタの指すサイズ、今は全部8バイトなので）
-                    if let identifier = casted.left as? IdentifierNode,
-                       variables[identifier.identifierName]?.type is PointerTypeNode || variables[identifier.identifierName]?.type is ArrayTypeNode {
+                    if let identifier = casted.left as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(8, identifierName: identifier.identifierName) {
                         result += "    lsl x0, x0, #3\n"
-                    } else if let identifier = casted.right as? IdentifierNode, variables[identifier.identifierName]?.type is PointerTypeNode || variables[identifier.identifierName]?.type is ArrayTypeNode {
+                    } else if let identifier = casted.right as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(8, identifierName: identifier.identifierName) {
                         result += "    lsl x1, x1, #3\n"
                     }
                 }
@@ -459,6 +482,31 @@ public final class Generator {
 
     // MARK: - Private
 
+    /// local or global variableから変数を検索する
+    private func getVariableType(name: String) -> (any TypeNodeProtocol)? {
+        if let type = variables[name]?.type {
+            type
+        } else if let type = globalVariables[name] {
+            type
+        } else {
+            nil
+        }
+    }
+
+    private func isElementOrReferenceTypeMemorySizeOf(_ size: Int, identifierName: String) -> Bool {
+        guard let identifierType = getVariableType(name: identifierName) else { return false }
+
+        if let pointerType = identifierType as? PointerTypeNode {
+            return pointerType.referenceType.memorySize == size
+        }
+
+        if let arrayType = identifierType as? ArrayTypeNode {
+            return arrayType.elementType.memorySize == size
+        }
+
+        return false
+    }
+
     /// nameの変数のアドレスをスタックにpushするコードを生成する
     private func generatePushVariableAddress(node: IdentifierNode) throws -> String {
         var result = ""
@@ -487,8 +535,12 @@ public final class Generator {
 
         result += "    ldr x0, [sp]\n"
         result += "    add sp, sp, #16\n"
-        // subscriptの方は8倍
-        result += "    lsl x0, x0, 3\n"
+        // subscript内の値は要素のメモリサイズに応じてn倍する
+        if let arrayType = getVariableType(name: node.identifierNode.identifierName) as? ArrayTypeNode, arrayType.elementType.memorySize == 8 {
+            result += "    lsl x0, x0, 3\n"
+        } else if let pointerType = getVariableType(name: node.identifierNode.identifierName)  as? PointerTypeNode, pointerType.referenceType.memorySize == 8 {
+            result += "    lsl x0, x0, 3\n"
+        }
 
         result += "    ldr x1, [sp]\n"
         result += "    add sp, sp, #16\n"
