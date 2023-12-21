@@ -3,6 +3,7 @@ import Tokenizer
 public enum NodeKind {
     case integerLiteral
     case identifier
+    case stringLiteral
 
     case type
     case pointerType
@@ -73,6 +74,28 @@ public class IntegerLiteralNode: NodeProtocol {
     public var token: Token
 
     public var literal: String {
+        token.value
+    }
+
+    // MARK: - Initializer
+
+    init(token: Token) {
+        self.token = token
+        self.sourceTokens = [token]
+    }
+}
+
+public class StringLiteralNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public let kind: NodeKind = .stringLiteral
+
+    public let sourceTokens: [Token]
+    public let children: [any NodeProtocol] = []
+    public var token: Token
+
+    public var value: String {
         token.value
     }
 
