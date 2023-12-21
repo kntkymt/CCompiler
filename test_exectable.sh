@@ -83,5 +83,12 @@ assert 10 "int g; int main() { g = 10; return g; }"
 assert 100 "int g; int main() { g = 10; return g * 10; }"
 assert 30 "int g; int sub() { g = 30; return 0; } int main() { g = 20; sub(); return g; }"
 assert 30 "int g[10]; int main() { g[2] = 10; g[3] = 20; return g[2] + g[2 + 1]; }"
+assert 10 "int main() { char x; x = 10; return x; }"
+assert 30 "int main() { char x; x = 10; char* p; p = &x; *p = 30; return x; }"
+assert 3 "int main() { char x[3]; x[0] = -1; x[1] = 2; int y; y = 4; return x[0] + y; }"
+assert 15 "char x; int main() { x = 15; return x; }"
+assert 3 "char x[3]; int main() {  x[0] = -1; x[1] = 2; int y; y = 4; return x[0] + y; }"
+assert 150 "int main() { int x; x = 300; return x / 2; }"
+assert 22 "int main() { char x; x = 300; return x / 2; }"
 
 echo OK
