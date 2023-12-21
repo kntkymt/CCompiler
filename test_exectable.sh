@@ -90,5 +90,9 @@ assert 15 "char x; int main() { x = 15; return x; }"
 assert 3 "char x[3]; int main() {  x[0] = -1; x[1] = 2; int y; y = 4; return x[0] + y; }"
 assert 150 "int main() { int x; x = 300; return x / 2; }"
 assert 22 "int main() { char x; x = 300; return x / 2; }"
+assert 97 "int main() { char* x; x = \"aaaa\"; return x[0]; }"
+assert 0 "int main() { char* x; x = \"aaaa\"; return x[4]; }"
+assert 101 "int main() { char* x; x = \"aiue\"; return x[3]; }"
+assert 104 "char* sub() { return \"hoge\"; } int main() { char* x; x = sub(); return x[0]; }"
 
 echo OK

@@ -32,6 +32,7 @@ public final class Generator {
 
     private var globalVariables: [String: any TypeNodeProtocol] = [:]
     private var variables: [String: VariableInfo] = [:]
+    private var stringLiteralLabels: [String: String] = [:]
     private var functionLabels: Set<String> = Set()
 
     public init() {
@@ -48,12 +49,23 @@ public final class Generator {
 
         var functionDeclResult = ""
         for functionDecl in sourceFileNode.functions {
+            functionDeclResult += ".p2align 2\n"
             functionDeclResult += try generate(node: functionDecl)
         }
 
         let functionMeta = ".globl \(functionLabels.joined(separator: ", "))\n"
 
-        return variableDeclResult + functionMeta + functionDeclResult
+        // data section
+        var dataSection = ""
+        if !stringLiteralLabels.isEmpty {
+            dataSection = ".section __TEXT,__cstring,cstring_literals\n"
+            for (literal, label) in stringLiteralLabels {
+                dataSection += "\(label):\n"
+                dataSection += "    .asciz \"\(literal)\"\n"
+            }
+        }
+
+        return variableDeclResult + functionMeta + functionDeclResult + dataSection
     }
 
     func generateGlobalVariableDecl(node: VariableDeclNode) throws -> String {
@@ -75,6 +87,26 @@ public final class Generator {
         case .integerLiteral:
             let casted = try node.casted(IntegerLiteralNode.self)
             result += "    mov x0, #\(casted.literal)\n"
+            result += "    str x0, [sp, #-16]!\n"
+
+            return result
+
+        case .stringLiteral:
+            // stringLiteral自体はグローバル領域に定義し
+            // 式自体は先頭のポインタを表す
+            let casted = try node.casted(StringLiteralNode.self)
+            let label: String
+            if let stringLabel = stringLiteralLabels[casted.value] {
+                label = stringLabel
+            } else {
+                let stringLabel = "strings\(stringLiteralLabels.count)"
+                stringLiteralLabels[casted.value] = stringLabel
+                label = stringLabel
+            }
+
+            result += "    adrp x0, \(label)@GOTPAGE\n"
+            result += "    ldr x0, [x0, \(label)@GOTPAGEOFF]\n"
+
             result += "    str x0, [sp, #-16]!\n"
 
             return result
