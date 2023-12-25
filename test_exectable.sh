@@ -94,5 +94,8 @@ assert 97 "074.c"
 assert 0 "075.c"
 assert 101 "076.c"
 assert 104 "077.c"
+assert 10 "078.c"
+assert 20 "079.c"
+assert 1 "080.c"
 
 echo OK

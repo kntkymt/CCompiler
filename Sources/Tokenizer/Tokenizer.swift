@@ -77,6 +77,28 @@ root:
             continue
         }
 
+        if index + 1 < charactors.count, String(charactors[index...index+1]) == "//" {
+            index += 2
+
+            while (index < charactors.count && !charactors[index].isNewline) {
+                index += 1
+            }
+
+            index += 1
+            continue
+        }
+
+        if index + 1 < charactors.count, String(charactors[index...index+1]) == "/*" {
+            index += 2
+
+            while (index + 1 < charactors.count && String(charactors[index...index+1]) != "*/") {
+                index += 1
+            }
+
+            index += 2
+            continue
+        }
+
         if charactors[index].isNumber {
             tokens.append(extractNumber())
             continue
