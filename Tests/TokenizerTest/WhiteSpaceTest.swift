@@ -38,4 +38,28 @@ final class WhiteSpaceTest: XCTestCase {
             ]
         )
     }
+
+    func testLineComment() throws {
+        let tokens = try tokenize(source: "1 + // 234 \n 23")
+        XCTAssertEqual(
+            tokens,
+            [
+                .number("1", sourceIndex: 0),
+                .reserved(.add, sourceIndex: 2),
+                .number("23", sourceIndex: 13)
+            ]
+        )
+    }
+
+    func testBlockComment() throws {
+        let tokens = try tokenize(source: "1 + /* 234 */ 23")
+        XCTAssertEqual(
+            tokens,
+            [
+                .number("1", sourceIndex: 0),
+                .reserved(.add, sourceIndex: 2),
+                .number("23", sourceIndex: 14)
+            ]
+        )
+    }
 }
