@@ -1,11 +1,21 @@
 import Foundation
 import CCompilerCore
+import ArgumentParser
 
-struct CCompiler {
-    static func main() {
-        guard let source = CommandLine.arguments.dropFirst().first else {
-            print("Error: please input source code")
-            print("usage: ccompiler [source code]")
+@main
+struct Ccompiler: ParsableCommand {
+
+    @Argument(help: "The path to the input source code file.", completion: .file())
+    var inputFilePath: String
+
+    @Option(name: .shortAndLong, help: "The path to the output file.", completion: .file())
+    var outputFilePath: String?
+
+    mutating func run() {
+        let currentDirectoryURL = URL(filePath: FileManager.default.currentDirectoryPath)
+        let inputPath = currentDirectoryURL.appendingPathComponent(inputFilePath)
+        guard let source = try? String(contentsOf: inputPath, encoding: .utf8) else {
+            print("no such file \(inputFilePath)")
             return
         }
 
@@ -13,11 +23,16 @@ struct CCompiler {
             let compiled = try compile(source)
 
             guard let data = compiled.data(using: .utf8) else { return }
-            let currentDirectoryURL = URL(filePath: FileManager.default.currentDirectoryPath)
-            let fileURL = currentDirectoryURL.appending(path: "output.s")
+            let outputURL: URL
+            if let outputFilePath {
+                outputURL = currentDirectoryURL.appending(path: outputFilePath)
+            } else {
+                let filename = inputPath.lastPathComponent.prefix { $0 != "." }
+                outputURL = currentDirectoryURL.appending(path: filename + ".s")
+            }
 
             do {
-                try data.write(to: fileURL)
+                try data.write(to: outputURL)
             } catch {
                 print("failed to write")
             }
@@ -41,5 +56,3 @@ struct CCompiler {
         }
     }
 }
-
-CCompiler.main()
