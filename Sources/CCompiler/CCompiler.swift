@@ -8,7 +8,7 @@ struct Ccompiler: ParsableCommand {
     @Argument(help: "The path to the input source code file.", completion: .file())
     var inputFilePath: String
 
-    @Option(name: .customShort("o"), help: "The path to the output file.", completion: .file())
+    @Option(name: .shortAndLong, help: "The path to the output file.", completion: .file())
     var outputFilePath: String?
 
     mutating func run() {
