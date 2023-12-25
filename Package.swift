@@ -11,11 +11,15 @@ let package = Package(
             targets: ["CCompiler"]
         )
     ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.3.0")
+    ],
     targets: [
         .executableTarget(
             name: "CCompiler",
             dependencies: [
-                "CCompilerCore"
+                "CCompilerCore",
+                .product(name: "ArgumentParser", package: "swift-argument-parser")
             ]
         ),
         .target(
