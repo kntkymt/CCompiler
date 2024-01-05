@@ -111,3 +111,24 @@ public class SubscriptCallExpressionNode: NodeProtocol {
         self.squareRightToken = squareRightToken
     }
 }
+
+public class ArrayExpressionNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public var kind: NodeKind = .arrayExpr
+    public var children: [any NodeProtocol] { return exprListNodes.flatMap { $0.children } }
+    public var sourceTokens: [Token] { return  [braceLeft] + exprListNodes.flatMap { $0.sourceTokens } + [braceRight] }
+
+    public let braceLeft: Token
+    public let exprListNodes: [any NodeProtocol]
+    public let braceRight: Token
+
+    // MARK: - Initializer
+
+    public init(braceLeft: Token, exprListNodes: [any NodeProtocol], braceRight: Token) {
+        self.braceLeft = braceLeft
+        self.exprListNodes = exprListNodes
+        self.braceRight = braceRight
+    }
+}

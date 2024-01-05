@@ -16,6 +16,7 @@ public enum NodeKind {
     case infixOperatorExpr
     case functionCallExpr
     case subscriptCallExpr
+    case arrayExpr
 
     case ifStatement
     case whileStatement

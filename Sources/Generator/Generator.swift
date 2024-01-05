@@ -208,22 +208,98 @@ public final class Generator {
             variables[casted.identifierName] = VariableInfo(type: casted.type, addressOffset: offset)
 
             if let initializerExpr = casted.initializerExpr {
-                result += try generatePushVariableAddress(identifierName: casted.identifierName, sourceIndex: casted.sourceTokens.first!.sourceIndex)
-                result += try generate(node: initializerExpr)
+                switch initializerExpr.kind {
+                case .arrayExpr:
+                    // = { }
+                    let arrayExpr = try initializerExpr.casted(ArrayExpressionNode.self)
 
-                result += "    ldr x0, [sp]\n"
-                result += "    add sp, sp, #16\n"
-                result += "    ldr x1, [sp]\n"
-                result += "    add sp, sp, #16\n"
+                    for (arrayIndex, element) in arrayExpr.exprListNodes.enumerated() {
+                        result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+                        result += try generate(node: element)
 
-                if getVariableType(name: casted.identifierName)?.memorySize == 1 {
-                    result += "    strb w0, [x1]\n"
-                } else {
-                    result += "    str x0, [x1]\n"
+                        result += "    ldr x0, [sp]\n"
+                        result += "    add sp, sp, #16\n"
+                        result += "    ldr x1, [sp]\n"
+                        result += "    add sp, sp, #16\n"
+
+                        if isElementOrReferenceTypeMemorySizeOf(1, identifierName: casted.identifierName) {
+                            result += "    strb w0, [x1]\n"
+                        } else {
+                            result += "    str x0, [x1]\n"
+                        }
+                    }
+
+                    // { ... }の要素が足りなかったら0埋めする
+                    let arrayType = try casted.type.casted(ArrayTypeNode.self)
+                    if arrayExpr.exprListNodes.count < arrayType.arraySize {
+                        for arrayIndex in arrayExpr.exprListNodes.count..<arrayType.arraySize {
+                            result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+
+                            result += "    mov x0, #0\n"
+                            result += "    ldr x1, [sp]\n"
+                            result += "    add sp, sp, #16\n"
+
+                            if isElementOrReferenceTypeMemorySizeOf(1, identifierName: casted.identifierName) {
+                                result += "    strb w0, [x1]\n"
+                            } else {
+                                result += "    str x0, [x1]\n"
+                            }
+                        }
+                    }
+
+                    return result
+
+                case .stringLiteral:
+                    // = ""
+                    if casted.type is PointerTypeNode { fallthrough }
+
+                    let stringLiteralNode = try initializerExpr.casted(StringLiteralNode.self)
+                    for (arrayIndex, element) in stringLiteralNode.value.enumerated() {
+                        result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+
+                        result += "    mov x0, #\(element.asciiValue ?? 0)\n"
+                        result += "    ldr x1, [sp]\n"
+                        result += "    add sp, sp, #16\n"
+
+                        result += "    strb w0, [x1]\n"
+                    }
+
+                    // ""の要素が足りなかったら0埋めする
+                    let arrayType = try casted.type.casted(ArrayTypeNode.self)
+                    if stringLiteralNode.value.count < arrayType.arraySize {
+                        for arrayIndex in stringLiteralNode.value.count..<arrayType.arraySize {
+                            result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+
+                            result += "    mov x0, #0\n"
+                            result += "    ldr x1, [sp]\n"
+                            result += "    add sp, sp, #16\n"
+
+                            result += "    strb w0, [x1]\n"
+                        }
+                    }
+
+                default:
+                    result += try generatePushVariableAddress(identifierName: casted.identifierName, sourceIndex: casted.identifierToken.sourceIndex)
+                    result += try generate(node: initializerExpr)
+
+                    result += "    ldr x0, [sp]\n"
+                    result += "    add sp, sp, #16\n"
+                    result += "    ldr x1, [sp]\n"
+                    result += "    add sp, sp, #16\n"
+
+                    if getVariableType(name: casted.identifierName)?.memorySize == 1 {
+                        result += "    strb w0, [x1]\n"
+                    } else {
+                        result += "    str x0, [x1]\n"
+                    }
                 }
             }
 
             return result
+
+        case .arrayExpr:
+            // variableDeclの右辺にのみ現れるため、variableDeclで処理
+            fatalError()
 
         case .subscriptCallExpr:
             let casted = try node.casted(SubscriptCallExpressionNode.self)
@@ -599,6 +675,37 @@ public final class Generator {
 
         // identifierがポインタだった場合はアドレスが指す値にする
         if variables[node.identifierNode.identifierName]?.type.kind == .pointerType {
+            result += "    ldr x1, [x1]\n"
+
+        }
+
+        // それらを足す
+        result += "    add x0, x1, x0\n"
+
+        result += "    str x0, [sp, #-16]!\n"
+
+        return result
+    }
+
+    private func generatePushArrayElementAddress(identifierName: String, index: Int, sourceIndex: Int) throws -> String {
+        var result = ""
+
+        // 配列の先頭アドレス, subscriptの値をpush
+        result += try generatePushVariableAddress(identifierName: identifierName, sourceIndex: sourceIndex)
+
+        result += "    mov x0, #\(index)\n"
+        // subscript内の値は要素のメモリサイズに応じてn倍する
+        if let arrayType = getVariableType(name: identifierName) as? ArrayTypeNode, arrayType.elementType.memorySize == 8 {
+            result += "    lsl x0, x0, 3\n"
+        } else if let pointerType = getVariableType(name: identifierName)  as? PointerTypeNode, pointerType.referenceType.memorySize == 8 {
+            result += "    lsl x0, x0, 3\n"
+        }
+
+        result += "    ldr x1, [sp]\n"
+        result += "    add sp, sp, #16\n"
+
+        // identifierがポインタだった場合はアドレスが指す値にする
+        if variables[identifierName]?.type.kind == .pointerType {
             result += "    ldr x1, [x1]\n"
 
         }

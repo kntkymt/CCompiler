@@ -297,7 +297,7 @@ public final class Parser {
         return BlockStatementNode(statements: statements, sourceTokens: Array(tokens[startIndex..<index]))
     }
 
-    // variableDecl = type identifier ("[" num "]")? ("=" expr)?
+    // variableDecl = type identifier ("[" num "]")? ("=" (expr | "{" exprList "}" | stringLiteral)?
     func variableDecl(variableType: (any TypeNodeProtocol)? = nil, identifier: Token? = nil) throws -> VariableDeclNode {
         var type = if let variableType { variableType } else { try type() }
         let identifier = if let identifier { identifier } else { try consumeIdentifierToken() }
@@ -312,12 +312,37 @@ public final class Parser {
         }
 
         if index < tokens.count, case .reserved(.assign, _) = tokens[index] {
-            return VariableDeclNode(
-                type: type,
-                identifierToken: identifier,
-                initializerToken: try consumeReservedToken(.assign),
-                initializerExpr: try expr()
-            )
+            let initializerToken = try consumeReservedToken(.assign)
+
+            switch tokens[index] {
+            case .reserved(.braceLeft, _):
+                return VariableDeclNode(
+                    type: type,
+                    identifierToken: identifier,
+                    initializerToken: initializerToken,
+                    initializerExpr: ArrayExpressionNode(
+                        braceLeft: try consumeReservedToken(.braceLeft),
+                        exprListNodes: try exprList(),
+                        braceRight: try consumeReservedToken(.braceRight)
+                    )
+                )
+
+            case .stringLiteral:
+                return VariableDeclNode(
+                    type: type,
+                    identifierToken: identifier,
+                    initializerToken: initializerToken,
+                    initializerExpr: StringLiteralNode(token: try consumeStringLiteralToken())
+                )
+
+            default:
+                return VariableDeclNode(
+                    type: type,
+                    identifierToken: identifier,
+                    initializerToken: initializerToken,
+                    initializerExpr: try expr()
+                )
+            }
         }
 
         return VariableDeclNode(
@@ -682,13 +707,13 @@ public final class Parser {
         results.append(try expr())
 
         while index < tokens.count {
-            if case .reserved(.parenthesisRight, _) = tokens[index] {
+            if case .reserved(.comma, _) = tokens[index] {
+                try consumeReservedToken(.comma)
+
+                results.append(try expr())
+            } else {
                 break
             }
-
-            try consumeReservedToken(.comma)
-
-            results.append(try expr())
         }
 
         return results
