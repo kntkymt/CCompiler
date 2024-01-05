@@ -42,9 +42,12 @@ public final class Generator {
 
     public func generate(sourceFileNode: SourceFileNode) throws -> String {
 
-        var variableDeclResult = ""
-        for variableDecl in sourceFileNode.globalVariables {
-            variableDeclResult += try generateGlobalVariableDecl(node: variableDecl)
+        var dataSection = ""
+        if !sourceFileNode.globalVariables.isEmpty {
+            dataSection += ".section    __DATA,__data\n"
+            for variableDecl in sourceFileNode.globalVariables {
+                dataSection += try generateGlobalVariableDecl(node: variableDecl)
+            }
         }
 
         var functionDeclResult = ""
@@ -55,27 +58,82 @@ public final class Generator {
 
         let functionMeta = ".globl \(functionLabels.joined(separator: ", "))\n"
 
-        // data section
-        var dataSection = ""
         if !stringLiteralLabels.isEmpty {
-            dataSection = ".section __TEXT,__cstring,cstring_literals\n"
+            dataSection += ".section __TEXT,__cstring,cstring_literals\n"
             for (literal, label) in stringLiteralLabels {
                 dataSection += "\(label):\n"
                 dataSection += "    .asciz \"\(literal)\"\n"
             }
         }
 
-        return variableDeclResult + functionMeta + functionDeclResult + dataSection
+        return functionMeta + functionDeclResult + dataSection
     }
 
     func generateGlobalVariableDecl(node: VariableDeclNode) throws -> String {
+        globalVariables[node.identifierName] = node.type
+
         var result = ""
 
-        // g: .zeroじゃApple Clangは動かない？
-        let alignment = isElementOrReferenceTypeMemorySizeOf(1, identifierName: node.identifierName) ? 0 : 8
-        result += ".comm \(node.identifierName),\(node.type.memorySize),\(alignment)\n"
+        if let initializerExpr = node.initializerExpr {
 
-        globalVariables[node.identifierName] = node.type
+            result += ".globl \(node.identifierName)\n"
+            if node.type.memorySize != 1 {
+                result += ".p2align 3, 0x0\n"
+            }
+            result += "\(node.identifierName):\n"
+
+            switch initializerExpr.kind {
+            case .integerLiteral:
+                let sizeKind = node.type.memorySize == 1 ? "byte" : "quad"
+                let value = try initializerExpr.casted(IntegerLiteralNode.self).literal
+                result += "    .\(sizeKind) \(value)\n"
+
+            case .stringLiteral:
+                let value = try initializerExpr.casted(StringLiteralNode.self).value
+                result += "    .asciz \"\(value)\"\n"
+
+            case .prefixOperatorExpr:
+                let prefixOperatorExpr = try initializerExpr.casted(PrefixOperatorExpressionNode.self)
+                if prefixOperatorExpr.operatorKind == .address {
+                    let value = try prefixOperatorExpr.right.casted(IdentifierNode.self).identifierName
+                    result += "    .quad \(value)\n"
+                } else {
+                    throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
+                }
+
+            case .infixOperatorExpr:
+                let infixOperator = try initializerExpr.casted(InfixOperatorExpressionNode.self)
+
+                func generateAddressValue(referenceNode: any NodeProtocol, integerLiteralNode: any NodeProtocol) -> String? {
+                    if let prefix = referenceNode as? PrefixOperatorExpressionNode,
+                       prefix.operatorKind == .address,
+                       let identifier = prefix.right as? IdentifierNode,
+                       let binaryOperator = infixOperator.operator as? BinaryOperatorNode,
+                       (binaryOperator.operatorKind == .add || binaryOperator.operatorKind == .sub),
+                       let integerLiteral = integerLiteralNode as? IntegerLiteralNode {
+                        return "    .quad \(identifier.identifierName) \(binaryOperator.token.value) \(integerLiteral.literal)\n"
+                    } else {
+                        return nil
+                    }
+                }
+
+                // 左右一方が「&変数」, 他方が「IntergerLiteral」のはず
+                if let leftIsReference = generateAddressValue(referenceNode: infixOperator.left, integerLiteralNode: infixOperator.right) {
+                    result += leftIsReference
+                } else if let rightIsReference = generateAddressValue(referenceNode: infixOperator.right, integerLiteralNode: infixOperator.left) {
+                    result += rightIsReference
+                } else {
+                    throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
+                }
+
+            default:
+                throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
+            }
+        } else {
+            // Apple Clangでは初期化がない場合は.commじゃないとダメっぽい？
+            let alignment = isElementOrReferenceTypeMemorySizeOf(1, identifierName: node.identifierName) ? 0 : 3
+            result += ".comm \(node.identifierName),\(node.type.memorySize),\(alignment)\n"
+        }
 
         return result
     }
