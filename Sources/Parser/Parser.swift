@@ -134,7 +134,7 @@ public final class Parser {
             if index < tokens.count, case .reserved(.parenthesisLeft, _) = tokens[index] {
                 let parenthesisLeft = try consumeReservedToken(.parenthesisLeft)
 
-                var parameters: [VariableDeclNode] = []
+                var parameters: [FunctionParameterNode] = []
                 if index < tokens.count, case .type = tokens[index] {
                     parameters = try functionParameters()
                 }
@@ -160,14 +160,14 @@ public final class Parser {
         return SourceFileNode(functions: functionDecls, globalVariables: globalVariableDecls)
     }
 
-    // functionParameters = variableDecl ("," variableDecl)*
-    func functionParameters() throws -> [VariableDeclNode] {
+    // functionParameters = functionParameter ("," functionParameter)*
+    func functionParameters() throws -> [FunctionParameterNode] {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
-        var results: [VariableDeclNode] = []
+        var results: [FunctionParameterNode] = []
 
-        results.append(try variableDecl())
+        results.append(try functionParameter())
 
         while index < tokens.count {
             if case .reserved(.parenthesisRight, _) = tokens[index] {
@@ -176,10 +176,29 @@ public final class Parser {
 
             try consumeReservedToken(.comma)
 
-            results.append(try variableDecl())
+            results.append(try functionParameter())
         }
 
         return results
+    }
+
+    func functionParameter() throws -> FunctionParameterNode {
+        var type = try type()
+        let identifier = try consumeIdentifierToken()
+
+        if index < tokens.count, case .reserved(.squareLeft, _) = tokens[index] {
+            type = ArrayTypeNode(
+                elementType: type,
+                squareLeftToken: try consumeReservedToken(.squareLeft),
+                arraySizeToken: try consumeNumberToken(),
+                squareRightToken: try consumeReservedToken(.squareRight)
+            )
+        }
+
+        return FunctionParameterNode(
+            type: type,
+            identifierToken: identifier
+        )
     }
 
     // stmt    = expr ";"

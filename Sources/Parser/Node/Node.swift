@@ -25,6 +25,7 @@ public enum NodeKind {
     case blockStatement
 
     case functionDecl
+    case functionParameter
     case variableDecl
 
     case sourceFile

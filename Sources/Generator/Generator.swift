@@ -201,6 +201,10 @@ public final class Generator {
 
             return result
 
+        case .functionParameter:
+            // functionDecl側で処理
+            fatalError()
+
         case .variableDecl:
             let casted = try node.casted(VariableDeclNode.self)
 
