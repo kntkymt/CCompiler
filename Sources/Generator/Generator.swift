@@ -42,9 +42,12 @@ public final class Generator {
 
     public func generate(sourceFileNode: SourceFileNode) throws -> String {
 
-        var variableDeclResult = ""
-        for variableDecl in sourceFileNode.globalVariables {
-            variableDeclResult += try generateGlobalVariableDecl(node: variableDecl)
+        var dataSection = ""
+        if !sourceFileNode.globalVariables.isEmpty {
+            dataSection += ".section    __DATA,__data\n"
+            for variableDecl in sourceFileNode.globalVariables {
+                dataSection += try generateGlobalVariableDecl(node: variableDecl)
+            }
         }
 
         var functionDeclResult = ""
@@ -55,27 +58,82 @@ public final class Generator {
 
         let functionMeta = ".globl \(functionLabels.joined(separator: ", "))\n"
 
-        // data section
-        var dataSection = ""
         if !stringLiteralLabels.isEmpty {
-            dataSection = ".section __TEXT,__cstring,cstring_literals\n"
+            dataSection += ".section __TEXT,__cstring,cstring_literals\n"
             for (literal, label) in stringLiteralLabels {
                 dataSection += "\(label):\n"
                 dataSection += "    .asciz \"\(literal)\"\n"
             }
         }
 
-        return variableDeclResult + functionMeta + functionDeclResult + dataSection
+        return functionMeta + functionDeclResult + dataSection
     }
 
     func generateGlobalVariableDecl(node: VariableDeclNode) throws -> String {
+        globalVariables[node.identifierName] = node.type
+
         var result = ""
 
-        // g: .zeroじゃApple Clangは動かない？
-        let alignment = isElementOrReferenceTypeMemorySizeOf(1, identifierName: node.identifierName) ? 0 : 8
-        result += ".comm \(node.identifierName),\(node.type.memorySize),\(alignment)\n"
+        if let initializerExpr = node.initializerExpr {
 
-        globalVariables[node.identifierName] = node.type
+            result += ".globl \(node.identifierName)\n"
+            if node.type.memorySize != 1 {
+                result += ".p2align 3, 0x0\n"
+            }
+            result += "\(node.identifierName):\n"
+
+            switch initializerExpr.kind {
+            case .integerLiteral:
+                let sizeKind = node.type.memorySize == 1 ? "byte" : "quad"
+                let value = try initializerExpr.casted(IntegerLiteralNode.self).literal
+                result += "    .\(sizeKind) \(value)\n"
+
+            case .stringLiteral:
+                let value = try initializerExpr.casted(StringLiteralNode.self).value
+                result += "    .asciz \"\(value)\"\n"
+
+            case .prefixOperatorExpr:
+                let prefixOperatorExpr = try initializerExpr.casted(PrefixOperatorExpressionNode.self)
+                if prefixOperatorExpr.operatorKind == .address {
+                    let value = try prefixOperatorExpr.right.casted(IdentifierNode.self).identifierName
+                    result += "    .quad \(value)\n"
+                } else {
+                    throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
+                }
+
+            case .infixOperatorExpr:
+                let infixOperator = try initializerExpr.casted(InfixOperatorExpressionNode.self)
+
+                func generateAddressValue(referenceNode: any NodeProtocol, integerLiteralNode: any NodeProtocol) -> String? {
+                    if let prefix = referenceNode as? PrefixOperatorExpressionNode,
+                       prefix.operatorKind == .address,
+                       let identifier = prefix.right as? IdentifierNode,
+                       let binaryOperator = infixOperator.operator as? BinaryOperatorNode,
+                       (binaryOperator.operatorKind == .add || binaryOperator.operatorKind == .sub),
+                       let integerLiteral = integerLiteralNode as? IntegerLiteralNode {
+                        return "    .quad \(identifier.identifierName) \(binaryOperator.token.value) \(integerLiteral.literal)\n"
+                    } else {
+                        return nil
+                    }
+                }
+
+                // 左右一方が「&変数」, 他方が「IntergerLiteral」のはず
+                if let leftIsReference = generateAddressValue(referenceNode: infixOperator.left, integerLiteralNode: infixOperator.right) {
+                    result += leftIsReference
+                } else if let rightIsReference = generateAddressValue(referenceNode: infixOperator.right, integerLiteralNode: infixOperator.left) {
+                    result += rightIsReference
+                } else {
+                    throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
+                }
+
+            default:
+                throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
+            }
+        } else {
+            // Apple Clangでは初期化がない場合は.commじゃないとダメっぽい？
+            let alignment = isElementOrReferenceTypeMemorySizeOf(1, identifierName: node.identifierName) ? 0 : 3
+            result += ".comm \(node.identifierName),\(node.type.memorySize),\(alignment)\n"
+        }
 
         return result
     }
@@ -201,13 +259,109 @@ public final class Generator {
 
             return result
 
+        case .functionParameter:
+            // functionDecl側で処理
+            fatalError()
+
         case .variableDecl:
             let casted = try node.casted(VariableDeclNode.self)
 
             let offset = variables.reduce(0) { $0 + $1.value.type.memorySize } + casted.type.memorySize
             variables[casted.identifierName] = VariableInfo(type: casted.type, addressOffset: offset)
 
-            return ""
+            if let initializerExpr = casted.initializerExpr {
+                switch initializerExpr.kind {
+                case .arrayExpr:
+                    // = { }
+                    let arrayExpr = try initializerExpr.casted(ArrayExpressionNode.self)
+
+                    for (arrayIndex, element) in arrayExpr.exprListNodes.enumerated() {
+                        result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+                        result += try generate(node: element)
+
+                        result += "    ldr x0, [sp]\n"
+                        result += "    add sp, sp, #16\n"
+                        result += "    ldr x1, [sp]\n"
+                        result += "    add sp, sp, #16\n"
+
+                        if isElementOrReferenceTypeMemorySizeOf(1, identifierName: casted.identifierName) {
+                            result += "    strb w0, [x1]\n"
+                        } else {
+                            result += "    str x0, [x1]\n"
+                        }
+                    }
+
+                    // { ... }の要素が足りなかったら0埋めする
+                    let arrayType = try casted.type.casted(ArrayTypeNode.self)
+                    if arrayExpr.exprListNodes.count < arrayType.arraySize {
+                        for arrayIndex in arrayExpr.exprListNodes.count..<arrayType.arraySize {
+                            result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+
+                            result += "    mov x0, #0\n"
+                            result += "    ldr x1, [sp]\n"
+                            result += "    add sp, sp, #16\n"
+
+                            if isElementOrReferenceTypeMemorySizeOf(1, identifierName: casted.identifierName) {
+                                result += "    strb w0, [x1]\n"
+                            } else {
+                                result += "    str x0, [x1]\n"
+                            }
+                        }
+                    }
+
+                    return result
+
+                case .stringLiteral:
+                    // = ""
+                    if casted.type is PointerTypeNode { fallthrough }
+
+                    let stringLiteralNode = try initializerExpr.casted(StringLiteralNode.self)
+                    for (arrayIndex, element) in stringLiteralNode.value.enumerated() {
+                        result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+
+                        result += "    mov x0, #\(element.asciiValue ?? 0)\n"
+                        result += "    ldr x1, [sp]\n"
+                        result += "    add sp, sp, #16\n"
+
+                        result += "    strb w0, [x1]\n"
+                    }
+
+                    // ""の要素が足りなかったら0埋めする
+                    let arrayType = try casted.type.casted(ArrayTypeNode.self)
+                    if stringLiteralNode.value.count < arrayType.arraySize {
+                        for arrayIndex in stringLiteralNode.value.count..<arrayType.arraySize {
+                            result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+
+                            result += "    mov x0, #0\n"
+                            result += "    ldr x1, [sp]\n"
+                            result += "    add sp, sp, #16\n"
+
+                            result += "    strb w0, [x1]\n"
+                        }
+                    }
+
+                default:
+                    result += try generatePushVariableAddress(identifierName: casted.identifierName, sourceIndex: casted.identifierToken.sourceIndex)
+                    result += try generate(node: initializerExpr)
+
+                    result += "    ldr x0, [sp]\n"
+                    result += "    add sp, sp, #16\n"
+                    result += "    ldr x1, [sp]\n"
+                    result += "    add sp, sp, #16\n"
+
+                    if getVariableType(name: casted.identifierName)?.memorySize == 1 {
+                        result += "    strb w0, [x1]\n"
+                    } else {
+                        result += "    str x0, [x1]\n"
+                    }
+                }
+            }
+
+            return result
+
+        case .arrayExpr:
+            // variableDeclの右辺にのみ現れるため、variableDeclで処理
+            fatalError()
 
         case .subscriptCallExpr:
             let casted = try node.casted(SubscriptCallExpressionNode.self)
@@ -541,16 +695,20 @@ public final class Generator {
 
     /// nameの変数のアドレスをスタックにpushするコードを生成する
     private func generatePushVariableAddress(node: IdentifierNode) throws -> String {
+        try generatePushVariableAddress(identifierName: node.identifierName, sourceIndex: node.token.sourceIndex)
+    }
+
+    private func generatePushVariableAddress(identifierName: String, sourceIndex: Int) throws -> String {
         var result = ""
 
-        if let localVariableInfo = variables[node.identifierName] {
+        if let localVariableInfo = variables[identifierName] {
             result += "    sub x0, x29, #\(localVariableInfo.addressOffset)\n"
-        } else if globalVariables[node.identifierName] != nil {
+        } else if globalVariables[identifierName] != nil {
             // addじゃなくてldrであってる？
-            result += "    adrp x0, \(node.identifierName)@GOTPAGE\n"
-            result += "    ldr x0, [x0, \(node.identifierName)@GOTPAGEOFF]\n"
+            result += "    adrp x0, \(identifierName)@GOTPAGE\n"
+            result += "    ldr x0, [x0, \(identifierName)@GOTPAGEOFF]\n"
         } else {
-            throw GenerateError.noSuchVariable(varibaleName: node.identifierName, index: node.token.sourceIndex)
+            throw GenerateError.noSuchVariable(varibaleName: identifierName, index: sourceIndex)
         }
 
         result += "    str x0, [sp, #-16]!\n"
@@ -579,6 +737,37 @@ public final class Generator {
 
         // identifierがポインタだった場合はアドレスが指す値にする
         if variables[node.identifierNode.identifierName]?.type.kind == .pointerType {
+            result += "    ldr x1, [x1]\n"
+
+        }
+
+        // それらを足す
+        result += "    add x0, x1, x0\n"
+
+        result += "    str x0, [sp, #-16]!\n"
+
+        return result
+    }
+
+    private func generatePushArrayElementAddress(identifierName: String, index: Int, sourceIndex: Int) throws -> String {
+        var result = ""
+
+        // 配列の先頭アドレス, subscriptの値をpush
+        result += try generatePushVariableAddress(identifierName: identifierName, sourceIndex: sourceIndex)
+
+        result += "    mov x0, #\(index)\n"
+        // subscript内の値は要素のメモリサイズに応じてn倍する
+        if let arrayType = getVariableType(name: identifierName) as? ArrayTypeNode, arrayType.elementType.memorySize == 8 {
+            result += "    lsl x0, x0, 3\n"
+        } else if let pointerType = getVariableType(name: identifierName)  as? PointerTypeNode, pointerType.referenceType.memorySize == 8 {
+            result += "    lsl x0, x0, 3\n"
+        }
+
+        result += "    ldr x1, [sp]\n"
+        result += "    add sp, sp, #16\n"
+
+        // identifierがポインタだった場合はアドレスが指す値にする
+        if variables[identifierName]?.type.kind == .pointerType {
             result += "    ldr x1, [x1]\n"
 
         }

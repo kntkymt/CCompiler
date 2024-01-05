@@ -125,8 +125,8 @@ final class FunctionTest: XCTestCase {
                         functionNameToken: tokens[1],
                         parenthesisLeftToken: tokens[2],
                         parameterNodes: [
-                            VariableDeclNode(type: TypeNode(typeToken: tokens[3]), identifierToken: tokens[4]),
-                            VariableDeclNode(type: TypeNode(typeToken: tokens[6]), identifierToken: tokens[7])
+                            FunctionParameterNode(type: TypeNode(typeToken: tokens[3]), identifierToken: tokens[4]),
+                            FunctionParameterNode(type: TypeNode(typeToken: tokens[6]), identifierToken: tokens[7])
                         ],
                         parenthesisRightToken: tokens[8],
                         block: BlockStatementNode(

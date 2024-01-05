@@ -143,7 +143,7 @@ public class FunctionDeclNode: NodeProtocol {
     public let returnTypeNode: any NodeProtocol
     public let functionNameToken: Token
     public let parenthesisLeftToken: Token
-    public let parameterNodes: [VariableDeclNode]
+    public let parameterNodes: [FunctionParameterNode]
     public let parenthesisRightToken: Token
     public let block: BlockStatementNode
 
@@ -157,7 +157,7 @@ public class FunctionDeclNode: NodeProtocol {
         returnTypeNode: any NodeProtocol,
         functionNameToken: Token,
         parenthesisLeftToken: Token,
-        parameterNodes: [VariableDeclNode],
+        parameterNodes: [FunctionParameterNode],
         parenthesisRightToken: Token,
         block: BlockStatementNode
     ) {
@@ -174,7 +174,54 @@ public class VariableDeclNode: NodeProtocol {
 
     // MARK: - Property
 
-    public var kind: NodeKind = .variableDecl
+    public let kind: NodeKind = .variableDecl
+    public var sourceTokens: [Token] {
+        var tokens = type.sourceTokens + [identifierToken]
+
+        if let initializerToken {
+            tokens += [initializerToken]
+        }
+
+        if let initializerExpr {
+            tokens += initializerExpr.sourceTokens
+        }
+
+        return tokens
+    }
+    public var children: [any NodeProtocol] {
+        var nodes: [any NodeProtocol] = [type]
+
+        if let initializerExpr {
+            nodes += [initializerExpr]
+        }
+
+        return nodes
+    }
+
+    public let type: any TypeNodeProtocol
+    public let identifierToken: Token
+    public let initializerToken: Token?
+    public let initializerExpr: (any NodeProtocol)?
+
+    public var identifierName: String {
+        identifierToken.value
+    }
+
+    // MARK: - Initializer
+
+    init(type: any TypeNodeProtocol, identifierToken: Token, initializerToken: Token? = nil, initializerExpr: (any NodeProtocol)? = nil) {
+        self.type = type
+        self.identifierToken = identifierToken
+        self.initializerToken = initializerToken
+        self.initializerExpr = initializerExpr
+    }
+}
+
+public class FunctionParameterNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public let kind: NodeKind = .functionParameter
     public var sourceTokens: [Token] {
         type.sourceTokens + [identifierToken]
     }

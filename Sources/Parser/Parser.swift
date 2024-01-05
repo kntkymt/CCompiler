@@ -134,7 +134,7 @@ public final class Parser {
             if index < tokens.count, case .reserved(.parenthesisLeft, _) = tokens[index] {
                 let parenthesisLeft = try consumeReservedToken(.parenthesisLeft)
 
-                var parameters: [VariableDeclNode] = []
+                var parameters: [FunctionParameterNode] = []
                 if index < tokens.count, case .type = tokens[index] {
                     parameters = try functionParameters()
                 }
@@ -160,14 +160,14 @@ public final class Parser {
         return SourceFileNode(functions: functionDecls, globalVariables: globalVariableDecls)
     }
 
-    // functionParameters = variableDecl ("," variableDecl)*
-    func functionParameters() throws -> [VariableDeclNode] {
+    // functionParameters = functionParameter ("," functionParameter)*
+    func functionParameters() throws -> [FunctionParameterNode] {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
-        var results: [VariableDeclNode] = []
+        var results: [FunctionParameterNode] = []
 
-        results.append(try variableDecl())
+        results.append(try functionParameter())
 
         while index < tokens.count {
             if case .reserved(.parenthesisRight, _) = tokens[index] {
@@ -176,10 +176,29 @@ public final class Parser {
 
             try consumeReservedToken(.comma)
 
-            results.append(try variableDecl())
+            results.append(try functionParameter())
         }
 
         return results
+    }
+
+    func functionParameter() throws -> FunctionParameterNode {
+        var type = try type()
+        let identifier = try consumeIdentifierToken()
+
+        if index < tokens.count, case .reserved(.squareLeft, _) = tokens[index] {
+            type = ArrayTypeNode(
+                elementType: type,
+                squareLeftToken: try consumeReservedToken(.squareLeft),
+                arraySizeToken: try consumeNumberToken(),
+                squareRightToken: try consumeReservedToken(.squareRight)
+            )
+        }
+
+        return FunctionParameterNode(
+            type: type,
+            identifierToken: identifier
+        )
     }
 
     // stmt    = expr ";"
@@ -297,7 +316,7 @@ public final class Parser {
         return BlockStatementNode(statements: statements, sourceTokens: Array(tokens[startIndex..<index]))
     }
 
-    // variableDecl = type identifier ("[" num "]")?
+    // variableDecl = type identifier ("[" num "]")? ("=" (expr | "{" exprList "}" | stringLiteral)?
     func variableDecl(variableType: (any TypeNodeProtocol)? = nil, identifier: Token? = nil) throws -> VariableDeclNode {
         var type = if let variableType { variableType } else { try type() }
         let identifier = if let identifier { identifier } else { try consumeIdentifierToken() }
@@ -309,6 +328,40 @@ public final class Parser {
                 arraySizeToken: try consumeNumberToken(),
                 squareRightToken: try consumeReservedToken(.squareRight)
             )
+        }
+
+        if index < tokens.count, case .reserved(.assign, _) = tokens[index] {
+            let initializerToken = try consumeReservedToken(.assign)
+
+            switch tokens[index] {
+            case .reserved(.braceLeft, _):
+                return VariableDeclNode(
+                    type: type,
+                    identifierToken: identifier,
+                    initializerToken: initializerToken,
+                    initializerExpr: ArrayExpressionNode(
+                        braceLeft: try consumeReservedToken(.braceLeft),
+                        exprListNodes: try exprList(),
+                        braceRight: try consumeReservedToken(.braceRight)
+                    )
+                )
+
+            case .stringLiteral:
+                return VariableDeclNode(
+                    type: type,
+                    identifierToken: identifier,
+                    initializerToken: initializerToken,
+                    initializerExpr: StringLiteralNode(token: try consumeStringLiteralToken())
+                )
+
+            default:
+                return VariableDeclNode(
+                    type: type,
+                    identifierToken: identifier,
+                    initializerToken: initializerToken,
+                    initializerExpr: try expr()
+                )
+            }
         }
 
         return VariableDeclNode(
@@ -673,13 +726,13 @@ public final class Parser {
         results.append(try expr())
 
         while index < tokens.count {
-            if case .reserved(.parenthesisRight, _) = tokens[index] {
+            if case .reserved(.comma, _) = tokens[index] {
+                try consumeReservedToken(.comma)
+
+                results.append(try expr())
+            } else {
                 break
             }
-
-            try consumeReservedToken(.comma)
-
-            results.append(try expr())
         }
 
         return results

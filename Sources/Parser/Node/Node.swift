@@ -16,6 +16,7 @@ public enum NodeKind {
     case infixOperatorExpr
     case functionCallExpr
     case subscriptCallExpr
+    case arrayExpr
 
     case ifStatement
     case whileStatement
@@ -24,6 +25,7 @@ public enum NodeKind {
     case blockStatement
 
     case functionDecl
+    case functionParameter
     case variableDecl
 
     case sourceFile
