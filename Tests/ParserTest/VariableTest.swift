@@ -18,6 +18,27 @@ final class VariableTest: XCTestCase {
         )
     }
 
+    func testDeclAndInitVariable() throws {
+        let tokens: [Token] = [
+            .type(.int, sourceIndex: 0),
+            .identifier("a", sourceIndex: 4),
+            .reserved(.assign, sourceIndex: 5),
+            .number("1", sourceIndex: 6),
+            .reserved(.semicolon, sourceIndex: 7)
+        ]
+        let node = try Parser(tokens: tokens).stmt()
+
+        XCTAssertEqual(
+            node as! VariableDeclNode,
+            VariableDeclNode(
+                type: TypeNode(typeToken: tokens[0]),
+                identifierToken: tokens[1],
+                initializerToken: tokens[2],
+                initializerExpr: IntegerLiteralNode(token: tokens[3])
+            )
+        )
+    }
+
     func testDeclVariablePointer() throws {
         let tokens: [Token] = [
             .type(.int, sourceIndex: 0),

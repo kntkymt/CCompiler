@@ -207,7 +207,23 @@ public final class Generator {
             let offset = variables.reduce(0) { $0 + $1.value.type.memorySize } + casted.type.memorySize
             variables[casted.identifierName] = VariableInfo(type: casted.type, addressOffset: offset)
 
-            return ""
+            if let initializerExpr = casted.initializerExpr {
+                result += try generatePushVariableAddress(identifierName: casted.identifierName, sourceIndex: casted.sourceTokens.first!.sourceIndex)
+                result += try generate(node: initializerExpr)
+
+                result += "    ldr x0, [sp]\n"
+                result += "    add sp, sp, #16\n"
+                result += "    ldr x1, [sp]\n"
+                result += "    add sp, sp, #16\n"
+
+                if getVariableType(name: casted.identifierName)?.memorySize == 1 {
+                    result += "    strb w0, [x1]\n"
+                } else {
+                    result += "    str x0, [x1]\n"
+                }
+            }
+
+            return result
 
         case .subscriptCallExpr:
             let casted = try node.casted(SubscriptCallExpressionNode.self)
@@ -541,16 +557,20 @@ public final class Generator {
 
     /// nameの変数のアドレスをスタックにpushするコードを生成する
     private func generatePushVariableAddress(node: IdentifierNode) throws -> String {
+        try generatePushVariableAddress(identifierName: node.identifierName, sourceIndex: node.token.sourceIndex)
+    }
+
+    private func generatePushVariableAddress(identifierName: String, sourceIndex: Int) throws -> String {
         var result = ""
 
-        if let localVariableInfo = variables[node.identifierName] {
+        if let localVariableInfo = variables[identifierName] {
             result += "    sub x0, x29, #\(localVariableInfo.addressOffset)\n"
-        } else if globalVariables[node.identifierName] != nil {
+        } else if globalVariables[identifierName] != nil {
             // addじゃなくてldrであってる？
-            result += "    adrp x0, \(node.identifierName)@GOTPAGE\n"
-            result += "    ldr x0, [x0, \(node.identifierName)@GOTPAGEOFF]\n"
+            result += "    adrp x0, \(identifierName)@GOTPAGE\n"
+            result += "    ldr x0, [x0, \(identifierName)@GOTPAGEOFF]\n"
         } else {
-            throw GenerateError.noSuchVariable(varibaleName: node.identifierName, index: node.token.sourceIndex)
+            throw GenerateError.noSuchVariable(varibaleName: identifierName, index: sourceIndex)
         }
 
         result += "    str x0, [sp, #-16]!\n"

@@ -182,6 +182,8 @@ public class VariableDeclNode: NodeProtocol {
 
     public let type: any TypeNodeProtocol
     public let identifierToken: Token
+    public let initializerToken: Token?
+    public let initializerExpr: (any NodeProtocol)?
 
     public var identifierName: String {
         identifierToken.value
@@ -189,9 +191,11 @@ public class VariableDeclNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(type: any TypeNodeProtocol, identifierToken: Token) {
+    init(type: any TypeNodeProtocol, identifierToken: Token, initializerToken: Token? = nil, initializerExpr: (any NodeProtocol)? = nil) {
         self.type = type
         self.identifierToken = identifierToken
+        self.initializerToken = initializerToken
+        self.initializerExpr = initializerExpr
     }
 }
 
