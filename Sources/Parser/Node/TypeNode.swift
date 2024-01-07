@@ -50,7 +50,7 @@ public class PointerTypeNode: TypeNodeProtocol {
 
     // MARK: - Initializer
 
-    init(referenceType: any TypeNodeProtocol, pointerToken: Token) {
+    public init(referenceType: any TypeNodeProtocol, pointerToken: Token) {
         self.referenceType = referenceType
         self.pointerToken = pointerToken
     }

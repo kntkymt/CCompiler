@@ -49,7 +49,7 @@ public final class AnyNode: NodeProtocol {
     public let sourceTokens: [Token]
     public let children: [any NodeProtocol]
 
-    init(_ node: any NodeProtocol) {
+    public init(_ node: any NodeProtocol) {
         self.sourceTokens = node.sourceTokens
         self.children = node.children
         self.kind = node.kind

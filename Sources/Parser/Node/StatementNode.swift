@@ -16,7 +16,7 @@ public class WhileStatementNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(whileToken: Token, condition: any NodeProtocol, body: any NodeProtocol) {
+    public init(whileToken: Token, condition: any NodeProtocol, body: any NodeProtocol) {
         self.whileToken = whileToken
         self.condition = condition
         self.body = body
@@ -43,7 +43,7 @@ public class ForStatementNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(forToken: Token, pre: (any NodeProtocol)?, condition: (any NodeProtocol)?, post: (any NodeProtocol)?, body: any NodeProtocol) {
+    public init(forToken: Token, pre: (any NodeProtocol)?, condition: (any NodeProtocol)?, post: (any NodeProtocol)?, body: any NodeProtocol) {
         self.forToken = forToken
         self.condition = condition
         self.pre = pre
@@ -76,7 +76,7 @@ public class IfStatementNode: NodeProtocol {
     public let elseToken: Token?
     public let falseBody: (any NodeProtocol)?
 
-    init(ifToken: Token, condition: any NodeProtocol, trueBody: any NodeProtocol, elseToken: Token?, falseBody: (any NodeProtocol)?) {
+    public init(ifToken: Token, condition: any NodeProtocol, trueBody: any NodeProtocol, elseToken: Token?, falseBody: (any NodeProtocol)?) {
         self.ifToken = ifToken
         self.condition = condition
         self.trueBody = trueBody
@@ -98,7 +98,7 @@ public class ReturnStatementNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(returnToken: Token, expression: any NodeProtocol) {
+    public init(returnToken: Token, expression: any NodeProtocol) {
         self.returnToken = returnToken
         self.expression = expression
     }
@@ -118,7 +118,7 @@ public class BlockStatementNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(statements: [any NodeProtocol]) {
+    public init(statements: [any NodeProtocol]) {
         self.statements = statements
     }
 }
@@ -150,7 +150,7 @@ public class FunctionDeclNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(
+    public init(
         returnTypeNode: any NodeProtocol,
         functionNameToken: Token,
         parenthesisLeftToken: Token,
@@ -200,7 +200,7 @@ public class VariableDeclNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(type: any TypeNodeProtocol, identifierToken: Token, initializerToken: Token? = nil, initializerExpr: (any NodeProtocol)? = nil) {
+    public init(type: any TypeNodeProtocol, identifierToken: Token, initializerToken: Token? = nil, initializerExpr: (any NodeProtocol)? = nil) {
         self.type = type
         self.identifierToken = identifierToken
         self.initializerToken = initializerToken
@@ -227,7 +227,7 @@ public class FunctionParameterNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(type: any TypeNodeProtocol, identifierToken: Token) {
+    public init(type: any TypeNodeProtocol, identifierToken: Token) {
         self.type = type
         self.identifierToken = identifierToken
     }
@@ -251,7 +251,7 @@ public class SourceFileNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(functions: [FunctionDeclNode], globalVariables: [VariableDeclNode]) {
+    public init(functions: [FunctionDeclNode], globalVariables: [VariableDeclNode]) {
         self.functions = functions
         self.globalVariables = globalVariables
     }

@@ -18,7 +18,7 @@ public class InfixOperatorExpressionNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(left: any NodeProtocol, operator: any NodeProtocol, right: any NodeProtocol) {
+    public init(left: any NodeProtocol, operator: any NodeProtocol, right: any NodeProtocol) {
         self.left = left
         self.operator = `operator`
         self.right = right
@@ -61,7 +61,7 @@ public class PrefixOperatorExpressionNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(operator: Token, expression: any NodeProtocol) {
+    public init(operator: Token, expression: any NodeProtocol) {
         self.operator = `operator`
         self.expression = expression
     }
@@ -88,7 +88,7 @@ public class FunctionCallExpressionNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(identifierToken: Token, parenthesisLeftToken: Token, arguments: [any NodeProtocol], parenthesisRightToken: Token) {
+    public init(identifierToken: Token, parenthesisLeftToken: Token, arguments: [any NodeProtocol], parenthesisRightToken: Token) {
         self.identifierToken = identifierToken
         self.parenthesisLeftToken = parenthesisLeftToken
         self.arguments = arguments

@@ -18,7 +18,7 @@ public class IntegerLiteralNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(token: Token) {
+    public init(token: Token) {
         self.token = token
     }
 }
@@ -41,7 +41,7 @@ public class StringLiteralNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(token: Token) {
+    public init(token: Token) {
         self.token = token
     }
 }
@@ -64,7 +64,7 @@ public class IdentifierNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(token: Token) {
+    public init(token: Token) {
         self.token = token
     }
 }
@@ -151,7 +151,7 @@ public class BinaryOperatorNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(token: Token) {
+    public init(token: Token) {
         self.token = token
     }
 }
@@ -170,7 +170,7 @@ public class AssignNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    init(token: Token) {
+    public init(token: Token) {
         self.token = token
     }
 }
