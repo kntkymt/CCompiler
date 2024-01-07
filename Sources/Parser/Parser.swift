@@ -212,8 +212,6 @@ public final class Parser {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
-        let startIndex = index
-
         switch tokens[index] {
         case .reserved(.braceLeft, _):
             return try block()
@@ -240,7 +238,7 @@ public final class Parser {
                 falseStatement = try stmt()
             }
 
-            return IfStatementNode(ifToken: ifToken, condition: condition, trueBody: trueStatement, elseToken: elseToken, falseBody: falseStatement, sourceTokens: Array(tokens[startIndex..<index]))
+            return IfStatementNode(ifToken: ifToken, condition: condition, trueBody: trueStatement, elseToken: elseToken, falseBody: falseStatement)
 
         case .keyword(.while, _):
             let token = try consumeKeywordToken(.while)
@@ -249,7 +247,7 @@ public final class Parser {
             let condition = try expr()
             try consumeReservedToken(.parenthesisRight)
 
-            return WhileStatementNode(token: token, condition: condition, body: try stmt(), sourceTokens: Array(tokens[startIndex..<index]))
+            return WhileStatementNode(whileToken: token, condition: condition, body: try stmt())
 
         case .keyword(.for, _):
             let forToken = try consumeKeywordToken(.for)
@@ -279,13 +277,13 @@ public final class Parser {
                 try consumeReservedToken(.parenthesisRight)
             }
 
-            return ForStatementNode(token: forToken, condition: condition, pre: preExpr, post: postExpr, body: try stmt(), sourceTokens: Array(tokens[startIndex..<index]))
+            return ForStatementNode(forToken: forToken, pre: preExpr, condition: condition, post: postExpr, body: try stmt())
 
         case .keyword(.return, _):
             let token = try consumeKeywordToken(.return)
 
             let left = try expr()
-            let node = ReturnStatementNode(token: token, expression: left, sourceTokens: Array(tokens[startIndex..<index]))
+            let node = ReturnStatementNode(returnToken: token, expression: left)
             try consumeReservedToken(.semicolon)
 
             return node
@@ -300,7 +298,6 @@ public final class Parser {
 
     // block = "{" stmt* "}"
     func block() throws -> BlockStatementNode {
-        let startIndex = index
         try consumeReservedToken(.braceLeft)
 
         var statements: [any NodeProtocol] = []
@@ -313,7 +310,7 @@ public final class Parser {
             statements.append(try stmt())
         }
 
-        return BlockStatementNode(statements: statements, sourceTokens: Array(tokens[startIndex..<index]))
+        return BlockStatementNode(statements: statements)
     }
 
     // variableDecl = type identifier ("[" num "]")? ("=" (expr | "{" exprList "}" | stringLiteral)?
@@ -393,7 +390,6 @@ public final class Parser {
 
     // assign = equality ("=" assign)?
     func assign() throws -> any NodeProtocol {
-        let startIndex = index
         var node = try equality()
 
         if index >= tokens.count {
@@ -405,10 +401,9 @@ public final class Parser {
             let rightNode = try assign()
 
             node = InfixOperatorExpressionNode(
+                left: node, 
                 operator: AssignNode(token: token),
-                left: node,
-                right: rightNode,
-                sourceTokens: Array(tokens[startIndex..<index])
+                right: rightNode
             )
         }
 
@@ -417,7 +412,6 @@ public final class Parser {
 
     // equality = relational ("==" relational | "!=" relational)*
     func equality() throws -> any NodeProtocol {
-        let startIndex = index
         var node = try relational()
 
         while index < tokens.count {
@@ -427,10 +421,9 @@ public final class Parser {
                 let rightNode = try relational()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: token),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             case .reserved(.notEqual, _):
@@ -438,10 +431,9 @@ public final class Parser {
                 let rightNode = try relational()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: token),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             default:
@@ -454,7 +446,6 @@ public final class Parser {
 
     // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
     func relational() throws -> any NodeProtocol {
-        let startIndex = index
         var node = try add()
 
         while index < tokens.count {
@@ -464,10 +455,9 @@ public final class Parser {
                 let rightNode = try add()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: token),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             case .reserved(.lessThanOrEqual, _):
@@ -475,10 +465,9 @@ public final class Parser {
                 let rightNode = try add()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: token),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             case .reserved(.greaterThan, _):
@@ -486,10 +475,9 @@ public final class Parser {
                 let rightNode = try add()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: token),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             case .reserved(.greaterThanOrEqual, _):
@@ -497,10 +485,9 @@ public final class Parser {
                 let rightNode = try add()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: token),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             default:
@@ -513,7 +500,6 @@ public final class Parser {
 
     // add = mul ("+" mul | "-" mul)*
     func add() throws -> any NodeProtocol {
-        let startIndex = index
         var node = try mul()
 
         while index < tokens.count {
@@ -523,10 +509,9 @@ public final class Parser {
                 let rightNode = try mul()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: addToken),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             case .reserved(.sub, _):
@@ -534,10 +519,9 @@ public final class Parser {
                 let rightNode = try mul()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: subToken),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             default:
@@ -550,8 +534,6 @@ public final class Parser {
 
     // mul = unary ("*" unary | "/" unary)*
     func mul() throws -> any NodeProtocol {
-        let startIndex = index
-
         var node = try unary()
 
         while index < tokens.count {
@@ -561,10 +543,9 @@ public final class Parser {
                 let rightNode = try unary()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: mulToken),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             case .reserved(.div, _):
@@ -572,10 +553,9 @@ public final class Parser {
                 let rightNode = try unary()
 
                 node = InfixOperatorExpressionNode(
+                    left: node, 
                     operator: BinaryOperatorNode(token: divToken),
-                    left: node,
-                    right: rightNode,
-                    sourceTokens: Array(tokens[startIndex..<index])
+                    right: rightNode
                 )
 
             default:
@@ -593,8 +573,6 @@ public final class Parser {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
-
-        let startIndex = index
 
         switch tokens[index] {
         case .keyword(.sizeof, _):
@@ -619,10 +597,9 @@ public final class Parser {
             let right = try primary()
 
             return InfixOperatorExpressionNode(
+                left: left, 
                 operator: BinaryOperatorNode(token: subToken),
-                left: left,
-                right: right,
-                sourceTokens: Array(tokens[startIndex..<index])
+                right: right
             )
 
         case .reserved(.mul, _):
@@ -631,8 +608,7 @@ public final class Parser {
 
             return PrefixOperatorExpressionNode(
                 operator: mulToken,
-                right: right,
-                sourceTokens: Array(tokens[startIndex..<index])
+                expression: right
             )
 
         case .reserved(.and, _):
@@ -641,8 +617,7 @@ public final class Parser {
 
             return PrefixOperatorExpressionNode(
                 operator: andToken,
-                right: right,
-                sourceTokens: Array(tokens[startIndex..<index])
+                expression: right
             )
 
         default:
@@ -658,8 +633,6 @@ public final class Parser {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
         }
-
-        let startIndex = index
 
         switch tokens[index] {
         case .reserved(.parenthesisLeft, _):
@@ -687,7 +660,7 @@ public final class Parser {
             let identifierToken = try consumeIdentifierToken()
 
             if index < tokens.count, case .reserved(.parenthesisLeft, _) = tokens[index] {
-                try consumeReservedToken(.parenthesisLeft)
+                let parenthesisLeft = try consumeReservedToken(.parenthesisLeft)
 
                 var argments: [any NodeProtocol] = []
                 if index < tokens.count {
@@ -698,9 +671,14 @@ public final class Parser {
                     }
                 }
 
-                try consumeReservedToken(.parenthesisRight)
+                let parenthesisRight = try consumeReservedToken(.parenthesisRight)
 
-                return FunctionCallExpressionNode(token: identifierToken, arguments: argments, sourceTokens: Array(tokens[startIndex..<index]))
+                return FunctionCallExpressionNode(
+                    identifierToken: identifierToken,
+                    parenthesisLeftToken: parenthesisLeft,
+                    arguments: argments,
+                    parenthesisRightToken: parenthesisRight
+                )
             } else if index < tokens.count, case .reserved(.squareLeft, _) = tokens[index] {
                 return SubscriptCallExpressionNode(
                     identifierNode: IdentifierNode(token: identifierToken),

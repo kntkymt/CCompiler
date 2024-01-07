@@ -29,10 +29,9 @@ final class StringLiteralTest: XCTestCase {
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
             InfixOperatorExpressionNode(
+                left: IdentifierNode(token: tokens[0]), 
                 operator: AssignNode(token: tokens[1]),
-                left: IdentifierNode(token: tokens[0]),
-                right: StringLiteralNode(token: tokens[2]),
-                sourceTokens: Array(tokens[0...2])
+                right: StringLiteralNode(token: tokens[2])
             )
         )
     }

@@ -15,9 +15,8 @@ final class ReturnTest: XCTestCase {
         XCTAssertEqual(
             node as! ReturnStatementNode,
             ReturnStatementNode(
-                token: tokens[0],
-                expression: IntegerLiteralNode(token: tokens[1]),
-                sourceTokens: Array(tokens[0...1])
+                returnToken: tokens[0],
+                expression: IntegerLiteralNode(token: tokens[1])
             )
         )
     }

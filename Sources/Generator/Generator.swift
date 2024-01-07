@@ -95,7 +95,7 @@ public final class Generator {
             case .prefixOperatorExpr:
                 let prefixOperatorExpr = try initializerExpr.casted(PrefixOperatorExpressionNode.self)
                 if prefixOperatorExpr.operatorKind == .address {
-                    let value = try prefixOperatorExpr.right.casted(IdentifierNode.self).identifierName
+                    let value = try prefixOperatorExpr.expression.casted(IdentifierNode.self).identifierName
                     result += "    .quad \(value)\n"
                 } else {
                     throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
@@ -107,7 +107,7 @@ public final class Generator {
                 func generateAddressValue(referenceNode: any NodeProtocol, integerLiteralNode: any NodeProtocol) -> String? {
                     if let prefix = referenceNode as? PrefixOperatorExpressionNode,
                        prefix.operatorKind == .address,
-                       let identifier = prefix.right as? IdentifierNode,
+                       let identifier = prefix.expression as? IdentifierNode,
                        let binaryOperator = infixOperator.operator as? BinaryOperatorNode,
                        (binaryOperator.operatorKind == .add || binaryOperator.operatorKind == .sub),
                        let integerLiteral = integerLiteralNode as? IntegerLiteralNode {
@@ -524,14 +524,14 @@ public final class Generator {
             switch casted.operatorKind {
             case .reference:
                 // *のあとはどんな値でも良い
-                result += try generate(node: casted.right)
+                result += try generate(node: casted.expression)
 
                 // 値をロードしてpush
                 result += "    ldr x0, [sp]\n"
                 result += "    add sp, sp, #16\n"
 
                 // 値をアドレスとして読み、アドレスが指す値をロード
-                if let identifier = casted.right as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
+                if let identifier = casted.expression as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
                     result += "    ldrb w0, [x0]\n"
                 } else {
                     result += "    ldr x0, [x0]\n"
@@ -541,7 +541,7 @@ public final class Generator {
 
             case .address:
                 // &のあとは変数しか入らない（はず？）
-                if let right = casted.right as? IdentifierNode {
+                if let right = casted.expression as? IdentifierNode {
                     result += try generatePushVariableAddress(node: right)
                 } else {
                     throw GenerateError.invalidSyntax(index: node.sourceTokens[0].sourceIndex)
@@ -558,7 +558,7 @@ public final class Generator {
                 if casted.left is IdentifierNode {
                     result += try generatePushVariableAddress(node: casted.left.casted(IdentifierNode.self))
                 } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference {
-                    result += try generate(node: pointer.right)
+                    result += try generate(node: pointer.expression)
                 } else if let subscriptCall = casted.left as? SubscriptCallExpressionNode {
                     result += try generatePushArrayElementAddress(node: subscriptCall)
                 } else {
@@ -577,7 +577,7 @@ public final class Generator {
                 // assign
                 if let identifier = casted.left as? IdentifierNode, getVariableType(name: identifier.identifierName)?.memorySize == 1 {
                     result += "    strb w0, [x1]\n"
-                } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference, let identifier = pointer.right as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
+                } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference, let identifier = pointer.expression as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
                     result += "    strb w0, [x1]\n"
                 } else if let subscriptCall = casted.left as? SubscriptCallExpressionNode,
                           isElementOrReferenceTypeMemorySizeOf(1, identifierName: subscriptCall.identifierNode.identifierName) {

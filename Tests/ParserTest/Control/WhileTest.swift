@@ -18,10 +18,9 @@ final class WhileTest: XCTestCase {
         XCTAssertEqual(
             node as! WhileStatementNode,
             WhileStatementNode(
-                token: tokens[0],
+                whileToken: tokens[0],
                 condition: IntegerLiteralNode(token: tokens[2]),
-                body: IntegerLiteralNode(token: tokens[4]),
-                sourceTokens: Array(tokens[0...5])
+                body: IntegerLiteralNode(token: tokens[4])
             )
         )
     }

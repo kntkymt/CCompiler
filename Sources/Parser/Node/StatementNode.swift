@@ -2,109 +2,105 @@ import Tokenizer
 
 public class WhileStatementNode: NodeProtocol {
 
-    public var kind: NodeKind = .whileStatement
+    // MARK: - Property
 
-    public let token: Token
-    public let sourceTokens: [Token]
+    public var kind: NodeKind = .whileStatement
+    public var sourceTokens: [Token] {
+        [whileToken] + condition.sourceTokens + body.sourceTokens
+    }
     public var children: [any NodeProtocol] { [condition, body] }
 
-    public var condition: any NodeProtocol
-    public var body: any NodeProtocol
+    public let whileToken: Token
+    public let condition: any NodeProtocol
+    public let body: any NodeProtocol
 
-    init(token: Token, condition: any NodeProtocol, body: any NodeProtocol, sourceTokens: [Token]) {
-        self.token = token
+    // MARK: - Initializer
+
+    init(whileToken: Token, condition: any NodeProtocol, body: any NodeProtocol) {
+        self.whileToken = whileToken
         self.condition = condition
         self.body = body
-        self.sourceTokens = sourceTokens
     }
 }
 
 public class ForStatementNode: NodeProtocol {
 
-    public var kind: NodeKind = .forStatement
+    // MARK: - Property
 
-    public let token: Token
+    public let kind: NodeKind = .forStatement
+    public var sourceTokens: [Token] {
+        [forToken] + (pre?.sourceTokens ?? []) + (condition?.sourceTokens ?? []) + (post?.sourceTokens ?? [])
+    }
+    public var children: [any NodeProtocol] {
+        [pre, condition, post, body].compactMap { $0 }
+    }
 
-    public var condition: (any NodeProtocol)?
+    public let forToken: Token
     public var pre: (any NodeProtocol)?
+    public var condition: (any NodeProtocol)?
     public var post: (any NodeProtocol)?
     public var body: any NodeProtocol
 
-    public let sourceTokens: [Token]
-    public var children: [any NodeProtocol] {
-        var result: [any NodeProtocol] = [body]
+    // MARK: - Initializer
 
-        if let pre {
-            result.append(pre)
-        }
-
-        if let post {
-            result.append(post)
-        }
-
-        if let condition {
-            result.append(condition)
-        }
-
-        return result
-    }
-
-    init(token: Token, condition: (any NodeProtocol)?, pre: (any NodeProtocol)?, post: (any NodeProtocol)?, body: any NodeProtocol, sourceTokens: [Token]) {
-        self.token = token
+    init(forToken: Token, pre: (any NodeProtocol)?, condition: (any NodeProtocol)?, post: (any NodeProtocol)?, body: any NodeProtocol) {
+        self.forToken = forToken
         self.condition = condition
         self.pre = pre
         self.post = post
         self.body = body
-        self.sourceTokens = sourceTokens
     }
 }
 
 public class IfStatementNode: NodeProtocol {
 
-    public var kind: NodeKind = .ifStatement
+    // MARK: - Property
 
-    public let ifToken: Token
-    public let elseToken: Token?
+    public let kind: NodeKind = .ifStatement
+    public var sourceTokens: [Token] {
+        var result = [ifToken] + condition.sourceTokens + trueBody.sourceTokens
 
-    public var condition: any NodeProtocol
-    public var trueBody: any NodeProtocol
-    public var falseBody: (any NodeProtocol)?
-
-    public let sourceTokens: [Token]
-    public var children: [any NodeProtocol] {
-        var result: [any NodeProtocol] = [condition, trueBody]
-
-        if let falseBody {
-            result.append(falseBody)
+        if let elseToken {
+            result.append(elseToken)
         }
 
-        return result
+        return result + (falseBody?.sourceTokens ?? [])
+    }
+    public var children: [any NodeProtocol] {
+        [condition, trueBody, falseBody].compactMap { $0 }
     }
 
-    init(ifToken: Token, condition: any NodeProtocol, trueBody: any NodeProtocol, elseToken: Token?, falseBody: (any NodeProtocol)?, sourceTokens: [Token]) {
+    public let ifToken: Token
+    public let condition: any NodeProtocol
+    public let trueBody: any NodeProtocol
+    public let elseToken: Token?
+    public let falseBody: (any NodeProtocol)?
+
+    init(ifToken: Token, condition: any NodeProtocol, trueBody: any NodeProtocol, elseToken: Token?, falseBody: (any NodeProtocol)?) {
         self.ifToken = ifToken
         self.condition = condition
         self.trueBody = trueBody
         self.elseToken = elseToken
         self.falseBody = falseBody
-        self.sourceTokens = sourceTokens
     }
 }
 
 public class ReturnStatementNode: NodeProtocol {
 
-    public var kind: NodeKind = .returnStatement
-    public let token: Token
+    // MARK: - Property
 
-    public var expression: any NodeProtocol
-
-    public let sourceTokens: [Token]
+    public let kind: NodeKind = .returnStatement
+    public var sourceTokens: [Token] { [returnToken] + expression.sourceTokens }
     public var children: [any NodeProtocol] { [expression] }
 
-    init(token: Token, expression: any NodeProtocol, sourceTokens: [Token]) {
-        self.token = token
+    public let returnToken: Token
+    public let expression: any NodeProtocol
+
+    // MARK: - Initializer
+
+    init(returnToken: Token, expression: any NodeProtocol) {
+        self.returnToken = returnToken
         self.expression = expression
-        self.sourceTokens = sourceTokens
     }
 }
 
@@ -113,16 +109,17 @@ public class BlockStatementNode: NodeProtocol {
     // MARK: - Property
 
     public var kind: NodeKind = .blockStatement
-    public let sourceTokens: [Token]
+    public var sourceTokens: [Token] {
+        statements.flatMap { $0.sourceTokens }
+    }
     public var children: [any NodeProtocol] { statements }
 
-    public var statements: [any NodeProtocol]
+    public let statements: [any NodeProtocol]
 
     // MARK: - Initializer
 
-    init(statements: [any NodeProtocol], sourceTokens: [Token]) {
+    init(statements: [any NodeProtocol]) {
         self.statements = statements
-        self.sourceTokens = sourceTokens
     }
 }
 
@@ -130,7 +127,7 @@ public class FunctionDeclNode: NodeProtocol {
 
     // MARK: - Property
 
-    public var kind: NodeKind = .functionDecl
+    public let kind: NodeKind = .functionDecl
     public var sourceTokens: [Token] {
         returnTypeNode.sourceTokens +
         [functionNameToken, parenthesisLeftToken] +
@@ -189,13 +186,7 @@ public class VariableDeclNode: NodeProtocol {
         return tokens
     }
     public var children: [any NodeProtocol] {
-        var nodes: [any NodeProtocol] = [type]
-
-        if let initializerExpr {
-            nodes += [initializerExpr]
-        }
-
-        return nodes
+        [type, initializerExpr].compactMap { $0 }
     }
 
     public let type: any TypeNodeProtocol

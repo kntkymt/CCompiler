@@ -33,8 +33,7 @@ final class FunctionTest: XCTestCase {
                             statements: [
                                 IntegerLiteralNode(token: tokens[5]),
                                 IntegerLiteralNode(token: tokens[7])
-                            ],
-                            sourceTokens: Array(tokens[4...9])
+                            ]
                         )
                     )
                 ],
@@ -73,8 +72,7 @@ final class FunctionTest: XCTestCase {
                             statements: [
                                 IntegerLiteralNode(token: tokens[6]),
                                 IntegerLiteralNode(token: tokens[8])
-                            ],
-                            sourceTokens: Array(tokens[5...10])
+                            ]
                         )
                     )
                 ],
@@ -94,7 +92,12 @@ final class FunctionTest: XCTestCase {
 
         XCTAssertEqual(
             node as! FunctionCallExpressionNode,
-            FunctionCallExpressionNode(token: tokens[0], arguments: [], sourceTokens: Array(tokens[0...2]))
+            FunctionCallExpressionNode(
+                identifierToken: tokens[0],
+                parenthesisLeftToken: tokens[1],
+                arguments: [],
+                parenthesisRightToken: tokens[2]
+            )
         )
     }
 
@@ -132,8 +135,7 @@ final class FunctionTest: XCTestCase {
                         block: BlockStatementNode(
                             statements: [
                                 IntegerLiteralNode(token: tokens[10])
-                            ],
-                            sourceTokens: Array(tokens[9...12])
+                            ]
                         )
                     )
                 ],
@@ -157,12 +159,13 @@ final class FunctionTest: XCTestCase {
         XCTAssertEqual(
             node as! FunctionCallExpressionNode,
             FunctionCallExpressionNode(
-                token: tokens[0], 
+                identifierToken: tokens[0],
+                parenthesisLeftToken: tokens[1],
                 arguments: [
                     IntegerLiteralNode(token: tokens[2]),
                     IdentifierNode(token: tokens[4])
                 ],
-                sourceTokens: Array(tokens[0...5])
+                parenthesisRightToken: tokens[5]
             )
         )
     }
@@ -201,8 +204,7 @@ final class FunctionTest: XCTestCase {
                         block: BlockStatementNode(
                             statements: [
                                 IntegerLiteralNode(token: tokens[5])
-                            ],
-                            sourceTokens: Array(tokens[4...7])
+                            ]
                         )
                     ),
                     FunctionDeclNode(
@@ -214,8 +216,7 @@ final class FunctionTest: XCTestCase {
                         block: BlockStatementNode(
                             statements: [
                                 IntegerLiteralNode(token: tokens[13])
-                            ],
-                            sourceTokens: Array(tokens[12...15])
+                            ]
                         )
                     )
                 ],
@@ -263,10 +264,9 @@ final class FunctionTest: XCTestCase {
                 identifierNode: IdentifierNode(token: tokens[0]),
                 squareLeftToken: tokens[1],
                 argument: InfixOperatorExpressionNode(
-                    operator: BinaryOperatorNode(token: tokens[3]),
                     left: IntegerLiteralNode(token: tokens[2]),
-                    right: IdentifierNode(token: tokens[4]),
-                    sourceTokens: Array(tokens[2...4])
+                    operator: BinaryOperatorNode(token: tokens[3]),
+                    right: IdentifierNode(token: tokens[4])
                 ),
                 squareRightToken: tokens[5]
             )

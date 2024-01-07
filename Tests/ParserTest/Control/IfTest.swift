@@ -22,8 +22,7 @@ final class IfTest: XCTestCase {
                 condition: IntegerLiteralNode(token: tokens[2]),
                 trueBody: IntegerLiteralNode(token: tokens[4]),
                 elseToken: nil,
-                falseBody: nil,
-                sourceTokens: Array(tokens[0...5])
+                falseBody: nil
             )
         )
     }
@@ -49,8 +48,7 @@ final class IfTest: XCTestCase {
                 condition: IntegerLiteralNode(token: tokens[2]),
                 trueBody: IntegerLiteralNode(token: tokens[4]),
                 elseToken: tokens[6],
-                falseBody: IntegerLiteralNode(token: tokens[7]),
-                sourceTokens: Array(tokens[0...8])
+                falseBody: IntegerLiteralNode(token: tokens[7])
             )
         )
     }

@@ -18,15 +18,13 @@ final class OperatorPriorityTest: XCTestCase {
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
             InfixOperatorExpressionNode(
-                operator: BinaryOperatorNode(token: tokens[3]),
                 left: InfixOperatorExpressionNode(
+                    left: IntegerLiteralNode(token: tokens[0]), 
                     operator: BinaryOperatorNode(token: tokens[1]),
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    right: IntegerLiteralNode(token: tokens[2]),
-                    sourceTokens: Array(tokens[0...2])
-                ),
-                right: IntegerLiteralNode(token: tokens[4]),
-                sourceTokens: Array(tokens[0...4])
+                    right: IntegerLiteralNode(token: tokens[2])
+                ), 
+                operator: BinaryOperatorNode(token: tokens[3]),
+                right: IntegerLiteralNode(token: tokens[4])
             )
         )
     }
@@ -45,15 +43,13 @@ final class OperatorPriorityTest: XCTestCase {
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
             InfixOperatorExpressionNode(
-                operator: BinaryOperatorNode(token: tokens[3]),
                 left: InfixOperatorExpressionNode(
-                    operator: BinaryOperatorNode(token: tokens[1]),
                     left: IntegerLiteralNode(token: tokens[0]),
-                    right: IntegerLiteralNode(token: tokens[2]),
-                    sourceTokens: Array(tokens[0...2])
-                ),
-                right: IntegerLiteralNode(token: tokens[4]),
-                sourceTokens: Array(tokens[0...4])
+                    operator: BinaryOperatorNode(token: tokens[1]),
+                    right: IntegerLiteralNode(token: tokens[2])
+                ), 
+                operator: BinaryOperatorNode(token: tokens[3]),
+                right: IntegerLiteralNode(token: tokens[4])
             )
         )
     }
@@ -72,15 +68,13 @@ final class OperatorPriorityTest: XCTestCase {
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
             InfixOperatorExpressionNode(
+                left: IntegerLiteralNode(token: tokens[0]), 
                 operator: BinaryOperatorNode(token: tokens[1]),
-                left: IntegerLiteralNode(token: tokens[0]),
                 right: InfixOperatorExpressionNode(
+                    left: IntegerLiteralNode(token: tokens[2]), 
                     operator: BinaryOperatorNode(token: tokens[3]),
-                    left: IntegerLiteralNode(token: tokens[2]),
-                    right: IntegerLiteralNode(token: tokens[4]),
-                    sourceTokens: Array(tokens[2...4])
-                ),
-                sourceTokens: Array(tokens[0...4])
+                    right: IntegerLiteralNode(token: tokens[4])
+                )
             )
         )
     }
@@ -101,15 +95,13 @@ final class OperatorPriorityTest: XCTestCase {
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
             InfixOperatorExpressionNode(
-                operator: BinaryOperatorNode(token: tokens[5]),
                 left: InfixOperatorExpressionNode(
+                    left: IntegerLiteralNode(token: tokens[1]), 
                     operator: BinaryOperatorNode(token: tokens[2]),
-                    left: IntegerLiteralNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[3]), 
-                    sourceTokens: Array(tokens[1...3])
-                ),
-                right: IntegerLiteralNode(token: tokens[6]),
-                sourceTokens: Array(tokens[0...6])
+                    right: IntegerLiteralNode(token: tokens[3])
+                ), 
+                operator: BinaryOperatorNode(token: tokens[5]),
+                right: IntegerLiteralNode(token: tokens[6])
             )
         )
     }

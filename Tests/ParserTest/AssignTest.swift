@@ -16,10 +16,9 @@ final class AssignTest: XCTestCase {
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
             InfixOperatorExpressionNode(
+                left: IdentifierNode(token: tokens[0]), 
                 operator: AssignNode(token: tokens[1]),
-                left: IdentifierNode(token: tokens[0]),
-                right: IntegerLiteralNode(token: tokens[2]), 
-                sourceTokens: Array(tokens[0...2])
+                right: IntegerLiteralNode(token: tokens[2])
             )
         )
     }
@@ -38,15 +37,13 @@ final class AssignTest: XCTestCase {
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
             InfixOperatorExpressionNode(
+                left: IdentifierNode(token: tokens[0]), 
                 operator: AssignNode(token: tokens[1]),
-                left: IdentifierNode(token: tokens[0]),
                 right: InfixOperatorExpressionNode(
-                    operator: AssignNode(token: tokens[3]),
                     left: IdentifierNode(token: tokens[2]),
-                    right: IntegerLiteralNode(token: tokens[4]), 
-                    sourceTokens: Array(tokens[2...4])
-                ),
-                sourceTokens: Array(tokens[0...4])
+                    operator: AssignNode(token: tokens[3]),
+                    right: IntegerLiteralNode(token: tokens[4])
+                )
             )
         )
     }
@@ -64,10 +61,9 @@ final class AssignTest: XCTestCase {
         XCTAssertEqual(
             node as! InfixOperatorExpressionNode,
             InfixOperatorExpressionNode(
+                left: IntegerLiteralNode(token: tokens[0]), 
                 operator: AssignNode(token: tokens[1]),
-                left: IntegerLiteralNode(token: tokens[0]),
-                right: IntegerLiteralNode(token: tokens[2]),
-                sourceTokens: Array(tokens[0...2])
+                right: IntegerLiteralNode(token: tokens[2])
             )
         )
     }

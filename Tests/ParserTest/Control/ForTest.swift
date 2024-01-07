@@ -22,12 +22,11 @@ final class ForTest: XCTestCase {
         XCTAssertEqual(
             node as! ForStatementNode,
             ForStatementNode(
-                token: tokens[0],
+                forToken: tokens[0],
+                pre: IntegerLiteralNode(token: tokens[2]), 
                 condition: IntegerLiteralNode(token: tokens[4]),
-                pre: IntegerLiteralNode(token: tokens[2]),
                 post: IntegerLiteralNode(token: tokens[6]),
-                body: IntegerLiteralNode(token: tokens[8]),
-                sourceTokens: Array(tokens[0...9])
+                body: IntegerLiteralNode(token: tokens[8])
             )
         )
     }
@@ -54,18 +53,16 @@ final class ForTest: XCTestCase {
         XCTAssertEqual(
             node as! ForStatementNode,
             ForStatementNode(
-                token: tokens[0],
-                condition: IntegerLiteralNode(token: tokens[4]),
+                forToken: tokens[0],
                 pre: IntegerLiteralNode(token: tokens[2]),
+                condition: IntegerLiteralNode(token: tokens[4]),
                 post: IntegerLiteralNode(token: tokens[6]),
                 body: BlockStatementNode(
                     statements: [
                         IntegerLiteralNode(token: tokens[9]),
                         IntegerLiteralNode(token: tokens[11]),
-                    ],
-                    sourceTokens: Array(tokens[8...13])
-                ),
-                sourceTokens: tokens
+                    ]
+                )
             )
         )
     }
@@ -85,12 +82,11 @@ final class ForTest: XCTestCase {
         XCTAssertEqual(
             node as! ForStatementNode,
             ForStatementNode(
-                token: tokens[0],
+                forToken: tokens[0],
+                pre: nil, 
                 condition: nil,
-                pre: nil,
                 post: nil,
-                body: IntegerLiteralNode(token: tokens[5]),
-                sourceTokens: Array(tokens[0...6])
+                body: IntegerLiteralNode(token: tokens[5])
             )
         )
     }
