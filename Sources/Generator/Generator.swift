@@ -43,17 +43,25 @@ public final class Generator {
     public func generate(sourceFileNode: SourceFileNode) throws -> String {
 
         var dataSection = ""
-        if !sourceFileNode.globalVariables.isEmpty {
-            dataSection += ".section    __DATA,__data\n"
-            for variableDecl in sourceFileNode.globalVariables {
-                dataSection += try generateGlobalVariableDecl(node: variableDecl)
-            }
-        }
-
         var functionDeclResult = ""
-        for functionDecl in sourceFileNode.functions {
-            functionDeclResult += ".p2align 2\n"
-            functionDeclResult += try generate(node: functionDecl)
+        for statement in sourceFileNode.statements {
+            switch statement.item.kind {
+            case .variableDecl:
+                if dataSection.isEmpty {
+                    dataSection += ".section    __DATA,__data\n"
+                }
+
+                let casted = try statement.item.casted(VariableDeclNode.self)
+                dataSection += try generateGlobalVariableDecl(node: casted)
+
+            case .functionDecl:
+                let casted = try statement.item.casted(FunctionDeclNode.self)
+                functionDeclResult += ".p2align 2\n"
+                functionDeclResult += try generate(node: casted)
+
+            default:
+                throw GenerateError.invalidSyntax(index: statement.sourceTokens.first!.sourceIndex)
+            }
         }
 
         let functionMeta = ".globl \(functionLabels.joined(separator: ", "))\n"
@@ -216,6 +224,10 @@ public final class Generator {
             result += "    str x0, [sp, #-16]!\n"
 
             return result
+
+        case .exprListItem:
+            let casted = try node.casted(ExpressionListItemNode.self)
+            return try generate(node: casted.expression)
 
         case .functionDecl:
             let casted = try node.casted(FunctionDeclNode.self)
@@ -394,7 +406,7 @@ public final class Generator {
         case .blockStatement:
             let casted = try node.casted(BlockStatementNode.self)
 
-            for statement in casted.statements {
+            for statement in casted.items {
                 result += try generate(node: statement)
 
                 // 次のstmtに行く前に今のstmtの最終結果を消す
@@ -403,6 +415,11 @@ public final class Generator {
             }
 
             return result
+
+        case .blockItem:
+            let casted = try node.casted(BlockItemNode.self)
+
+            return try generate(node: casted.item)
 
         case .returnStatement:
             let casted = try node.casted(ReturnStatementNode.self)
@@ -518,10 +535,29 @@ public final class Generator {
 
             return result
 
+        case .tupleExpr:
+            let casted = try node.casted(TupleExpressionNode.self)
+            return try generate(node: casted.expression)
+
         case .prefixOperatorExpr:
             let casted = try node.casted(PrefixOperatorExpressionNode.self)
 
             switch casted.operatorKind {
+            case .plus:
+                // +は影響がないのでそのまま
+                result += try generate(node: casted.expression)
+
+            case .minus:
+                result += try generate(node: casted.expression)
+
+                result += "    ldr x0, [sp]\n"
+                result += "    add sp, sp, #16\n"
+
+                // 符号反転
+                result += "    neg x0, x0\n"
+
+                result += "    str x0, [sp, #-16]!\n"
+
             case .reference:
                 // *のあとはどんな値でも良い
                 result += try generate(node: casted.expression)

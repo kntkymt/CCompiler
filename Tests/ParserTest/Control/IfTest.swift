@@ -15,14 +15,23 @@ final class IfTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! IfStatementNode,
-            IfStatementNode(
-                ifToken: tokens[0],
-                condition: IntegerLiteralNode(token: tokens[2]),
-                trueBody: IntegerLiteralNode(token: tokens[4]),
-                elseToken: nil,
-                falseBody: nil
+            node,
+            BlockItemNode(
+                item: IfStatementNode(
+                    ifToken: tokens[0],
+                    parenthesisLeftToken: tokens[1],
+                    condition: IntegerLiteralNode(token: tokens[2]),
+                    parenthesisRightToken: tokens[3],
+                    trueBody: BlockItemNode(
+                        item: IntegerLiteralNode(token: tokens[4]),
+                        semicolonToken: tokens[5]
+                    ),
+                    elseToken: nil,
+                    falseBody: nil
+                )
             )
         )
     }
@@ -41,14 +50,26 @@ final class IfTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! IfStatementNode,
-            IfStatementNode(
-                ifToken: tokens[0],
-                condition: IntegerLiteralNode(token: tokens[2]),
-                trueBody: IntegerLiteralNode(token: tokens[4]),
-                elseToken: tokens[6],
-                falseBody: IntegerLiteralNode(token: tokens[7])
+            node,
+            BlockItemNode(
+                item: IfStatementNode(
+                    ifToken: tokens[0],
+                    parenthesisLeftToken: tokens[1],
+                    condition: IntegerLiteralNode(token: tokens[2]),
+                    parenthesisRightToken: tokens[3],
+                    trueBody: BlockItemNode(
+                        item: IntegerLiteralNode(token: tokens[4]),
+                        semicolonToken: tokens[5]
+                    ),
+                    elseToken: tokens[6],
+                    falseBody: BlockItemNode(
+                        item: IntegerLiteralNode(token: tokens[7]),
+                        semicolonToken: tokens[8]
+                    )
+                )
             )
         )
     }

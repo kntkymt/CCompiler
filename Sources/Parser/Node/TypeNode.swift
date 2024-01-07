@@ -60,7 +60,7 @@ public class ArrayTypeNode: TypeNodeProtocol {
 
     // MARK: - Property
 
-    public var kind: NodeKind = .arrayType
+    public let kind: NodeKind = .arrayType
 
     public var sourceTokens: [Token] { [squareLeftToken] + elementType.sourceTokens + [squareRightToken] }
     public var children: [any NodeProtocol] { [elementType] }

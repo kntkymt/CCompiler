@@ -11,9 +11,14 @@ final class StringLiteralTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! StringLiteralNode,
-            StringLiteralNode(token: tokens[0])
+            node,
+            BlockItemNode(
+                item: StringLiteralNode(token: tokens[0]),
+                semicolonToken: tokens[1]
+            )
         )
     }
 
@@ -26,12 +31,17 @@ final class StringLiteralTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! InfixOperatorExpressionNode,
-            InfixOperatorExpressionNode(
-                left: IdentifierNode(token: tokens[0]), 
-                operator: AssignNode(token: tokens[1]),
-                right: StringLiteralNode(token: tokens[2])
+            node,
+            BlockItemNode(
+                item: InfixOperatorExpressionNode(
+                    left: IdentifierNode(token: tokens[0]),
+                    operator: AssignNode(token: tokens[1]),
+                    right: StringLiteralNode(token: tokens[2])
+                ),
+                semicolonToken: tokens[3]
             )
         )
     }

@@ -17,12 +17,15 @@ public enum NodeKind {
     case functionCallExpr
     case subscriptCallExpr
     case arrayExpr
+    case exprListItem
+    case tupleExpr
 
     case ifStatement
     case whileStatement
     case forStatement
     case returnStatement
     case blockStatement
+    case blockItem
 
     case functionDecl
     case functionParameter

@@ -4,21 +4,25 @@ public class WhileStatementNode: NodeProtocol {
 
     // MARK: - Property
 
-    public var kind: NodeKind = .whileStatement
+    public let kind: NodeKind = .whileStatement
     public var sourceTokens: [Token] {
-        [whileToken] + condition.sourceTokens + body.sourceTokens
+        [whileToken, parenthesisLeftToken] + condition.sourceTokens + [parenthesisRightToken] + body.sourceTokens
     }
     public var children: [any NodeProtocol] { [condition, body] }
 
     public let whileToken: Token
+    public let parenthesisLeftToken: Token
     public let condition: any NodeProtocol
-    public let body: any NodeProtocol
+    public let parenthesisRightToken: Token
+    public let body: BlockItemNode
 
     // MARK: - Initializer
 
-    public init(whileToken: Token, condition: any NodeProtocol, body: any NodeProtocol) {
+    public init(whileToken: Token, parenthesisLeftToken: Token, condition: any NodeProtocol, parenthesisRightToken: Token, body: BlockItemNode) {
         self.whileToken = whileToken
+        self.parenthesisLeftToken = parenthesisLeftToken
         self.condition = condition
+        self.parenthesisRightToken = parenthesisRightToken
         self.body = body
     }
 }
@@ -29,25 +33,65 @@ public class ForStatementNode: NodeProtocol {
 
     public let kind: NodeKind = .forStatement
     public var sourceTokens: [Token] {
-        [forToken] + (pre?.sourceTokens ?? []) + (condition?.sourceTokens ?? []) + (post?.sourceTokens ?? [])
+        var result = [forToken, parenthesisLeftToken]
+
+        if let pre {
+            result += pre.sourceTokens
+        }
+
+        result += [firstSemicolonToken]
+
+        if let condition {
+            result += condition.sourceTokens
+        }
+
+        result += [secondSemicolonToken]
+
+        if let post {
+            result += post.sourceTokens
+        }
+
+        result += [parenthesisRightToken]
+
+        result += body.sourceTokens
+
+        return result
     }
     public var children: [any NodeProtocol] {
         [pre, condition, post, body].compactMap { $0 }
     }
 
     public let forToken: Token
-    public var pre: (any NodeProtocol)?
-    public var condition: (any NodeProtocol)?
-    public var post: (any NodeProtocol)?
-    public var body: any NodeProtocol
+    public let parenthesisLeftToken: Token
+    public let pre: (any NodeProtocol)?
+    public let firstSemicolonToken: Token
+    public let condition: (any NodeProtocol)?
+    public let secondSemicolonToken: Token
+    public let post: (any NodeProtocol)?
+    public let parenthesisRightToken: Token
+    public let body: BlockItemNode
 
     // MARK: - Initializer
 
-    public init(forToken: Token, pre: (any NodeProtocol)?, condition: (any NodeProtocol)?, post: (any NodeProtocol)?, body: any NodeProtocol) {
+    public init(
+        forToken: Token,
+        parenthesisLeftToken: Token,
+        pre: (any NodeProtocol)?,
+        firstSemicolonToken: Token,
+        condition: (any NodeProtocol)?,
+        secondSemicolonToken: Token,
+        post: (any NodeProtocol)?,
+        parenthesisRightToken: Token,
+        body: BlockItemNode
+    ) {
         self.forToken = forToken
+        self.parenthesisLeftToken = parenthesisLeftToken
         self.condition = condition
+        self.firstSemicolonToken = firstSemicolonToken
         self.pre = pre
+        self.secondSemicolonToken = secondSemicolonToken
         self.post = post
+        self.parenthesisRightToken = parenthesisRightToken
         self.body = body
     }
 }
@@ -58,7 +102,7 @@ public class IfStatementNode: NodeProtocol {
 
     public let kind: NodeKind = .ifStatement
     public var sourceTokens: [Token] {
-        var result = [ifToken] + condition.sourceTokens + trueBody.sourceTokens
+        var result = [ifToken, parenthesisLeftToken] + condition.sourceTokens + [parenthesisRightToken] + trueBody.sourceTokens
 
         if let elseToken {
             result.append(elseToken)
@@ -67,18 +111,30 @@ public class IfStatementNode: NodeProtocol {
         return result + (falseBody?.sourceTokens ?? [])
     }
     public var children: [any NodeProtocol] {
-        [condition, trueBody, falseBody].compactMap { $0 }
+        [condition, trueBody, falseBody as (any NodeProtocol)?].compactMap { $0 }
     }
 
     public let ifToken: Token
+    public let parenthesisLeftToken: Token
     public let condition: any NodeProtocol
-    public let trueBody: any NodeProtocol
+    public let parenthesisRightToken: Token
+    public let trueBody: BlockItemNode
     public let elseToken: Token?
-    public let falseBody: (any NodeProtocol)?
+    public let falseBody: BlockItemNode?
 
-    public init(ifToken: Token, condition: any NodeProtocol, trueBody: any NodeProtocol, elseToken: Token?, falseBody: (any NodeProtocol)?) {
+    public init(
+        ifToken: Token,
+        parenthesisLeftToken: Token,
+        condition: any NodeProtocol,
+        parenthesisRightToken: Token,
+        trueBody: BlockItemNode,
+        elseToken: Token?,
+        falseBody: BlockItemNode?
+    ) {
         self.ifToken = ifToken
+        self.parenthesisLeftToken = parenthesisLeftToken
         self.condition = condition
+        self.parenthesisRightToken = parenthesisRightToken
         self.trueBody = trueBody
         self.elseToken = elseToken
         self.falseBody = falseBody
@@ -108,18 +164,51 @@ public class BlockStatementNode: NodeProtocol {
 
     // MARK: - Property
 
-    public var kind: NodeKind = .blockStatement
+    public let kind: NodeKind = .blockStatement
     public var sourceTokens: [Token] {
-        statements.flatMap { $0.sourceTokens }
+        [braceLeftToken] + items.flatMap { $0.sourceTokens } + [braceRightToken]
     }
-    public var children: [any NodeProtocol] { statements }
+    public var children: [any NodeProtocol] { items }
 
-    public let statements: [any NodeProtocol]
+    public let braceLeftToken: Token
+    public let items: [BlockItemNode]
+    public let braceRightToken: Token
 
     // MARK: - Initializer
 
-    public init(statements: [any NodeProtocol]) {
-        self.statements = statements
+    public init(braceLeftToken: Token, items: [BlockItemNode], braceRightToken: Token) {
+        self.braceLeftToken = braceLeftToken
+        self.items = items
+        self.braceRightToken = braceRightToken
+    }
+}
+
+public class BlockItemNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public let kind: NodeKind = .blockItem
+    public var sourceTokens: [Token] {
+        var result = item.sourceTokens
+
+        if let semicolonToken {
+            result += [semicolonToken]
+        }
+
+        return result
+    }
+    public var children: [any NodeProtocol] {
+        [item]
+    }
+
+    public let item: any NodeProtocol
+    public let semicolonToken: Token?
+
+    // MARK: - Initializer
+
+    public init(item: any NodeProtocol, semicolonToken: Token? = nil) {
+        self.item = item
+        self.semicolonToken = semicolonToken
     }
 }
 
@@ -129,11 +218,11 @@ public class FunctionDeclNode: NodeProtocol {
 
     public let kind: NodeKind = .functionDecl
     public var sourceTokens: [Token] {
-        returnTypeNode.sourceTokens +
-        [functionNameToken, parenthesisLeftToken] +
-        parameterNodes.flatMap { $0.sourceTokens } +
-        [parenthesisRightToken] +
-        block.sourceTokens
+        returnTypeNode.sourceTokens 
+        + [functionNameToken, parenthesisLeftToken]
+        + parameterNodes.flatMap { $0.sourceTokens }
+        + [parenthesisRightToken]
+        + block.sourceTokens
     }
     public var children: [any NodeProtocol] { [returnTypeNode] + parameterNodes + [block] }
 
@@ -214,12 +303,19 @@ public class FunctionParameterNode: NodeProtocol {
 
     public let kind: NodeKind = .functionParameter
     public var sourceTokens: [Token] {
-        type.sourceTokens + [identifierToken]
+        var result = type.sourceTokens + [identifierToken]
+
+        if let commaToken {
+            result += [commaToken]
+        }
+
+        return result
     }
     public var children: [any NodeProtocol] { [type] }
 
     public let type: any TypeNodeProtocol
     public let identifierToken: Token
+    public let commaToken: Token?
 
     public var identifierName: String {
         identifierToken.value
@@ -227,9 +323,10 @@ public class FunctionParameterNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    public init(type: any TypeNodeProtocol, identifierToken: Token) {
+    public init(type: any TypeNodeProtocol, identifierToken: Token, commaToken: Token? = nil) {
         self.type = type
         self.identifierToken = identifierToken
+        self.commaToken = commaToken
     }
 }
 
@@ -237,22 +334,20 @@ public class SourceFileNode: NodeProtocol {
 
     // MARK: - Property
 
-    public var kind: NodeKind = .sourceFile
+    public let kind: NodeKind = .sourceFile
     public var sourceTokens: [Token] {
-        functions.flatMap { $0.sourceTokens } + globalVariables.flatMap { $0.sourceTokens }
+        statements.flatMap { $0.sourceTokens }
     }
 
     public var children: [any NodeProtocol] {
-        functions + globalVariables
+        statements
     }
 
-    public let functions: [FunctionDeclNode]
-    public let globalVariables: [VariableDeclNode]
+    public let statements: [BlockItemNode]
 
     // MARK: - Initializer
 
-    public init(functions: [FunctionDeclNode], globalVariables: [VariableDeclNode]) {
-        self.functions = functions
-        self.globalVariables = globalVariables
+    public init(statements: [BlockItemNode]) {
+        self.statements = statements
     }
 }

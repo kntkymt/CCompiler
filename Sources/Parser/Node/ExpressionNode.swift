@@ -28,6 +28,12 @@ public class InfixOperatorExpressionNode: NodeProtocol {
 public class PrefixOperatorExpressionNode: NodeProtocol {
 
     public enum OperatorKind {
+        /// `+`
+        case plus
+
+        /// `-`
+        case minus
+
         /// `*`
         case reference
 
@@ -48,6 +54,12 @@ public class PrefixOperatorExpressionNode: NodeProtocol {
 
     public var operatorKind: OperatorKind {
         switch `operator` {
+        case .reserved(.add, _):
+            return .plus
+
+        case .reserved(.sub, _):
+            return .minus
+
         case .reserved(.mul, _):
             return .reference
 
@@ -79,7 +91,7 @@ public class FunctionCallExpressionNode: NodeProtocol {
 
     public let identifierToken: Token
     public let parenthesisLeftToken: Token
-    public let arguments: [any NodeProtocol]
+    public let arguments: [ExpressionListItemNode]
     public let parenthesisRightToken: Token
 
     public var functionName: String {
@@ -88,7 +100,7 @@ public class FunctionCallExpressionNode: NodeProtocol {
 
     // MARK: - Initializer
 
-    public init(identifierToken: Token, parenthesisLeftToken: Token, arguments: [any NodeProtocol], parenthesisRightToken: Token) {
+    public init(identifierToken: Token, parenthesisLeftToken: Token, arguments: [ExpressionListItemNode], parenthesisRightToken: Token) {
         self.identifierToken = identifierToken
         self.parenthesisLeftToken = parenthesisLeftToken
         self.arguments = arguments
@@ -123,19 +135,73 @@ public class ArrayExpressionNode: NodeProtocol {
 
     // MARK: - Property
 
-    public var kind: NodeKind = .arrayExpr
+    public let kind: NodeKind = .arrayExpr
     public var sourceTokens: [Token] { return  [braceLeft] + exprListNodes.flatMap { $0.sourceTokens } + [braceRight] }
     public var children: [any NodeProtocol] { return exprListNodes.flatMap { $0.children } }
 
     public let braceLeft: Token
-    public let exprListNodes: [any NodeProtocol]
+    public let exprListNodes: [ExpressionListItemNode]
     public let braceRight: Token
 
     // MARK: - Initializer
 
-    public init(braceLeft: Token, exprListNodes: [any NodeProtocol], braceRight: Token) {
+    public init(braceLeft: Token, exprListNodes: [ExpressionListItemNode], braceRight: Token) {
         self.braceLeft = braceLeft
         self.exprListNodes = exprListNodes
         self.braceRight = braceRight
+    }
+}
+
+public class ExpressionListItemNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public let kind: NodeKind = .exprListItem
+    public var sourceTokens: [Token] {
+        var result = expression.sourceTokens
+
+        if let comma {
+            result += [comma]
+        }
+
+        return result
+    }
+    public var children: [any NodeProtocol] {
+        [expression]
+    }
+
+    public let expression: any NodeProtocol
+    public let comma: Token?
+
+    // MARK: - Initializer
+
+    public init(expression: any NodeProtocol, comma: Token? = nil) {
+        self.expression = expression
+        self.comma = comma
+    }
+}
+
+public class TupleExpressionNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public let kind: NodeKind = .tupleExpr
+    public var sourceTokens: [Token] {
+        [parenthesisLeftToken] + expression.sourceTokens + [parenthesisRightToken]
+    }
+    public var children: [any NodeProtocol] {
+        [expression]
+    }
+
+    public let parenthesisLeftToken: Token
+    public let expression: any NodeProtocol
+    public let parenthesisRightToken: Token
+
+    // MARK: - Initializer
+
+    public init(parenthesisLeftToken: Token, expression: any NodeProtocol, parenthesisRightToken: Token) {
+        self.parenthesisLeftToken = parenthesisLeftToken
+        self.expression = expression
+        self.parenthesisRightToken = parenthesisRightToken
     }
 }
