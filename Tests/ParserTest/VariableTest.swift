@@ -12,9 +12,17 @@ final class VariableTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! VariableDeclNode,
-            VariableDeclNode(type: TypeNode(typeToken: tokens[0]), identifierToken: tokens[1])
+            node,
+            BlockItemNode(
+                item: VariableDeclNode(
+                    type: TypeNode(typeToken: tokens[0]),
+                    identifierToken: tokens[1]
+                ),
+                semicolonToken: tokens[2]
+            )
         )
     }
 
@@ -28,13 +36,18 @@ final class VariableTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! VariableDeclNode,
-            VariableDeclNode(
-                type: TypeNode(typeToken: tokens[0]),
-                identifierToken: tokens[1],
-                initializerToken: tokens[2],
-                initializerExpr: IntegerLiteralNode(token: tokens[3])
+            node,
+            BlockItemNode(
+                item: VariableDeclNode(
+                    type: TypeNode(typeToken: tokens[0]),
+                    identifierToken: tokens[1],
+                    initializerToken: tokens[2],
+                    initializerExpr: IntegerLiteralNode(token: tokens[3])
+                ),
+                semicolonToken: tokens[4]
             )
         )
     }
@@ -48,9 +61,20 @@ final class VariableTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! VariableDeclNode,
-            VariableDeclNode(type: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]), identifierToken: tokens[2])
+            node,
+            BlockItemNode(
+                item: VariableDeclNode(
+                    type: PointerTypeNode(
+                        referenceType: TypeNode(typeToken: tokens[0]),
+                        pointerToken: tokens[1]
+                    ),
+                    identifierToken: tokens[2]
+                ),
+                semicolonToken: tokens[3]
+            )
         )
     }
 
@@ -64,12 +88,27 @@ final class VariableTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! VariableDeclNode,
-            VariableDeclNode(type: PointerTypeNode(referenceType: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]), pointerToken: tokens[2]) , identifierToken: tokens[3])
+            node,
+            BlockItemNode(
+                item: VariableDeclNode(
+                    type: PointerTypeNode(
+                        referenceType: PointerTypeNode(
+                            referenceType: TypeNode(typeToken: tokens[0]),
+                            pointerToken: tokens[1]
+                        ),
+                        pointerToken: tokens[2]
+                    ),
+                    identifierToken: tokens[3]
+                ),
+                semicolonToken: tokens[4]
+            )
         )
     }
 
+    // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclVariableArray() throws {
         let tokens: [Token] = [
             .type(.int, sourceIndex: 0),
@@ -82,19 +121,23 @@ final class VariableTest: XCTestCase {
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
-            node as! VariableDeclNode,
-            VariableDeclNode(
-                type: ArrayTypeNode(
-                    elementType: TypeNode(typeToken: tokens[0]),
-                    squareLeftToken: tokens[2],
-                    arraySizeToken: tokens[3],
-                    squareRightToken: tokens[4]
+            node,
+            BlockItemNode(
+                item: VariableDeclNode(
+                    type: ArrayTypeNode(
+                        elementType: TypeNode(typeToken: tokens[0]),
+                        squareLeftToken: tokens[2],
+                        arraySizeToken: tokens[3],
+                        squareRightToken: tokens[4]
+                    ),
+                    identifierToken: tokens[1]
                 ),
-                identifierToken: tokens[1]
+                semicolonToken: tokens[5]
             )
         )
     }
 
+    // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclAndInitVariableArray() throws {
         let tokens: [Token] = [
             .type(.int, sourceIndex: 0),
@@ -113,28 +156,32 @@ final class VariableTest: XCTestCase {
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
-            node as! VariableDeclNode,
-            VariableDeclNode(
-                type: ArrayTypeNode(
-                    elementType: TypeNode(typeToken: tokens[0]),
-                    squareLeftToken: tokens[2],
-                    arraySizeToken: tokens[3],
-                    squareRightToken: tokens[4]
+            node,
+            BlockItemNode(
+                item: VariableDeclNode(
+                    type: ArrayTypeNode(
+                        elementType: TypeNode(typeToken: tokens[0]),
+                        squareLeftToken: tokens[2],
+                        arraySizeToken: tokens[3],
+                        squareRightToken: tokens[4]
+                    ),
+                    identifierToken: tokens[1],
+                    initializerToken: tokens[5],
+                    initializerExpr: ArrayExpressionNode(
+                        braceLeft: tokens[6],
+                        exprListNodes: [
+                            ExpressionListItemNode(expression: IntegerLiteralNode(token: tokens[7]), comma: tokens[8]),
+                            ExpressionListItemNode(expression: IntegerLiteralNode(token: tokens[9]))
+                        ],
+                        braceRight: tokens[10]
+                    )
                 ),
-                identifierToken: tokens[1],
-                initializerToken: tokens[5],
-                initializerExpr: ArrayExpressionNode(
-                    braceLeft: tokens[6],
-                    exprListNodes: [
-                        IntegerLiteralNode(token: tokens[7]),
-                        IntegerLiteralNode(token: tokens[9])
-                    ],
-                    braceRight: tokens[10]
-                )
+                semicolonToken: tokens[11]
             )
         )
     }
 
+    // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclAndInitVariableStringLiteral() throws {
         let tokens: [Token] = [
             .type(.char, sourceIndex: 0),
@@ -149,21 +196,25 @@ final class VariableTest: XCTestCase {
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
-            node as! VariableDeclNode,
-            VariableDeclNode(
-                type: ArrayTypeNode(
-                    elementType: TypeNode(typeToken: tokens[0]),
-                    squareLeftToken: tokens[2],
-                    arraySizeToken: tokens[3],
-                    squareRightToken: tokens[4]
+            node,
+            BlockItemNode(
+                item: VariableDeclNode(
+                    type: ArrayTypeNode(
+                        elementType: TypeNode(typeToken: tokens[0]),
+                        squareLeftToken: tokens[2],
+                        arraySizeToken: tokens[3],
+                        squareRightToken: tokens[4]
+                    ),
+                    identifierToken: tokens[1],
+                    initializerToken: tokens[5],
+                    initializerExpr: StringLiteralNode(token: tokens[6])
                 ),
-                identifierToken: tokens[1],
-                initializerToken: tokens[5],
-                initializerExpr: StringLiteralNode(token: tokens[6])
+                semicolonToken: tokens[7]
             )
         )
     }
 
+    // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclVariableArrayPointer() throws {
         let tokens: [Token] = [
             .type(.int, sourceIndex: 0),
@@ -177,15 +228,18 @@ final class VariableTest: XCTestCase {
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
-            node as! VariableDeclNode,
-            VariableDeclNode(
-                type: ArrayTypeNode(
-                    elementType: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]),
-                    squareLeftToken: tokens[3],
-                    arraySizeToken: tokens[4],
-                    squareRightToken: tokens[5]
+            node,
+            BlockItemNode(
+                item: VariableDeclNode(
+                    type: ArrayTypeNode(
+                        elementType: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]),
+                        squareLeftToken: tokens[3],
+                        arraySizeToken: tokens[4],
+                        squareRightToken: tokens[5]
+                    ),
+                    identifierToken: tokens[2]
                 ),
-                identifierToken: tokens[2]
+                semicolonToken: tokens[6]
             )
         )
     }
@@ -198,12 +252,19 @@ final class VariableTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).parse()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
             node,
             SourceFileNode(
-                functions: [],
-                globalVariables: [
-                    VariableDeclNode(type: TypeNode(typeToken: tokens[0]), identifierToken: tokens[1])
+                statements: [
+                    BlockItemNode(
+                        item: VariableDeclNode(
+                            type: TypeNode(typeToken: tokens[0]),
+                            identifierToken: tokens[1]
+                        ),
+                        semicolonToken: tokens[2]
+                    )
                 ]
             )
         )
@@ -218,12 +279,22 @@ final class VariableTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).parse()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
             node,
             SourceFileNode(
-                functions: [],
-                globalVariables: [
-                    VariableDeclNode(type: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]), identifierToken: tokens[2])
+                statements: [
+                    BlockItemNode(
+                        item: VariableDeclNode(
+                            type: PointerTypeNode(
+                                referenceType: TypeNode(typeToken: tokens[0]),
+                                pointerToken: tokens[1]
+                            ),
+                            identifierToken: tokens[2]
+                        ),
+                        semicolonToken: tokens[3]
+                    )
                 ]
             )
         )

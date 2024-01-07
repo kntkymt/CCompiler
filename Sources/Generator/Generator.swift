@@ -43,17 +43,25 @@ public final class Generator {
     public func generate(sourceFileNode: SourceFileNode) throws -> String {
 
         var dataSection = ""
-        if !sourceFileNode.globalVariables.isEmpty {
-            dataSection += ".section    __DATA,__data\n"
-            for variableDecl in sourceFileNode.globalVariables {
-                dataSection += try generateGlobalVariableDecl(node: variableDecl)
-            }
-        }
-
         var functionDeclResult = ""
-        for functionDecl in sourceFileNode.functions {
-            functionDeclResult += ".p2align 2\n"
-            functionDeclResult += try generate(node: functionDecl)
+        for statement in sourceFileNode.statements {
+            switch statement.item.kind {
+            case .variableDecl:
+                if dataSection.isEmpty {
+                    dataSection += ".section    __DATA,__data\n"
+                }
+
+                let casted = try statement.item.casted(VariableDeclNode.self)
+                dataSection += try generateGlobalVariableDecl(node: casted)
+
+            case .functionDecl:
+                let casted = try statement.item.casted(FunctionDeclNode.self)
+                functionDeclResult += ".p2align 2\n"
+                functionDeclResult += try generate(node: casted)
+
+            default:
+                throw GenerateError.invalidSyntax(index: statement.sourceTokens.first!.sourceIndex)
+            }
         }
 
         let functionMeta = ".globl \(functionLabels.joined(separator: ", "))\n"
@@ -95,7 +103,7 @@ public final class Generator {
             case .prefixOperatorExpr:
                 let prefixOperatorExpr = try initializerExpr.casted(PrefixOperatorExpressionNode.self)
                 if prefixOperatorExpr.operatorKind == .address {
-                    let value = try prefixOperatorExpr.right.casted(IdentifierNode.self).identifierName
+                    let value = try prefixOperatorExpr.expression.casted(IdentifierNode.self).identifierName
                     result += "    .quad \(value)\n"
                 } else {
                     throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
@@ -107,7 +115,7 @@ public final class Generator {
                 func generateAddressValue(referenceNode: any NodeProtocol, integerLiteralNode: any NodeProtocol) -> String? {
                     if let prefix = referenceNode as? PrefixOperatorExpressionNode,
                        prefix.operatorKind == .address,
-                       let identifier = prefix.right as? IdentifierNode,
+                       let identifier = prefix.expression as? IdentifierNode,
                        let binaryOperator = infixOperator.operator as? BinaryOperatorNode,
                        (binaryOperator.operatorKind == .add || binaryOperator.operatorKind == .sub),
                        let integerLiteral = integerLiteralNode as? IntegerLiteralNode {
@@ -216,6 +224,10 @@ public final class Generator {
             result += "    str x0, [sp, #-16]!\n"
 
             return result
+
+        case .exprListItem:
+            let casted = try node.casted(ExpressionListItemNode.self)
+            return try generate(node: casted.expression)
 
         case .functionDecl:
             let casted = try node.casted(FunctionDeclNode.self)
@@ -394,7 +406,7 @@ public final class Generator {
         case .blockStatement:
             let casted = try node.casted(BlockStatementNode.self)
 
-            for statement in casted.statements {
+            for statement in casted.items {
                 result += try generate(node: statement)
 
                 // 次のstmtに行く前に今のstmtの最終結果を消す
@@ -403,6 +415,11 @@ public final class Generator {
             }
 
             return result
+
+        case .blockItem:
+            let casted = try node.casted(BlockItemNode.self)
+
+            return try generate(node: casted.item)
 
         case .returnStatement:
             let casted = try node.casted(ReturnStatementNode.self)
@@ -518,20 +535,39 @@ public final class Generator {
 
             return result
 
+        case .tupleExpr:
+            let casted = try node.casted(TupleExpressionNode.self)
+            return try generate(node: casted.expression)
+
         case .prefixOperatorExpr:
             let casted = try node.casted(PrefixOperatorExpressionNode.self)
 
             switch casted.operatorKind {
+            case .plus:
+                // +は影響がないのでそのまま
+                result += try generate(node: casted.expression)
+
+            case .minus:
+                result += try generate(node: casted.expression)
+
+                result += "    ldr x0, [sp]\n"
+                result += "    add sp, sp, #16\n"
+
+                // 符号反転
+                result += "    neg x0, x0\n"
+
+                result += "    str x0, [sp, #-16]!\n"
+
             case .reference:
                 // *のあとはどんな値でも良い
-                result += try generate(node: casted.right)
+                result += try generate(node: casted.expression)
 
                 // 値をロードしてpush
                 result += "    ldr x0, [sp]\n"
                 result += "    add sp, sp, #16\n"
 
                 // 値をアドレスとして読み、アドレスが指す値をロード
-                if let identifier = casted.right as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
+                if let identifier = casted.expression as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
                     result += "    ldrb w0, [x0]\n"
                 } else {
                     result += "    ldr x0, [x0]\n"
@@ -541,7 +577,7 @@ public final class Generator {
 
             case .address:
                 // &のあとは変数しか入らない（はず？）
-                if let right = casted.right as? IdentifierNode {
+                if let right = casted.expression as? IdentifierNode {
                     result += try generatePushVariableAddress(node: right)
                 } else {
                     throw GenerateError.invalidSyntax(index: node.sourceTokens[0].sourceIndex)
@@ -558,7 +594,7 @@ public final class Generator {
                 if casted.left is IdentifierNode {
                     result += try generatePushVariableAddress(node: casted.left.casted(IdentifierNode.self))
                 } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference {
-                    result += try generate(node: pointer.right)
+                    result += try generate(node: pointer.expression)
                 } else if let subscriptCall = casted.left as? SubscriptCallExpressionNode {
                     result += try generatePushArrayElementAddress(node: subscriptCall)
                 } else {
@@ -577,7 +613,7 @@ public final class Generator {
                 // assign
                 if let identifier = casted.left as? IdentifierNode, getVariableType(name: identifier.identifierName)?.memorySize == 1 {
                     result += "    strb w0, [x1]\n"
-                } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference, let identifier = pointer.right as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
+                } else if let pointer = casted.left as? PrefixOperatorExpressionNode, pointer.operatorKind == .reference, let identifier = pointer.expression as? IdentifierNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.identifierName) {
                     result += "    strb w0, [x1]\n"
                 } else if let subscriptCall = casted.left as? SubscriptCallExpressionNode,
                           isElementOrReferenceTypeMemorySizeOf(1, identifierName: subscriptCall.identifierNode.identifierName) {

@@ -15,13 +15,21 @@ final class WhileTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! WhileStatementNode,
-            WhileStatementNode(
-                token: tokens[0],
-                condition: IntegerLiteralNode(token: tokens[2]),
-                body: IntegerLiteralNode(token: tokens[4]),
-                sourceTokens: Array(tokens[0...5])
+            node,
+            BlockItemNode(
+                item: WhileStatementNode(
+                    whileToken: tokens[0],
+                    parenthesisLeftToken: tokens[1],
+                    condition: IntegerLiteralNode(token: tokens[2]),
+                    parenthesisRightToken: tokens[3],
+                    body: BlockItemNode(
+                        item: IntegerLiteralNode(token: tokens[4]),
+                        semicolonToken: tokens[5]
+                    )
+                )
             )
         )
     }

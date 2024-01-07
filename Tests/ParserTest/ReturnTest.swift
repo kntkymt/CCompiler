@@ -12,12 +12,16 @@ final class ReturnTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! ReturnStatementNode,
-            ReturnStatementNode(
-                token: tokens[0],
-                expression: IntegerLiteralNode(token: tokens[1]),
-                sourceTokens: Array(tokens[0...1])
+            node,
+            BlockItemNode(
+                item: ReturnStatementNode(
+                    returnToken: tokens[0],
+                    expression: IntegerLiteralNode(token: tokens[1])
+                ),
+                semicolonToken: tokens[2]
             )
         )
     }

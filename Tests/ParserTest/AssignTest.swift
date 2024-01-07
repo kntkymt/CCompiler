@@ -13,13 +13,17 @@ final class AssignTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! InfixOperatorExpressionNode,
-            InfixOperatorExpressionNode(
-                operator: AssignNode(token: tokens[1]),
-                left: IdentifierNode(token: tokens[0]),
-                right: IntegerLiteralNode(token: tokens[2]), 
-                sourceTokens: Array(tokens[0...2])
+            node,
+            BlockItemNode(
+                item: InfixOperatorExpressionNode(
+                    left: IdentifierNode(token: tokens[0]),
+                    operator: AssignNode(token: tokens[1]),
+                    right: IntegerLiteralNode(token: tokens[2])
+                ),
+                semicolonToken: tokens[3]
             )
         )
     }
@@ -35,18 +39,21 @@ final class AssignTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! InfixOperatorExpressionNode,
-            InfixOperatorExpressionNode(
-                operator: AssignNode(token: tokens[1]),
-                left: IdentifierNode(token: tokens[0]),
-                right: InfixOperatorExpressionNode(
-                    operator: AssignNode(token: tokens[3]),
-                    left: IdentifierNode(token: tokens[2]),
-                    right: IntegerLiteralNode(token: tokens[4]), 
-                    sourceTokens: Array(tokens[2...4])
+            node,
+            BlockItemNode(
+                item: InfixOperatorExpressionNode(
+                    left: IdentifierNode(token: tokens[0]),
+                    operator: AssignNode(token: tokens[1]),
+                    right: InfixOperatorExpressionNode(
+                        left: IdentifierNode(token: tokens[2]),
+                        operator: AssignNode(token: tokens[3]),
+                        right: IntegerLiteralNode(token: tokens[4])
+                    )
                 ),
-                sourceTokens: Array(tokens[0...4])
+                semicolonToken: tokens[5]
             )
         )
     }
@@ -61,13 +68,17 @@ final class AssignTest: XCTestCase {
         ]
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
-            node as! InfixOperatorExpressionNode,
-            InfixOperatorExpressionNode(
-                operator: AssignNode(token: tokens[1]),
-                left: IntegerLiteralNode(token: tokens[0]),
-                right: IntegerLiteralNode(token: tokens[2]),
-                sourceTokens: Array(tokens[0...2])
+            node,
+            BlockItemNode(
+                item: InfixOperatorExpressionNode(
+                    left: IntegerLiteralNode(token: tokens[0]),
+                    operator: AssignNode(token: tokens[1]),
+                    right: IntegerLiteralNode(token: tokens[2])
+                ),
+                semicolonToken: tokens[3]
             )
         )
     }
