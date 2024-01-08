@@ -5,7 +5,7 @@ final class StringLiteralTest: XCTestCase {
 
     func testStringLiteral() throws {
         let source = "\"aaaa\""
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         // FIXME: StringLiteralの両端のクオーテーションをどうするか
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, "aaaa")

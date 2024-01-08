@@ -4,7 +4,7 @@ import XCTest
 final class TokensTest: XCTestCase {
     func testAdd() throws {
         let source = "1+2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -19,7 +19,7 @@ final class TokensTest: XCTestCase {
 
     func testSub() throws {
         let source = "1-2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -34,7 +34,7 @@ final class TokensTest: XCTestCase {
 
     func testMul() throws {
         let source = "1*2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -49,7 +49,7 @@ final class TokensTest: XCTestCase {
 
     func testDiv() throws {
         let source = "1/2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -64,7 +64,7 @@ final class TokensTest: XCTestCase {
 
     func testAnd() throws {
         let source = "&a"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -78,7 +78,7 @@ final class TokensTest: XCTestCase {
 
     func testParenthesis() throws {
         let source = "(1)"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -93,7 +93,7 @@ final class TokensTest: XCTestCase {
 
     func testSquares() throws {
         let source = "[1]"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -108,7 +108,7 @@ final class TokensTest: XCTestCase {
 
     func testBraces() throws {
         let source = "{1;}"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -124,7 +124,7 @@ final class TokensTest: XCTestCase {
 
     func testEqual() throws {
         let source = "1==2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -139,7 +139,7 @@ final class TokensTest: XCTestCase {
 
     func testNotEqual() throws {
         let source = "1!=2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -154,7 +154,7 @@ final class TokensTest: XCTestCase {
 
     func testGreaterThan() throws {
         let source = "1>2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -169,7 +169,7 @@ final class TokensTest: XCTestCase {
 
     func testgreaterThanOrEqual() throws {
         let source = "1>=2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -184,7 +184,7 @@ final class TokensTest: XCTestCase {
 
     func testLessThan() throws {
         let source = "1<2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -199,7 +199,7 @@ final class TokensTest: XCTestCase {
 
     func testlessThanOrEqual() throws {
         let source = "1<=2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -214,7 +214,7 @@ final class TokensTest: XCTestCase {
 
     func testAssign() throws {
         let source = "a=1"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -229,7 +229,7 @@ final class TokensTest: XCTestCase {
 
     func testSemicolon() throws {
         let source = "1;"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -243,7 +243,7 @@ final class TokensTest: XCTestCase {
 
     func testComma() throws {
         let source = "1,2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(

@@ -2,13 +2,38 @@ public enum TokenizeError: Error, Equatable {
     case unknownToken(index: Int)
 }
 
-public func tokenize(source: String) throws -> [Token] {
-    var tokens: [Token] = []
+public class Tokenizer {
 
-    let charactors = [Character](source)
-    var index = 0
+    // MARK: - Property
 
-    func extractNumber() -> (TokenKind, Int) {
+    private let charactors: [Character]
+    public var index = 0
+
+    // MARK: - Initializer
+
+    public init(source: String) {
+        self.charactors = [Character](source)
+    }
+
+    // MARK: - Public
+
+    public func tokenize() throws -> [Token] {
+        var tokens: [Token] = []
+
+        while index < charactors.count {
+            let leadingTrivia = extractTrivia(untilBeforeNewLine: false)
+            let kind = try extractTokenKind()
+            let trailingTrivia = extractTrivia(untilBeforeNewLine: true)
+
+            tokens.append(Token(kind: kind.0, leadingTrivia: leadingTrivia, trailingTrivia: trailingTrivia, sourceIndex: kind.1))
+        }
+
+        return tokens
+    }
+
+    // MARK: - Private
+
+    private func extractNumber() -> (TokenKind, Int) {
         var string = ""
         let startIndex = index
 
@@ -25,7 +50,7 @@ public func tokenize(source: String) throws -> [Token] {
         return (.number(string), startIndex)
     }
 
-    func extractString() -> (TokenKind, Int) {
+    private func extractString() -> (TokenKind, Int) {
         var string = ""
         let startIndex = index
 
@@ -47,7 +72,7 @@ public func tokenize(source: String) throws -> [Token] {
         return (.stringLiteral(string), startIndex)
     }
 
-    func extractIdentifier() -> (TokenKind, Int) {
+    private func extractIdentifier() -> (TokenKind, Int) {
         var string = ""
         let startIndex = index
 
@@ -64,7 +89,7 @@ public func tokenize(source: String) throws -> [Token] {
         return (.identifier(string), startIndex)
     }
 
-    func extractTrivia(untilBeforeNewLine: Bool) -> String {
+    private func extractTrivia(untilBeforeNewLine: Bool) -> String {
         var result: [Character] = []
 
         while index < charactors.count {
@@ -122,11 +147,11 @@ public func tokenize(source: String) throws -> [Token] {
 
     // 文字数が多い物からチェックしないといけない
     // 例: <= の時に<を先にチェックすると<, =の2つのトークンになってしまう
-    let reservedKinds = TokenKind.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
-    let keywordKinds = TokenKind.KeywordKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
-    let typeKinds = TokenKind.TypeKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    private let reservedKinds = TokenKind.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    private let keywordKinds = TokenKind.KeywordKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    private let typeKinds = TokenKind.TypeKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
 
-    func extractTokenKind() throws -> (TokenKind, Int) {
+    private func extractTokenKind() throws -> (TokenKind, Int) {
         if charactors[index].isNumber {
             return extractNumber()
         }
@@ -188,16 +213,6 @@ public func tokenize(source: String) throws -> [Token] {
 
         throw TokenizeError.unknownToken(index: index)
     }
-
-    while index < charactors.count {
-        let leadingTrivia = extractTrivia(untilBeforeNewLine: false)
-        let kind = try extractTokenKind()
-        let trailingTrivia = extractTrivia(untilBeforeNewLine: true)
-
-        tokens.append(Token(kind: kind.0, leadingTrivia: leadingTrivia, trailingTrivia: trailingTrivia, sourceIndex: kind.1))
-    }
-
-    return tokens
 }
 
 private extension Character {

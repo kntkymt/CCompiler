@@ -5,7 +5,7 @@ final class NumberTest: XCTestCase {
 
     func testNumber() throws {
         let source = "5"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -18,7 +18,7 @@ final class NumberTest: XCTestCase {
 
     func testNumberMultitoken() throws {
         let source = "123"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(

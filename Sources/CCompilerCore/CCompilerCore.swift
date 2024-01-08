@@ -11,7 +11,7 @@ public enum CompileError: Error, Equatable {
 
 public func compile(_ source: String) throws -> String {
     do {
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
         let node = try Parser(tokens: tokens).parse()
 
         return try Generator().generate(sourceFileNode: node)

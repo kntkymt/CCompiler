@@ -5,7 +5,7 @@ final class TypesTest: XCTestCase {
 
     func testInt() throws {
         let source = "int a"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -19,7 +19,7 @@ final class TypesTest: XCTestCase {
 
     func testInt2() throws {
         let source = "inta"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -32,7 +32,7 @@ final class TypesTest: XCTestCase {
 
     func testChar() throws {
         let source = "char a"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -46,7 +46,7 @@ final class TypesTest: XCTestCase {
 
     func testChar2() throws {
         let source = "chara"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(

@@ -5,7 +5,7 @@ final class IdentifierTest: XCTestCase {
 
     func testIdentifier() throws {
         let source = "a"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -18,7 +18,7 @@ final class IdentifierTest: XCTestCase {
 
     func testIdentifierAdd() throws {
         let source = "a+b"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -33,7 +33,7 @@ final class IdentifierTest: XCTestCase {
 
     func testIdentifierMulti() throws {
         let source = "ab"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -46,7 +46,7 @@ final class IdentifierTest: XCTestCase {
 
     func testIdentifierMulti2() throws {
         let source = "ab hoge"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -60,7 +60,7 @@ final class IdentifierTest: XCTestCase {
 
     func testIdentifierUpper() throws {
         let source = "AB"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -73,7 +73,7 @@ final class IdentifierTest: XCTestCase {
 
     func testIdentifierNumber() throws {
         let source = "A2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -86,7 +86,7 @@ final class IdentifierTest: XCTestCase {
 
     func testIdentifierUnderScore() throws {
         let source = "_"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -99,7 +99,7 @@ final class IdentifierTest: XCTestCase {
 
     func testIdentifierNotAlphabet() throws {
         do {
-            _ = try tokenize(source: "あ")
+            _ = try Tokenizer(source: "あ").tokenize()
         } catch let error as TokenizeError {
             XCTAssertEqual(error, .unknownToken(index: 0))
         }

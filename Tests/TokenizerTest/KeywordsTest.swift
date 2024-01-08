@@ -5,7 +5,7 @@ final class KeywordsTest: XCTestCase {
 
     func testReturn() throws {
         let source = "return"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -18,7 +18,7 @@ final class KeywordsTest: XCTestCase {
 
     func testReturn2() throws {
         let source = "return 2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -32,7 +32,7 @@ final class KeywordsTest: XCTestCase {
 
     func testReturn3() throws {
         let source = "return;"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -46,7 +46,7 @@ final class KeywordsTest: XCTestCase {
 
     func testReturnSimularIdentifier() throws {
         let source = "returnX"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -59,7 +59,7 @@ final class KeywordsTest: XCTestCase {
 
     func testReturnSimularIdentifier2() throws {
         let source = "return2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -72,7 +72,7 @@ final class KeywordsTest: XCTestCase {
 
     func testIf() throws {
         let source = "if(1)else 2"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -90,7 +90,7 @@ final class KeywordsTest: XCTestCase {
 
     func testWhile() throws {
         let source = "while(1)"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -106,7 +106,7 @@ final class KeywordsTest: XCTestCase {
 
     func testFor() throws {
         let source = "for(1;2;3)"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -126,7 +126,7 @@ final class KeywordsTest: XCTestCase {
 
     func testSizeOf() throws {
         let source = "sizeof(1)"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(

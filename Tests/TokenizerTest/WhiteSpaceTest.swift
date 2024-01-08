@@ -5,7 +5,7 @@ final class WhiteSpaceTest: XCTestCase {
 
     func testIgnoreSpaces() throws {
         let source = "1 +   23"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -20,7 +20,7 @@ final class WhiteSpaceTest: XCTestCase {
 
     func testIgnoreTab() throws {
         let source = "1 +  23"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -35,7 +35,7 @@ final class WhiteSpaceTest: XCTestCase {
 
     func testIgnoreBreak() throws {
         let source = "1 +\n23"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -50,7 +50,7 @@ final class WhiteSpaceTest: XCTestCase {
 
     func testLineComment() throws {
         let source = "1 + // 234 \n 23"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
@@ -65,7 +65,7 @@ final class WhiteSpaceTest: XCTestCase {
 
     func testBlockComment() throws {
         let source = "1 + /* 234 */ 23"
-        let tokens = try tokenize(source: source)
+        let tokens = try Tokenizer(source: source).tokenize()
 
         XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
