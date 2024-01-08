@@ -74,7 +74,7 @@ public class Tokenizer {
     }
 
     private func extractString() -> TokenKind {
-        var string = ""
+        var content = ""
 
         // 開始の"
         index += 1
@@ -86,12 +86,12 @@ public class Tokenizer {
                 index += 1
                 break
             } else {
-                string += String(nextToken)
+                content += String(nextToken)
                 index += 1
             }
         }
 
-        return .stringLiteral(string)
+        return .stringLiteral(content)
     }
 
     private func extractIdentifier() -> TokenKind {

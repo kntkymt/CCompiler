@@ -1,25 +1,49 @@
 import Tokenizer
 
-public class IntegerLiteralNode: NodeProtocol {
+public class TokenNode: NodeProtocol {
 
     // MARK: - Property
 
-    public let kind: NodeKind = .integerLiteral
-
+    public let kind: NodeKind = .token
     public var sourceTokens: [Token] {
         [token]
     }
     public let children: [any NodeProtocol] = []
+    
     public let token: Token
 
-    public var literal: String {
-        token.value
+    public var tokenKind: TokenKind {
+        token.kind
+    }
+    public var text: String {
+        token.text
+    }
+    public var description: String {
+        token.description
     }
 
     // MARK: - Initializer
 
     public init(token: Token) {
         self.token = token
+    }
+}
+
+public class IntegerLiteralNode: NodeProtocol {
+
+    // MARK: - Property
+
+    public let kind: NodeKind = .integerLiteral
+    public var children: [any NodeProtocol] {
+        [literal]
+    }
+
+    public let literal: TokenNode
+
+    // MARK: - Initializer
+
+    public init(literal: TokenNode) {
+        self.literal = literal
     }
 }
 
@@ -28,21 +52,16 @@ public class StringLiteralNode: NodeProtocol {
     // MARK: - Property
 
     public let kind: NodeKind = .stringLiteral
-    public var sourceTokens: [Token] {
-        [token]
+    public var children: [any NodeProtocol] {
+        [literal]
     }
-    public let children: [any NodeProtocol] = []
 
-    public let token: Token
-
-    public var value: String {
-        token.value
-    }
+    public let literal: TokenNode
 
     // MARK: - Initializer
 
-    public init(token: Token) {
-        self.token = token
+    public init(literal: TokenNode) {
+        self.literal = literal
     }
 }
 
@@ -51,21 +70,16 @@ public class IdentifierNode: NodeProtocol {
     // MARK: - Property
 
     public let kind: NodeKind = .identifier
-
-    public var sourceTokens: [Token] {
-        [token]
+    public var children: [any NodeProtocol] {
+        [baseName]
     }
-    public let children: [any NodeProtocol] = []
-    public let token: Token
 
-    public var identifierName: String {
-        token.value
-    }
+    public let baseName: TokenNode
 
     // MARK: - Initializer
 
-    public init(token: Token) {
-        self.token = token
+    public init(baseName: TokenNode) {
+        self.baseName = baseName
     }
 }
 
@@ -108,7 +122,7 @@ public class BinaryOperatorNode: NodeProtocol {
     public let kind: NodeKind = .binaryOperator
 
     public var operatorKind: OperatorKind {
-        switch token.kind {
+        switch `operator`.tokenKind {
         case .reserved(.add):
             return .add
 
@@ -143,16 +157,16 @@ public class BinaryOperatorNode: NodeProtocol {
             fatalError()
         }
     }
-    public var sourceTokens: [Token] {
-        [token]
+    public var children: [any NodeProtocol] {
+        [`operator`]
     }
-    public let children: [any NodeProtocol] = []
-    public let token: Token
+
+    public let `operator`: TokenNode
 
     // MARK: - Initializer
 
-    public init(token: Token) {
-        self.token = token
+    public init(operator: TokenNode) {
+        self.operator = `operator`
     }
 }
 
@@ -161,16 +175,15 @@ public class AssignNode: NodeProtocol {
     // MARK: - Property
 
     public let kind: NodeKind = .assign
-
-    public var sourceTokens: [Token] {
-        [token]
+    public var children: [any NodeProtocol] {
+        [equal]
     }
-    public let children: [any NodeProtocol] = []
-    public let token: Token
+
+    public let equal: TokenNode
 
     // MARK: - Initializer
 
-    public init(token: Token) {
-        self.token = token
+    public init(equal: TokenNode) {
+        self.equal = equal
     }
 }

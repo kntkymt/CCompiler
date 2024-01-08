@@ -18,7 +18,7 @@ public final class Parser {
     // MARK: - Util
 
     @discardableResult
-    func consumeIdentifierToken() throws -> Token {
+    func consumeIdentifierToken() throws -> TokenNode {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
@@ -26,14 +26,14 @@ public final class Parser {
         if case .identifier = tokens[index].kind {
             let token = tokens[index]
             index += 1
-            return token
+            return TokenNode(token: token)
         } else {
             throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
-    func consumeNumberToken() throws -> Token {
+    func consumeNumberToken() throws -> TokenNode {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
@@ -41,14 +41,14 @@ public final class Parser {
         if case .number = tokens[index].kind {
             let token = tokens[index]
             index += 1
-            return token
+            return TokenNode(token: token)
         } else {
             throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
-    func consumeStringLiteralToken() throws -> Token {
+    func consumeStringLiteralToken() throws -> TokenNode {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
@@ -56,14 +56,14 @@ public final class Parser {
         if case .stringLiteral = tokens[index].kind {
             let token = tokens[index]
             index += 1
-            return token
+            return TokenNode(token: token)
         } else {
             throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
-    func consumeReservedToken(_ reservedKind: TokenKind.ReservedKind) throws -> Token {
+    func consumeReservedToken(_ reservedKind: TokenKind.ReservedKind) throws -> TokenNode {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
@@ -71,14 +71,14 @@ public final class Parser {
         if case .reserved(let kind) = tokens[index].kind, kind == reservedKind {
             let token = tokens[index]
             index += 1
-            return token
+            return TokenNode(token: token)
         } else {
             throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
-    func consumeKeywordToken(_ keywordKind: TokenKind.KeywordKind) throws -> Token {
+    func consumeKeywordToken(_ keywordKind: TokenKind.KeywordKind) throws -> TokenNode {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
@@ -86,14 +86,14 @@ public final class Parser {
         if case .keyword(let kind) = tokens[index].kind, kind == keywordKind {
             let token = tokens[index]
             index += 1
-            return token
+            return TokenNode(token: token)
         } else {
             throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
-    func consumeTypeToken() throws -> Token {
+    func consumeTypeToken() throws -> TokenNode {
         if index >= tokens.count {
             throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
@@ -101,7 +101,7 @@ public final class Parser {
         if case .type = tokens[index].kind {
             let token = tokens[index]
             index += 1
-            return token
+            return TokenNode(token: token)
         } else {
             throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
@@ -141,17 +141,17 @@ public final class Parser {
                 let parenthesisRight = try consumeReservedToken(.parenthesisRight)
 
                 let function = FunctionDeclNode(
-                    returnTypeNode: type,
-                    functionNameToken: identifier,
-                    parenthesisLeftToken: parenthesisLeft,
-                    parameterNodes: parameters,
-                    parenthesisRightToken: parenthesisRight,
+                    returnType: type,
+                    functionName: identifier,
+                    parenthesisLeft: parenthesisLeft,
+                    parameters: parameters,
+                    parenthesisRight: parenthesisRight,
                     block: try block()
                 )
                 statements.append(BlockItemNode(item: function))
             } else {
                 let variable = try variableDecl(variableType: type, identifier: identifier)
-                statements.append(BlockItemNode(item: variable, semicolonToken: try consumeReservedToken(.semicolon)))
+                statements.append(BlockItemNode(item: variable, semicolon: try consumeReservedToken(.semicolon)))
             }
         }
 
@@ -186,22 +186,22 @@ public final class Parser {
         if index < tokens.count, case .reserved(.squareLeft) = tokens[index].kind {
             type = ArrayTypeNode(
                 elementType: type,
-                squareLeftToken: try consumeReservedToken(.squareLeft),
-                arraySizeToken: try consumeNumberToken(),
-                squareRightToken: try consumeReservedToken(.squareRight)
+                squareLeft: try consumeReservedToken(.squareLeft),
+                arraySize: try consumeNumberToken(),
+                squareRight: try consumeReservedToken(.squareRight)
             )
         }
 
         if index < tokens.count, case .reserved(.comma) = tokens[index].kind {
             return FunctionParameterNode(
                 type: type,
-                identifierToken: identifier,
-                commaToken: try consumeReservedToken(.comma)
+                identifier: identifier,
+                comma: try consumeReservedToken(.comma)
             )
         } else {
             return FunctionParameterNode(
                 type: type,
-                identifierToken: identifier
+                identifier: identifier
             )
         }
     }
@@ -222,7 +222,7 @@ public final class Parser {
             return BlockItemNode(item: try block())
 
         case .type:
-            return BlockItemNode(item: try variableDecl(), semicolonToken: try consumeReservedToken(.semicolon))
+            return BlockItemNode(item: try variableDecl(), semicolon: try consumeReservedToken(.semicolon))
 
         case .keyword(.if):
             let ifToken = try consumeKeywordToken(.if)
@@ -233,7 +233,7 @@ public final class Parser {
 
             let trueStatement = try stmt()
 
-            var elseToken: Token?
+            var elseToken: TokenNode?
             var falseStatement: BlockItemNode?
             if index < tokens.count, case .keyword(.else) = tokens[index].kind {
                 elseToken = try consumeKeywordToken(.else)
@@ -241,12 +241,12 @@ public final class Parser {
             }
 
             let ifStatement = IfStatementNode(
-                ifToken: ifToken,
-                parenthesisLeftToken: parenthesisLeft,
+                if: ifToken,
+                parenthesisLeft: parenthesisLeft,
                 condition: condition,
-                parenthesisRightToken: parenthesisRight,
+                parenthesisRight: parenthesisRight,
                 trueBody: trueStatement,
-                elseToken: elseToken,
+                else: elseToken,
                 falseBody: falseStatement
             )
             return BlockItemNode(item: ifStatement)
@@ -259,10 +259,10 @@ public final class Parser {
             let parenthesisRight = try consumeReservedToken(.parenthesisRight)
 
             let whileStatement = WhileStatementNode(
-                whileToken: token,
-                parenthesisLeftToken: parenthesisLeft,
+                while: token,
+                parenthesisLeft: parenthesisLeft,
                 condition: condition,
-                parenthesisRightToken: parenthesisRight,
+                parenthesisRight: parenthesisRight,
                 body: try stmt()
             )
             return BlockItemNode(item: whileStatement)
@@ -272,7 +272,7 @@ public final class Parser {
             let parenthesisLeft = try consumeReservedToken(.parenthesisLeft)
 
             var preExpr: (any NodeProtocol)?
-            let firstSemicolon: Token
+            let firstSemicolon: TokenNode
             if case .reserved(.semicolon) = tokens[index].kind {
                 firstSemicolon = try consumeReservedToken(.semicolon)
             } else {
@@ -281,7 +281,7 @@ public final class Parser {
             }
 
             var condition: (any NodeProtocol)?
-            let secondSemicolon: Token
+            let secondSemicolon: TokenNode
             if case .reserved(.semicolon) = tokens[index].kind {
                 secondSemicolon = try consumeReservedToken(.semicolon)
             } else {
@@ -290,7 +290,7 @@ public final class Parser {
             }
 
             var postExpr: (any NodeProtocol)?
-            let parenthesisRight: Token
+            let parenthesisRight: TokenNode
             if case .reserved(.parenthesisRight) = tokens[index].kind {
                 parenthesisRight = try consumeReservedToken(.parenthesisRight)
             } else {
@@ -299,14 +299,14 @@ public final class Parser {
             }
 
             let forStatement = ForStatementNode(
-                forToken: forToken,
-                parenthesisLeftToken: parenthesisLeft,
+                for: forToken,
+                parenthesisLeft: parenthesisLeft,
                 pre: preExpr,
-                firstSemicolonToken: firstSemicolon,
+                firstSemicolon: firstSemicolon,
                 condition: condition,
-                secondSemicolonToken: secondSemicolon,
+                secondSemicolon: secondSemicolon,
                 post: postExpr,
-                parenthesisRightToken: parenthesisRight,
+                parenthesisRight: parenthesisRight,
                 body: try stmt()
             )
             return BlockItemNode(item: forStatement)
@@ -315,16 +315,16 @@ public final class Parser {
             let token = try consumeKeywordToken(.return)
             let left = try expr()
 
-            let returnStatement = ReturnStatementNode(returnToken: token, expression: left)
+            let returnStatement = ReturnStatementNode(return: token, expression: left)
             return BlockItemNode(
                 item: returnStatement,
-                semicolonToken: try consumeReservedToken(.semicolon)
+                semicolon: try consumeReservedToken(.semicolon)
             )
 
         default:
             return BlockItemNode(
                 item: try expr(),
-                semicolonToken: try consumeReservedToken(.semicolon)
+                semicolon: try consumeReservedToken(.semicolon)
             )
         }
     }
@@ -345,35 +345,35 @@ public final class Parser {
         let braceRight = try consumeReservedToken(.braceRight)
 
         return BlockStatementNode(
-            braceLeftToken: braceLeft,
+            braceLeft: braceLeft,
             items: items,
-            braceRightToken: braceRight
+            braceRight: braceRight
         )
     }
 
     // variableDecl = type identifier ("[" num "]")? ("=" (expr | "{" exprList "}" | stringLiteral)? ";"
-    func variableDecl(variableType: (any TypeNodeProtocol)? = nil, identifier: Token? = nil) throws -> VariableDeclNode {
+    func variableDecl(variableType: (any TypeNodeProtocol)? = nil, identifier: TokenNode? = nil) throws -> VariableDeclNode {
         var type = if let variableType { variableType } else { try type() }
         let identifier = if let identifier { identifier } else { try consumeIdentifierToken() }
 
         if index < tokens.count, case .reserved(.squareLeft) = tokens[index].kind {
             type = ArrayTypeNode(
                 elementType: type,
-                squareLeftToken: try consumeReservedToken(.squareLeft),
-                arraySizeToken: try consumeNumberToken(),
-                squareRightToken: try consumeReservedToken(.squareRight)
+                squareLeft: try consumeReservedToken(.squareLeft),
+                arraySize: try consumeNumberToken(),
+                squareRight: try consumeReservedToken(.squareRight)
             )
         }
 
         if index < tokens.count, case .reserved(.assign) = tokens[index].kind {
-            let initializerToken = try consumeReservedToken(.assign)
+            let initializer = try consumeReservedToken(.assign)
 
             switch tokens[index].kind {
             case .reserved(.braceLeft):
                 return VariableDeclNode(
                     type: type,
-                    identifierToken: identifier,
-                    initializerToken: initializerToken,
+                    identifier: identifier,
+                    equal: initializer,
                     initializerExpr: ArrayExpressionNode(
                         braceLeft: try consumeReservedToken(.braceLeft),
                         exprListNodes: try exprList(),
@@ -384,16 +384,16 @@ public final class Parser {
             case .stringLiteral:
                 return VariableDeclNode(
                     type: type,
-                    identifierToken: identifier,
-                    initializerToken: initializerToken,
-                    initializerExpr: StringLiteralNode(token: try consumeStringLiteralToken())
+                    identifier: identifier,
+                    equal: initializer,
+                    initializerExpr: StringLiteralNode(literal: try consumeStringLiteralToken())
                 )
 
             default:
                 return VariableDeclNode(
                     type: type,
-                    identifierToken: identifier,
-                    initializerToken: initializerToken,
+                    identifier: identifier,
+                    equal: initializer,
                     initializerExpr: try expr()
                 )
             }
@@ -401,18 +401,18 @@ public final class Parser {
 
         return VariableDeclNode(
             type: type,
-            identifierToken: identifier
+            identifier: identifier
         )
     }
 
     // type = typeIdentifier "*"*
     func type() throws -> any TypeNodeProtocol {
-        var node: any TypeNodeProtocol = TypeNode(typeToken: try consumeTypeToken())
+        var node: any TypeNodeProtocol = TypeNode(type: try consumeTypeToken())
 
         while index < tokens.count {
             if case .reserved(.mul) = tokens[index].kind {
                 let mulToken = try consumeReservedToken(.mul)
-                node = PointerTypeNode(referenceType: node, pointerToken: mulToken)
+                node = PointerTypeNode(referenceType: node, pointer: mulToken)
             } else {
                 break
             }
@@ -440,7 +440,7 @@ public final class Parser {
 
             node = InfixOperatorExpressionNode(
                 left: node, 
-                operator: AssignNode(token: token),
+                operator: AssignNode(equal: token),
                 right: rightNode
             )
         }
@@ -460,7 +460,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: token),
+                    operator: BinaryOperatorNode(operator: token),
                     right: rightNode
                 )
 
@@ -470,7 +470,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: token),
+                    operator: BinaryOperatorNode(operator: token),
                     right: rightNode
                 )
 
@@ -494,7 +494,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: token),
+                    operator: BinaryOperatorNode(operator: token),
                     right: rightNode
                 )
 
@@ -504,7 +504,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: token),
+                    operator: BinaryOperatorNode(operator: token),
                     right: rightNode
                 )
 
@@ -514,7 +514,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: token),
+                    operator: BinaryOperatorNode(operator: token),
                     right: rightNode
                 )
 
@@ -524,7 +524,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: token),
+                    operator: BinaryOperatorNode(operator: token),
                     right: rightNode
                 )
 
@@ -548,7 +548,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: addToken),
+                    operator: BinaryOperatorNode(operator: addToken),
                     right: rightNode
                 )
 
@@ -558,7 +558,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: subToken),
+                    operator: BinaryOperatorNode(operator: subToken),
                     right: rightNode
                 )
 
@@ -582,7 +582,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: mulToken),
+                    operator: BinaryOperatorNode(operator: mulToken),
                     right: rightNode
                 )
 
@@ -592,7 +592,7 @@ public final class Parser {
 
                 node = InfixOperatorExpressionNode(
                     left: node, 
-                    operator: BinaryOperatorNode(token: divToken),
+                    operator: BinaryOperatorNode(operator: divToken),
                     right: rightNode
                 )
 
@@ -619,7 +619,7 @@ public final class Parser {
             _ = try unary()
 
             // FIXME: どうやって式の型を判断する？
-            return IntegerLiteralNode(token: Token(kind: .number("8"), sourceRange: SourceRange(start: .startOfFile, end: .startOfFile)))
+            return IntegerLiteralNode(literal: TokenNode(token: Token(kind: .number("8"), sourceRange: SourceRange(start: .startOfFile, end: .startOfFile))))
 
         case .reserved(.add):
             return PrefixOperatorExpressionNode(
@@ -668,20 +668,20 @@ public final class Parser {
         switch tokens[index].kind {
         case .reserved(.parenthesisLeft):
             return TupleExpressionNode(
-                parenthesisLeftToken: try consumeReservedToken(.parenthesisLeft),
+                parenthesisLeft: try consumeReservedToken(.parenthesisLeft),
                 expression: try expr(),
-                parenthesisRightToken: try consumeReservedToken(.parenthesisRight)
+                parenthesisRight: try consumeReservedToken(.parenthesisRight)
             )
 
         case .number:
             let numberToken = try consumeNumberToken()
-            let numberNode = IntegerLiteralNode(token: numberToken)
+            let numberNode = IntegerLiteralNode(literal: numberToken)
 
             return numberNode
 
         case .stringLiteral:
             let stringToken = try consumeStringLiteralToken()
-            let stringLiteralNode = StringLiteralNode(token: stringToken)
+            let stringLiteralNode = StringLiteralNode(literal: stringToken)
 
             return stringLiteralNode
 
@@ -703,20 +703,20 @@ public final class Parser {
                 let parenthesisRight = try consumeReservedToken(.parenthesisRight)
 
                 return FunctionCallExpressionNode(
-                    identifierToken: identifierToken,
-                    parenthesisLeftToken: parenthesisLeft,
+                    identifier: identifierToken,
+                    parenthesisLeft: parenthesisLeft,
                     arguments: argments,
-                    parenthesisRightToken: parenthesisRight
+                    parenthesisRight: parenthesisRight
                 )
             } else if index < tokens.count, case .reserved(.squareLeft) = tokens[index].kind {
                 return SubscriptCallExpressionNode(
-                    identifierNode: IdentifierNode(token: identifierToken),
-                    squareLeftToken: try consumeReservedToken(.squareLeft),
+                    identifier: IdentifierNode(baseName: identifierToken),
+                    squareLeft: try consumeReservedToken(.squareLeft),
                     argument: try expr(),
-                    squareRightToken: try consumeReservedToken(.squareRight)
+                    squareRight: try consumeReservedToken(.squareRight)
                 )
             } else {
-                return IdentifierNode(token: identifierToken)
+                return IdentifierNode(baseName: identifierToken)
             }
 
         default:

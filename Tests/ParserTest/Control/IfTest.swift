@@ -23,15 +23,15 @@ final class IfTest: XCTestCase {
             node,
             BlockItemNode(
                 item: IfStatementNode(
-                    ifToken: tokens[0],
-                    parenthesisLeftToken: tokens[1],
-                    condition: IntegerLiteralNode(token: tokens[2]),
-                    parenthesisRightToken: tokens[3],
+                    if: TokenNode(token: tokens[0]),
+                    parenthesisLeft: TokenNode(token: tokens[1]),
+                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                    parenthesisRight: TokenNode(token: tokens[3]),
                     trueBody: BlockItemNode(
-                        item: IntegerLiteralNode(token: tokens[4]),
-                        semicolonToken: tokens[5]
+                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
+                        semicolon: TokenNode(token: tokens[5])
                     ),
-                    elseToken: nil,
+                    else: nil,
                     falseBody: nil
                 )
             )
@@ -60,18 +60,18 @@ final class IfTest: XCTestCase {
             node,
             BlockItemNode(
                 item: IfStatementNode(
-                    ifToken: tokens[0],
-                    parenthesisLeftToken: tokens[1],
-                    condition: IntegerLiteralNode(token: tokens[2]),
-                    parenthesisRightToken: tokens[3],
+                    if: TokenNode(token: tokens[0]),
+                    parenthesisLeft: TokenNode(token: tokens[1]),
+                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                    parenthesisRight: TokenNode(token: tokens[3]),
                     trueBody: BlockItemNode(
-                        item: IntegerLiteralNode(token: tokens[4]),
-                        semicolonToken: tokens[5]
+                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
+                        semicolon: TokenNode(token: tokens[5])
                     ),
-                    elseToken: tokens[6],
+                    else: TokenNode(token: tokens[6]),
                     falseBody: BlockItemNode(
-                        item: IntegerLiteralNode(token: tokens[7]),
-                        semicolonToken: tokens[8]
+                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[7])),
+                        semicolon: TokenNode(token: tokens[8])
                     )
                 )
             )

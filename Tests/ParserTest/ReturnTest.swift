@@ -20,10 +20,10 @@ final class ReturnTest: XCTestCase {
             node,
             BlockItemNode(
                 item: ReturnStatementNode(
-                    returnToken: tokens[0],
-                    expression: IntegerLiteralNode(token: tokens[1])
+                    return: TokenNode(token: tokens[0]),
+                    expression: IntegerLiteralNode(literal: TokenNode(token: tokens[1]))
                 ),
-                semicolonToken: tokens[2]
+                semicolon: TokenNode(token: tokens[2])
             )
         )
     }

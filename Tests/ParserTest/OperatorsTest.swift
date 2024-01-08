@@ -21,11 +21,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -47,11 +47,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -73,11 +73,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -99,11 +99,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -124,10 +124,10 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: PrefixOperatorExpressionNode(
-                    operator: tokens[0],
-                    expression: IntegerLiteralNode(token: tokens[1])
+                    operator: TokenNode(token: tokens[0]),
+                    expression: IntegerLiteralNode(literal: TokenNode(token: tokens[1]))
                 ),
-                semicolonToken: tokens[2]
+                semicolon: TokenNode(token: tokens[2])
             )
         )
     }
@@ -148,10 +148,10 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: PrefixOperatorExpressionNode(
-                    operator: tokens[0],
-                    expression: IntegerLiteralNode(token: tokens[1])
+                    operator: TokenNode(token: tokens[0]),
+                    expression: IntegerLiteralNode(literal: TokenNode(token: tokens[1]))
                 ),
-                semicolonToken: tokens[2]
+                semicolon: TokenNode(token: tokens[2])
             )
         )
     }
@@ -172,10 +172,10 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: PrefixOperatorExpressionNode(
-                    operator: tokens[0],
-                    expression: IdentifierNode(token: tokens[1])
+                    operator: TokenNode(token: tokens[0]),
+                    expression: IdentifierNode(baseName: TokenNode(token: tokens[1]))
                 ),
-                semicolonToken: tokens[2]
+                semicolon: TokenNode(token: tokens[2])
             )
         )
     }
@@ -196,10 +196,10 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: PrefixOperatorExpressionNode(
-                    operator: tokens[0],
-                    expression: IdentifierNode(token: tokens[1])
+                    operator: TokenNode(token: tokens[0]),
+                    expression: IdentifierNode(baseName: TokenNode(token: tokens[1]))
                 ),
-                semicolonToken: tokens[2]
+                semicolon: TokenNode(token: tokens[2])
             )
         )
     }
@@ -221,11 +221,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -247,11 +247,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -273,11 +273,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -299,11 +299,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -325,11 +325,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -351,11 +351,11 @@ final class OperatorsTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -376,8 +376,16 @@ final class OperatorsTest: XCTestCase {
         XCTAssertEqual(
             node,
             BlockItemNode(
-                item: IntegerLiteralNode(token: Token(kind: .number("8"), sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 1)))),
-                semicolonToken: tokens[4]
+                item: IntegerLiteralNode(
+                    literal: TokenNode(token: Token(
+                        kind: .number("8"),
+                        sourceRange: SourceRange(
+                            start: SourceLocation(line: 1, column: 1),
+                            end: SourceLocation(line: 1, column: 1)
+                        )
+                    ))
+                ),
+                semicolon: TokenNode(token: tokens[4])
             )
         )
     }

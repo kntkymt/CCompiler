@@ -18,8 +18,8 @@ final class StringLiteralTest: XCTestCase {
         XCTAssertEqual(
             node,
             BlockItemNode(
-                item: StringLiteralNode(token: tokens[0]),
-                semicolonToken: tokens[1]
+                item: StringLiteralNode(literal: TokenNode(token: tokens[0])),
+                semicolon: TokenNode(token: tokens[1])
             )
         )
     }
@@ -41,11 +41,11 @@ final class StringLiteralTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IdentifierNode(token: tokens[0]),
-                    operator: AssignNode(token: tokens[1]),
-                    right: StringLiteralNode(token: tokens[2])
+                    left: IdentifierNode(baseName: TokenNode(token: tokens[0])),
+                    operator: AssignNode(equal: TokenNode(token: tokens[1])),
+                    right: StringLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }

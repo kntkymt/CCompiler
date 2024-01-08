@@ -7,8 +7,7 @@ final class StringLiteralTest: XCTestCase {
         let source = "\"aaaa\""
         let tokens = try Tokenizer(source: source).tokenize()
 
-        // FIXME: StringLiteralの両端のクオーテーションをどうするか
-        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, "aaaa")
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [

@@ -10,13 +10,14 @@ public class TypeNode: TypeNodeProtocol {
     // MARK: - Property
 
     public let kind: NodeKind = .type
-    public var sourceTokens: [Token] { [typeToken] }
-    public let children: [any NodeProtocol] = []
+    public var children: [any NodeProtocol] {
+        [type]
+    }
 
-    public let typeToken: Token
+    public let type: TokenNode
 
     public var memorySize: Int {
-        return switch typeToken.kind {
+        return switch type.tokenKind {
         case .type(let typeKind):
             switch typeKind {
             case .int: 8
@@ -30,8 +31,8 @@ public class TypeNode: TypeNodeProtocol {
 
     // MARK: - Initializer
 
-    public init(typeToken: Token) {
-        self.typeToken = typeToken
+    public init(type: TokenNode) {
+        self.type = type
     }
 }
 
@@ -40,19 +41,20 @@ public class PointerTypeNode: TypeNodeProtocol {
     // MARK: - Property
 
     public let kind: NodeKind = .pointerType
-    public var sourceTokens: [Token] { referenceType.sourceTokens + [pointerToken] }
-    public var children: [any NodeProtocol] { [referenceType] }
-    public let referenceType: any TypeNodeProtocol
+    public var children: [any NodeProtocol] {
+        [referenceType, pointer]
+    }
 
-    public let pointerToken: Token
+    public let referenceType: any TypeNodeProtocol
+    public let pointer: TokenNode
 
     public let memorySize: Int = 8
 
     // MARK: - Initializer
 
-    public init(referenceType: any TypeNodeProtocol, pointerToken: Token) {
+    public init(referenceType: any TypeNodeProtocol, pointer: TokenNode) {
         self.referenceType = referenceType
-        self.pointerToken = pointerToken
+        self.pointer = pointer
     }
 }
 
@@ -61,28 +63,28 @@ public class ArrayTypeNode: TypeNodeProtocol {
     // MARK: - Property
 
     public let kind: NodeKind = .arrayType
+    public var children: [any NodeProtocol] {
+        [elementType, squareLeft, arraySize, squareRight]
+    }
 
-    public var sourceTokens: [Token] { [squareLeftToken] + elementType.sourceTokens + [squareRightToken] }
-    public var children: [any NodeProtocol] { [elementType] }
     public let elementType: any TypeNodeProtocol
+    public let squareLeft: TokenNode
+    public let arraySize: TokenNode
+    public let squareRight: TokenNode
 
-    public let squareLeftToken: Token
-    public let arraySizeToken: Token
-    public let squareRightToken: Token
-
-    public var arraySize: Int {
-        Int(arraySizeToken.value)!
+    public var arrayLength: Int {
+        Int(arraySize.text)!
     }
 
     public var memorySize: Int {
-        arraySize * elementType.memorySize
+        arrayLength * elementType.memorySize
     }
     // MARK: - Initializer
 
-    public init(elementType: any TypeNodeProtocol, squareLeftToken: Token, arraySizeToken: Token, squareRightToken: Token) {
+    public init(elementType: any TypeNodeProtocol, squareLeft: TokenNode, arraySize: TokenNode, squareRight: TokenNode) {
         self.elementType = elementType
-        self.squareLeftToken = squareLeftToken
-        self.arraySizeToken = arraySizeToken
-        self.squareRightToken = squareRightToken
+        self.squareLeft = squareLeft
+        self.arraySize = arraySize
+        self.squareRight = squareRight
     }
 }
