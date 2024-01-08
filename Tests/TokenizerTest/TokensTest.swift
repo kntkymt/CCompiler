@@ -117,7 +117,7 @@ final class TokensTest: XCTestCase {
                 Token(kind: .reserved(.braceLeft), sourceIndex: 0),
                 Token(kind: .number("1"), sourceIndex: 1),
                 Token(kind: .reserved(.semicolon), sourceIndex: 2),
-                      Token(kind: .reserved(.braceRight), sourceIndex: 3)
+                Token(kind: .reserved(.braceRight), sourceIndex: 3)
             ]
         )
     }
