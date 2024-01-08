@@ -2,10 +2,10 @@ public struct Token: Equatable {
 
     // MARK: - Property
 
-    public let kind: TokenKind
-    public let leadingTrivia: String
-    public let trailingTrivia: String
-    public let sourceIndex: Int
+    public var kind: TokenKind
+    public var leadingTrivia: String
+    public var trailingTrivia: String
+    public var sourceRange: SourceRange
 
     /// without trivia
     public var value: String {
@@ -19,12 +19,46 @@ public struct Token: Equatable {
 
     // MARK: - Initializer
 
-    public init(kind: TokenKind, leadingTrivia: String = "", trailingTrivia: String = "", sourceIndex: Int) {
+    public init(kind: TokenKind, leadingTrivia: String = "", trailingTrivia: String = "", sourceRange: SourceRange) {
         self.kind = kind
         self.leadingTrivia = leadingTrivia
         self.trailingTrivia = trailingTrivia
-        self.sourceIndex = sourceIndex
+        self.sourceRange = sourceRange
     }
+}
+
+public struct SourceRange: Equatable {
+
+    // MARK: - Property
+
+    public var start: SourceLocation
+    public var end: SourceLocation
+
+    // MARK: - Initializer
+
+    public init(start: SourceLocation, end: SourceLocation) {
+        self.start = start
+        self.end = end
+    }
+}
+
+public struct SourceLocation: Equatable {
+
+    // MARK: - Property
+
+    public var line: Int
+    public var column: Int
+
+    // MARK: - Initializer
+
+    public init(line: Int, column: Int) {
+        self.line = line
+        self.column = column
+    }
+}
+
+extension SourceLocation {
+    public static let startOfFile = SourceLocation(line: 1, column: 1)
 }
 
 public enum TokenKind: Equatable {

@@ -1,5 +1,6 @@
 import XCTest
 @testable import CCompilerCore
+import Tokenizer
 
 final class CompileErrorTest: XCTestCase {
 
@@ -7,7 +8,7 @@ final class CompileErrorTest: XCTestCase {
         do {
             _ = try compile("int main(){5 ++}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 15))
+            XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 16)))
         }
     }
 
@@ -15,7 +16,7 @@ final class CompileErrorTest: XCTestCase {
         do {
             _ = try compile("main(){5++}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 0))
+            XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 1)))
         }
     }
 
@@ -23,7 +24,7 @@ final class CompileErrorTest: XCTestCase {
         do {
             _ = try compile("int main(){5 +}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 14))
+            XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 15)))
         }
     }
 
@@ -31,7 +32,7 @@ final class CompileErrorTest: XCTestCase {
         do {
             _ = try compile("int main(){+}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(index: 12))
+            XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 13)))
         }
     }
 
@@ -39,7 +40,7 @@ final class CompileErrorTest: XCTestCase {
         do {
             _ = try compile("int main(){5     ^}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidToken(index: 17))
+            XCTAssertEqual(error, .invalidToken(location: SourceLocation(line: 1, column: 18)))
         }
     }
 
@@ -47,7 +48,7 @@ final class CompileErrorTest: XCTestCase {
         do {
             _ = try compile("int main(){a = 0;}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .noSuchVariable(variableName: "a", index: 11))
+            XCTAssertEqual(error, .noSuchVariable(variableName: "a", location: SourceLocation(line: 1, column: 12)))
         }
     }
 }

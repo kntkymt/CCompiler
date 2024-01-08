@@ -5,18 +5,20 @@ import Tokenizer
 final class ForTest: XCTestCase {
 
     func testFor() throws {
-        let tokens: [Token] = [
-            Token(kind: .keyword(.for), sourceIndex: 0),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 3),
-            Token(kind: .number("1"), sourceIndex: 4),
-            Token(kind: .reserved(.semicolon), sourceIndex: 5),
-            Token(kind: .number("2"), sourceIndex: 6),
-            Token(kind: .reserved(.semicolon), sourceIndex: 7),
-            Token(kind: .number("3"), sourceIndex: 8),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 9),
-            Token(kind: .number("4"), sourceIndex: 10),
-            Token(kind: .reserved(.semicolon), sourceIndex: 11)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .keyword(.for),
+                .reserved(.parenthesisLeft),
+                .number("1"),
+                .reserved(.semicolon),
+                .number("2"),
+                .reserved(.semicolon),
+                .number("3"),
+                .reserved(.parenthesisRight),
+                .number("4"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -43,22 +45,24 @@ final class ForTest: XCTestCase {
     }
 
     func testForBlock() throws {
-        let tokens: [Token] = [
-            Token(kind: .keyword(.for), sourceIndex: 0),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 3),
-            Token(kind: .number("1"), sourceIndex: 4),
-            Token(kind: .reserved(.semicolon), sourceIndex: 5),
-            Token(kind: .number("2"), sourceIndex: 6),
-            Token(kind: .reserved(.semicolon), sourceIndex: 7),
-            Token(kind: .number("3"), sourceIndex: 8),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 9),
-            Token(kind: .reserved(.braceLeft), sourceIndex: 10),
-            Token(kind: .number("4"), sourceIndex: 10),
-            Token(kind: .reserved(.semicolon), sourceIndex: 11),
-            Token(kind: .number("5"), sourceIndex: 12),
-            Token(kind: .reserved(.semicolon), sourceIndex: 13),
-            Token(kind: .reserved(.braceRight), sourceIndex: 14)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .keyword(.for),
+                .reserved(.parenthesisLeft),
+                .number("1"),
+                .reserved(.semicolon),
+                .number("2"),
+                .reserved(.semicolon),
+                .number("3"),
+                .reserved(.parenthesisRight),
+                .reserved(.braceLeft),
+                .number("4"),
+                .reserved(.semicolon),
+                .number("5"),
+                .reserved(.semicolon),
+                .reserved(.braceRight),
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -91,15 +95,17 @@ final class ForTest: XCTestCase {
     }
 
     func testForNoNodes() throws {
-        let tokens: [Token] = [
-            Token(kind: .keyword(.for), sourceIndex: 0),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 3),
-            Token(kind: .reserved(.semicolon), sourceIndex: 4),
-            Token(kind: .reserved(.semicolon), sourceIndex: 5),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 6),
-            Token(kind: .number("4"), sourceIndex: 7),
-            Token(kind: .reserved(.semicolon), sourceIndex: 8)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .keyword(.for),
+                .reserved(.parenthesisLeft),
+                .reserved(.semicolon),
+                .reserved(.semicolon),
+                .reserved(.parenthesisRight),
+                .number("4"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)

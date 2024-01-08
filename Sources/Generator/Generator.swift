@@ -1,13 +1,14 @@
 import Parser
+import Tokenizer
 
 public enum GenerateError: Error {
-    case invalidSyntax(index: Int)
-    case noSuchVariable(varibaleName: String, index: Int)
+    case invalidSyntax(location: SourceLocation)
+    case noSuchVariable(varibaleName: String, location: SourceLocation)
 }
 
 extension NodeProtocol {
     func casted<T: NodeProtocol>(_ type: T.Type) throws -> T {
-        guard let casted = self as? T else { throw GenerateError.invalidSyntax(index: self.sourceTokens[0].sourceIndex) }
+        guard let casted = self as? T else { throw GenerateError.invalidSyntax(location: self.sourceTokens.first!.sourceRange.start) }
 
         return casted
     }
@@ -60,7 +61,7 @@ public final class Generator {
                 functionDeclResult += try generate(node: casted)
 
             default:
-                throw GenerateError.invalidSyntax(index: statement.sourceTokens.first!.sourceIndex)
+                throw GenerateError.invalidSyntax(location: statement.sourceTokens.first!.sourceRange.start)
             }
         }
 
@@ -106,7 +107,7 @@ public final class Generator {
                     let value = try prefixOperatorExpr.expression.casted(IdentifierNode.self).identifierName
                     result += "    .quad \(value)\n"
                 } else {
-                    throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
+                    throw GenerateError.invalidSyntax(location: initializerExpr.sourceTokens.first!.sourceRange.start)
                 }
 
             case .infixOperatorExpr:
@@ -131,11 +132,11 @@ public final class Generator {
                 } else if let rightIsReference = generateAddressValue(referenceNode: infixOperator.right, integerLiteralNode: infixOperator.left) {
                     result += rightIsReference
                 } else {
-                    throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
+                    throw GenerateError.invalidSyntax(location: initializerExpr.sourceTokens.first!.sourceRange.start)
                 }
 
             default:
-                throw GenerateError.invalidSyntax(index: initializerExpr.sourceTokens.first!.sourceIndex)
+                throw GenerateError.invalidSyntax(location: initializerExpr.sourceTokens.first!.sourceRange.start)
             }
         } else {
             // Apple Clangでは初期化がない場合は.commじゃないとダメっぽい？
@@ -288,7 +289,7 @@ public final class Generator {
                     let arrayExpr = try initializerExpr.casted(ArrayExpressionNode.self)
 
                     for (arrayIndex, element) in arrayExpr.exprListNodes.enumerated() {
-                        result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+                        result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceLocation: casted.identifierToken.sourceRange.start)
                         result += try generate(node: element)
 
                         result += "    ldr x0, [sp]\n"
@@ -307,7 +308,7 @@ public final class Generator {
                     let arrayType = try casted.type.casted(ArrayTypeNode.self)
                     if arrayExpr.exprListNodes.count < arrayType.arraySize {
                         for arrayIndex in arrayExpr.exprListNodes.count..<arrayType.arraySize {
-                            result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+                            result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceLocation: casted.identifierToken.sourceRange.start)
 
                             result += "    mov x0, #0\n"
                             result += "    ldr x1, [sp]\n"
@@ -329,7 +330,7 @@ public final class Generator {
 
                     let stringLiteralNode = try initializerExpr.casted(StringLiteralNode.self)
                     for (arrayIndex, element) in stringLiteralNode.value.enumerated() {
-                        result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+                        result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceLocation: casted.identifierToken.sourceRange.start)
 
                         result += "    mov x0, #\(element.asciiValue ?? 0)\n"
                         result += "    ldr x1, [sp]\n"
@@ -342,7 +343,7 @@ public final class Generator {
                     let arrayType = try casted.type.casted(ArrayTypeNode.self)
                     if stringLiteralNode.value.count < arrayType.arraySize {
                         for arrayIndex in stringLiteralNode.value.count..<arrayType.arraySize {
-                            result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceIndex: casted.identifierToken.sourceIndex)
+                            result += try generatePushArrayElementAddress(identifierName: casted.identifierName, index: arrayIndex, sourceLocation: casted.identifierToken.sourceRange.start)
 
                             result += "    mov x0, #0\n"
                             result += "    ldr x1, [sp]\n"
@@ -353,7 +354,7 @@ public final class Generator {
                     }
 
                 default:
-                    result += try generatePushVariableAddress(identifierName: casted.identifierName, sourceIndex: casted.identifierToken.sourceIndex)
+                    result += try generatePushVariableAddress(identifierName: casted.identifierName, sourceLocation: casted.identifierToken.sourceRange.start)
                     result += try generate(node: initializerExpr)
 
                     result += "    ldr x0, [sp]\n"
@@ -580,7 +581,7 @@ public final class Generator {
                 if let right = casted.expression as? IdentifierNode {
                     result += try generatePushVariableAddress(node: right)
                 } else {
-                    throw GenerateError.invalidSyntax(index: node.sourceTokens[0].sourceIndex)
+                    throw GenerateError.invalidSyntax(location: node.sourceTokens[0].sourceRange.start)
                 }
             }
 
@@ -598,7 +599,7 @@ public final class Generator {
                 } else if let subscriptCall = casted.left as? SubscriptCallExpressionNode {
                     result += try generatePushArrayElementAddress(node: subscriptCall)
                 } else {
-                    throw GenerateError.invalidSyntax(index: casted.left.sourceTokens[0].sourceIndex)
+                    throw GenerateError.invalidSyntax(location: casted.left.sourceTokens[0].sourceRange.start)
                 }
 
                 result += try generate(node: casted.right)
@@ -686,7 +687,7 @@ public final class Generator {
                 result += "    str x0, [sp, #-16]!\n"
 
             } else {
-                throw GenerateError.invalidSyntax(index: node.sourceTokens[0].sourceIndex)
+                throw GenerateError.invalidSyntax(location: node.sourceTokens[0].sourceRange.start)
             }
 
             return result
@@ -731,10 +732,10 @@ public final class Generator {
 
     /// nameの変数のアドレスをスタックにpushするコードを生成する
     private func generatePushVariableAddress(node: IdentifierNode) throws -> String {
-        try generatePushVariableAddress(identifierName: node.identifierName, sourceIndex: node.token.sourceIndex)
+        try generatePushVariableAddress(identifierName: node.identifierName, sourceLocation: node.token.sourceRange.start)
     }
 
-    private func generatePushVariableAddress(identifierName: String, sourceIndex: Int) throws -> String {
+    private func generatePushVariableAddress(identifierName: String, sourceLocation: SourceLocation) throws -> String {
         var result = ""
 
         if let localVariableInfo = variables[identifierName] {
@@ -744,7 +745,7 @@ public final class Generator {
             result += "    adrp x0, \(identifierName)@GOTPAGE\n"
             result += "    ldr x0, [x0, \(identifierName)@GOTPAGEOFF]\n"
         } else {
-            throw GenerateError.noSuchVariable(varibaleName: identifierName, index: sourceIndex)
+            throw GenerateError.noSuchVariable(varibaleName: identifierName, location: sourceLocation)
         }
 
         result += "    str x0, [sp, #-16]!\n"
@@ -785,11 +786,11 @@ public final class Generator {
         return result
     }
 
-    private func generatePushArrayElementAddress(identifierName: String, index: Int, sourceIndex: Int) throws -> String {
+    private func generatePushArrayElementAddress(identifierName: String, index: Int, sourceLocation: SourceLocation) throws -> String {
         var result = ""
 
         // 配列の先頭アドレス, subscriptの値をpush
-        result += try generatePushVariableAddress(identifierName: identifierName, sourceIndex: sourceIndex)
+        result += try generatePushVariableAddress(identifierName: identifierName, sourceLocation: sourceLocation)
 
         result += "    mov x0, #\(index)\n"
         // subscript内の値は要素のメモリサイズに応じてn倍する

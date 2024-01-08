@@ -5,14 +5,16 @@ import Tokenizer
 final class OperatorPriorityTest: XCTestCase {
 
     func testAddPriority() throws {
-        let tokens: [Token] = [
-            Token(kind: .number("1"), sourceIndex: 0),
-            Token(kind: .reserved(.add), sourceIndex: 1),
-            Token(kind: .number("2"), sourceIndex: 2),
-            Token(kind: .reserved(.add), sourceIndex: 3),
-            Token(kind: .number("3"), sourceIndex: 4),
-            Token(kind: .reserved(.semicolon), sourceIndex: 5),
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .number("1"),
+                .reserved(.add),
+                .number("2"),
+                .reserved(.add),
+                .number("3"),
+                .reserved(.semicolon),
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -35,14 +37,16 @@ final class OperatorPriorityTest: XCTestCase {
     }
 
     func testMulPriority() throws {
-        let tokens: [Token] = [
-            Token(kind: .number("1"), sourceIndex: 0),
-            Token(kind: .reserved(.mul), sourceIndex: 1),
-            Token(kind: .number("2"), sourceIndex: 2),
-            Token(kind: .reserved(.mul), sourceIndex: 3),
-            Token(kind: .number("3"), sourceIndex: 4),
-            Token(kind: .reserved(.semicolon), sourceIndex: 5),
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .number("1"),
+                .reserved(.mul),
+                .number("2"),
+                .reserved(.mul),
+                .number("3"),
+                .reserved(.semicolon),
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -65,14 +69,16 @@ final class OperatorPriorityTest: XCTestCase {
     }
 
     func testAddAndMulPriority() throws {
-        let tokens: [Token] = [
-            Token(kind: .number("1"), sourceIndex: 0),
-            Token(kind: .reserved(.add), sourceIndex: 1),
-            Token(kind: .number("2"), sourceIndex: 2),
-            Token(kind: .reserved(.mul), sourceIndex: 3),
-            Token(kind: .number("3"), sourceIndex: 4),
-            Token(kind: .reserved(.semicolon), sourceIndex: 5),
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .number("1"),
+                .reserved(.add),
+                .number("2"),
+                .reserved(.mul),
+                .number("3"),
+                .reserved(.semicolon),
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -95,16 +101,18 @@ final class OperatorPriorityTest: XCTestCase {
     }
 
     func testParenthesisPriority() throws {
-        let tokens: [Token] = [
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 0),
-            Token(kind: .number("1"), sourceIndex: 1),
-            Token(kind: .reserved(.add), sourceIndex: 2),
-            Token(kind: .number("2"), sourceIndex: 3),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 4),
-            Token(kind: .reserved(.mul), sourceIndex: 5),
-            Token(kind: .number("3"), sourceIndex: 6),
-            Token(kind: .reserved(.semicolon), sourceIndex: 7),
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .reserved(.parenthesisLeft),
+                .number("1"),
+                .reserved(.add),
+                .number("2"),
+                .reserved(.parenthesisRight),
+                .reserved(.mul),
+                .number("3"),
+                .reserved(.semicolon),
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
