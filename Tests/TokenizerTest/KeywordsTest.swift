@@ -4,111 +4,138 @@ import XCTest
 final class KeywordsTest: XCTestCase {
 
     func testReturn() throws {
-        let tokens = try tokenize(source: "return")
+        let source = "return"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .keyword(.return, sourceIndex: 0)
+                Token(kind: .keyword(.return), sourceIndex: 0)
             ]
         )
     }
 
     func testReturn2() throws {
-        let tokens = try tokenize(source: "return 2")
+        let source = "return 2"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .keyword(.return, sourceIndex: 0),
-                .number("2", sourceIndex: 7)
+                Token(kind: .keyword(.return), trailingTrivia: " ", sourceIndex: 0),
+                Token(kind: .number("2"), sourceIndex: 7)
             ]
         )
     }
 
     func testReturn3() throws {
-        let tokens = try tokenize(source: "return;")
+        let source = "return;"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .keyword(.return, sourceIndex: 0),
-                .reserved(.semicolon, sourceIndex: 6)
+                Token(kind: .keyword(.return), sourceIndex: 0),
+                Token(kind: .reserved(.semicolon), sourceIndex: 6)
             ]
         )
     }
 
     func testReturnSimularIdentifier() throws {
-        let tokens = try tokenize(source: "returnX")
+        let source = "returnX"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .identifier("returnX", sourceIndex: 0)
+                Token(kind: .identifier("returnX"), sourceIndex: 0)
             ]
         )
     }
 
     func testReturnSimularIdentifier2() throws {
-        let tokens = try tokenize(source: "return2")
+        let source = "return2"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .identifier("return2", sourceIndex: 0)
+                Token(kind: .identifier("return2"), sourceIndex: 0)
             ]
         )
     }
 
     func testIf() throws {
-        let tokens = try tokenize(source: "if(1)else 2")
+        let source = "if(1)else 2"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .keyword(.if, sourceIndex: 0),
-                .reserved(.parenthesisLeft, sourceIndex: 2),
-                .number("1", sourceIndex: 3),
-                .reserved(.parenthesisRight, sourceIndex: 4),
-                .keyword(.else, sourceIndex: 5),
-                .number("2", sourceIndex: 10)
+                Token(kind: .keyword(.if), sourceIndex: 0),
+                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 2),
+                Token(kind: .number("1"), sourceIndex: 3),
+                Token(kind: .reserved(.parenthesisRight), sourceIndex: 4),
+                Token(kind: .keyword(.else), trailingTrivia: " ", sourceIndex: 5),
+                Token(kind: .number("2"), sourceIndex: 10)
             ]
         )
     }
 
     func testWhile() throws {
-        let tokens = try tokenize(source: "while(1)")
+        let source = "while(1)"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .keyword(.while, sourceIndex: 0),
-                .reserved(.parenthesisLeft, sourceIndex: 5),
-                .number("1", sourceIndex: 6),
-                .reserved(.parenthesisRight, sourceIndex: 7),
+                Token(kind: .keyword(.while), sourceIndex: 0),
+                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 5),
+                Token(kind: .number("1"), sourceIndex: 6),
+                Token(kind: .reserved(.parenthesisRight), sourceIndex: 7),
             ]
         )
     }
 
     func testFor() throws {
-        let tokens = try tokenize(source: "for(1;2;3)")
+        let source = "for(1;2;3)"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .keyword(.for, sourceIndex: 0),
-                .reserved(.parenthesisLeft, sourceIndex: 3),
-                .number("1", sourceIndex: 4),
-                .reserved(.semicolon, sourceIndex: 5),
-                .number("2", sourceIndex: 6),
-                .reserved(.semicolon, sourceIndex: 7),
-                .number("3", sourceIndex: 8),
-                .reserved(.parenthesisRight, sourceIndex: 9),
+                Token(kind: .keyword(.for), sourceIndex: 0),
+                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 3),
+                Token(kind: .number("1"), sourceIndex: 4),
+                Token(kind: .reserved(.semicolon), sourceIndex: 5),
+                Token(kind: .number("2"), sourceIndex: 6),
+                Token(kind: .reserved(.semicolon), sourceIndex: 7),
+                Token(kind: .number("3"), sourceIndex: 8),
+                Token(kind: .reserved(.parenthesisRight), sourceIndex: 9),
             ]
         )
     }
 
     func testSizeOf() throws {
-        let tokens = try tokenize(source: "sizeof(1)")
+        let source = "sizeof(1)"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .keyword(.sizeof, sourceIndex: 0),
-                .reserved(.parenthesisLeft, sourceIndex: 6),
-                .number("1", sourceIndex: 7),
-                .reserved(.parenthesisRight, sourceIndex: 8),
+                Token(kind: .keyword(.sizeof), sourceIndex: 0),
+                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 6),
+                Token(kind: .number("1"), sourceIndex: 7),
+                Token(kind: .reserved(.parenthesisRight), sourceIndex: 8),
             ]
         )
     }

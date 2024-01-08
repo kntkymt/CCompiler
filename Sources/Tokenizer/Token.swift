@@ -1,55 +1,62 @@
-public enum Token: Equatable {
+public struct Token: Equatable {
 
     // MARK: - Property
 
-    case reserved(_ kind: ReservedKind, sourceIndex: Int)
-    case keyword(_ kind: KeywordKind, sourceIndex: Int)
-    case number(_ value: String, sourceIndex: Int)
-    case stringLiteral(_ value: String, sourceIndex: Int)
-    case identifier(_ value: String, sourceIndex: Int)
-    case type(_ kind: TypeKind, sourceIndex: Int)
+    public let kind: TokenKind
+    public let leadingTrivia: String
+    public let trailingTrivia: String
+    public let sourceIndex: Int
+
+    /// without trivia
+    public var value: String {
+        kind.value
+    }
+
+    /// with trivia
+    public var description: String {
+        leadingTrivia + kind.value + trailingTrivia
+    }
+
+    // MARK: - Initializer
+
+    public init(kind: TokenKind, leadingTrivia: String = "", trailingTrivia: String = "", sourceIndex: Int) {
+        self.kind = kind
+        self.leadingTrivia = leadingTrivia
+        self.trailingTrivia = trailingTrivia
+        self.sourceIndex = sourceIndex
+    }
+}
+
+public enum TokenKind: Equatable {
+
+    // MARK: - Property
+
+    case reserved(_ kind: ReservedKind)
+    case keyword(_ kind: KeywordKind)
+    case number(_ value: String)
+    case stringLiteral(_ value: String)
+    case identifier(_ value: String)
+    case type(_ kind: TypeKind)
 
     public var value: String {
         switch self {
-        case .reserved(let kind, _):
+        case .reserved(let kind):
             return kind.rawValue
 
-        case .keyword(let kind, _):
+        case .keyword(let kind):
             return kind.rawValue
 
-        case .number(let value, _):
+        case .number(let value):
             return value
 
-        case .stringLiteral(let value, _):
+        case .stringLiteral(let value):
             return value
 
-        case .identifier(let value, _):
+        case .identifier(let value):
             return value
 
-        case .type(let kind, _):
+        case .type(let kind):
             return kind.rawValue
-        }
-    }
-
-    public var sourceIndex: Int {
-        switch self {
-        case .reserved(_, let sourceIndex):
-            return sourceIndex
-
-        case .keyword(_, let sourceIndex):
-            return sourceIndex
-
-        case .number(_, let sourceIndex):
-            return sourceIndex
-
-        case .stringLiteral(_, let sourceIndex):
-            return sourceIndex
-
-        case .identifier(_, let sourceIndex):
-            return sourceIndex
-
-        case .type(_, let sourceIndex):
-            return sourceIndex
         }
     }
 

@@ -4,74 +4,95 @@ import XCTest
 final class IdentifierTest: XCTestCase {
 
     func testIdentifier() throws {
-        let tokens = try tokenize(source: "a")
+        let source = "a"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .identifier("a", sourceIndex: 0)
+                Token(kind: .identifier("a"), sourceIndex: 0)
             ]
         )
     }
 
     func testIdentifierAdd() throws {
-        let tokens = try tokenize(source: "a+b")
+        let source = "a+b"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .identifier("a", sourceIndex: 0),
-                .reserved(.add, sourceIndex: 1),
-                .identifier("b", sourceIndex: 2)
+                Token(kind: .identifier("a"), sourceIndex: 0),
+                Token(kind: .reserved(.add), sourceIndex: 1),
+                Token(kind: .identifier("b"), sourceIndex: 2)
             ]
         )
     }
 
     func testIdentifierMulti() throws {
-        let tokens = try tokenize(source: "ab")
+        let source = "ab"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .identifier("ab", sourceIndex: 0)
+                Token(kind: .identifier("ab"), sourceIndex: 0)
             ]
         )
     }
 
     func testIdentifierMulti2() throws {
-        let tokens = try tokenize(source: "ab hoge")
+        let source = "ab hoge"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .identifier("ab", sourceIndex: 0),
-                .identifier("hoge", sourceIndex: 3)
+                Token(kind: .identifier("ab"), trailingTrivia: " ", sourceIndex: 0),
+                Token(kind: .identifier("hoge"), sourceIndex: 3)
             ]
         )
     }
 
     func testIdentifierUpper() throws {
-        let tokens = try tokenize(source: "AB")
+        let source = "AB"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .identifier("AB", sourceIndex: 0)
+                Token(kind: .identifier("AB"), sourceIndex: 0)
             ]
         )
     }
 
     func testIdentifierNumber() throws {
-        let tokens = try tokenize(source: "A2")
+        let source = "A2"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .identifier("A2", sourceIndex: 0)
+                Token(kind: .identifier("A2"), sourceIndex: 0)
             ]
         )
     }
 
     func testIdentifierUnderScore() throws {
-        let tokens = try tokenize(source: "_")
+        let source = "_"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .identifier("_", sourceIndex: 0)
+                Token(kind: .identifier("_"), sourceIndex: 0)
             ]
         )
     }

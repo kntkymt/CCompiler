@@ -6,10 +6,10 @@ final class OperatorsTest: XCTestCase {
 
     func testAdd() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.add, sourceIndex: 1),
-            .number("2", sourceIndex: 2),
-            .reserved(.semicolon, sourceIndex: 3)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.add), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 2),
+            Token(kind: .reserved(.semicolon), sourceIndex: 3)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -30,10 +30,10 @@ final class OperatorsTest: XCTestCase {
 
     func testSub() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.sub, sourceIndex: 1),
-            .number("2", sourceIndex: 2),
-            .reserved(.semicolon, sourceIndex: 3)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.sub), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 2),
+            Token(kind: .reserved(.semicolon), sourceIndex: 3)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -54,10 +54,10 @@ final class OperatorsTest: XCTestCase {
 
     func testMul() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.mul, sourceIndex: 1),
-            .number("2", sourceIndex: 2),
-            .reserved(.semicolon, sourceIndex: 3)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.mul), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 2),
+            Token(kind: .reserved(.semicolon), sourceIndex: 3)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -78,10 +78,10 @@ final class OperatorsTest: XCTestCase {
 
     func testDiv() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.div, sourceIndex: 1),
-            .number("2", sourceIndex: 2),
-            .reserved(.semicolon, sourceIndex: 3)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.div), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 2),
+            Token(kind: .reserved(.semicolon), sourceIndex: 3)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -102,9 +102,9 @@ final class OperatorsTest: XCTestCase {
 
     func testUnaryAdd() throws {
         let tokens: [Token] = [
-            .reserved(.add, sourceIndex: 0),
-            .number("1", sourceIndex: 1),
-            .reserved(.semicolon, sourceIndex: 2)
+            Token(kind: .reserved(.add), sourceIndex: 0),
+            Token(kind: .number("1"), sourceIndex: 1),
+            Token(kind: .reserved(.semicolon), sourceIndex: 2)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -124,9 +124,9 @@ final class OperatorsTest: XCTestCase {
 
     func testUnarySub() throws {
         let tokens: [Token] = [
-            .reserved(.sub, sourceIndex: 0),
-            .number("1", sourceIndex: 1),
-            .reserved(.semicolon, sourceIndex: 2)
+            Token(kind: .reserved(.sub), sourceIndex: 0),
+            Token(kind: .number("1"), sourceIndex: 1),
+            Token(kind: .reserved(.semicolon), sourceIndex: 2)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -146,9 +146,9 @@ final class OperatorsTest: XCTestCase {
 
     func testUnaryAddress() throws {
         let tokens: [Token] = [
-            .reserved(.and, sourceIndex: 0),
-            .identifier("a", sourceIndex: 1),
-            .reserved(.semicolon, sourceIndex: 2)
+            Token(kind: .reserved(.and), sourceIndex: 0),
+            Token(kind: .identifier("a"), sourceIndex: 1),
+            Token(kind: .reserved(.semicolon), sourceIndex: 2)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -168,9 +168,9 @@ final class OperatorsTest: XCTestCase {
 
     func testUnaryReference() throws {
         let tokens: [Token] = [
-            .reserved(.mul, sourceIndex: 0),
-            .identifier("a", sourceIndex: 1),
-            .reserved(.semicolon, sourceIndex: 2)
+            Token(kind: .reserved(.mul), sourceIndex: 0),
+            Token(kind: .identifier("a"), sourceIndex: 1),
+            Token(kind: .reserved(.semicolon), sourceIndex: 2)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -190,10 +190,10 @@ final class OperatorsTest: XCTestCase {
 
     func testEqual() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.equal, sourceIndex: 1),
-            .number("2", sourceIndex: 3),
-            .reserved(.semicolon, sourceIndex: 4)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.equal), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 3),
+            Token(kind: .reserved(.semicolon), sourceIndex: 4)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -214,10 +214,10 @@ final class OperatorsTest: XCTestCase {
 
     func testNotEqual() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.notEqual, sourceIndex: 1),
-            .number("2", sourceIndex: 3),
-            .reserved(.semicolon, sourceIndex: 4)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.notEqual), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 3),
+            Token(kind: .reserved(.semicolon), sourceIndex: 4)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -238,10 +238,10 @@ final class OperatorsTest: XCTestCase {
 
     func testGreaterThan() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.greaterThan, sourceIndex: 1),
-            .number("2", sourceIndex: 2),
-            .reserved(.semicolon, sourceIndex: 3)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.greaterThan), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 2),
+            Token(kind: .reserved(.semicolon), sourceIndex: 3)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -262,10 +262,10 @@ final class OperatorsTest: XCTestCase {
 
     func testGreaterThanOrEqual() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.greaterThanOrEqual, sourceIndex: 1),
-            .number("2", sourceIndex: 3),
-            .reserved(.semicolon, sourceIndex: 4)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.greaterThanOrEqual), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 3),
+            Token(kind: .reserved(.semicolon), sourceIndex: 4)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -286,10 +286,10 @@ final class OperatorsTest: XCTestCase {
 
     func testLessThan() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.lessThan, sourceIndex: 1),
-            .number("2", sourceIndex: 2),
-            .reserved(.semicolon, sourceIndex: 3)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.lessThan), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 2),
+            Token(kind: .reserved(.semicolon), sourceIndex: 3)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -310,10 +310,10 @@ final class OperatorsTest: XCTestCase {
 
     func testLessThanOrEqual() throws {
         let tokens: [Token] = [
-            .number("1", sourceIndex: 0),
-            .reserved(.lessThanOrEqual, sourceIndex: 1),
-            .number("2", sourceIndex: 3),
-            .reserved(.semicolon, sourceIndex: 4)
+            Token(kind: .number("1"), sourceIndex: 0),
+            Token(kind: .reserved(.lessThanOrEqual), sourceIndex: 1),
+            Token(kind: .number("2"), sourceIndex: 3),
+            Token(kind: .reserved(.semicolon), sourceIndex: 4)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -335,18 +335,18 @@ final class OperatorsTest: XCTestCase {
     // FIXME: sizeofって本当にAST上で置き換えるの？
     func testSizeof() throws {
         let tokens: [Token] = [
-            .keyword(.sizeof, sourceIndex: 0),
-            .reserved(.parenthesisLeft, sourceIndex: 6),
-            .number("1", sourceIndex: 7),
-            .reserved(.parenthesisRight, sourceIndex: 8),
-            .reserved(.semicolon, sourceIndex: 9)
+            Token(kind: .keyword(.sizeof), sourceIndex: 0),
+            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 6),
+            Token(kind: .number("1"), sourceIndex: 7),
+            Token(kind: .reserved(.parenthesisRight), sourceIndex: 8),
+            Token(kind: .reserved(.semicolon), sourceIndex: 9)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
             node,
             BlockItemNode(
-                item: IntegerLiteralNode(token: .number("8", sourceIndex: 6)),
+                item: IntegerLiteralNode(token: Token(kind: .number("8"), sourceIndex: 6)),
                 semicolonToken: tokens[4]
             )
         )

@@ -8,7 +8,7 @@ public func tokenize(source: String) throws -> [Token] {
     let charactors = [Character](source)
     var index = 0
 
-    func extractNumber() -> Token {
+    func extractNumber() -> (TokenKind, Int) {
         var string = ""
         let startIndex = index
 
@@ -22,10 +22,10 @@ public func tokenize(source: String) throws -> [Token] {
             }
         }
 
-        return .number(string, sourceIndex: startIndex)
+        return (.number(string), startIndex)
     }
 
-    func extractString() -> Token {
+    func extractString() -> (TokenKind, Int) {
         var string = ""
         let startIndex = index
 
@@ -44,10 +44,10 @@ public func tokenize(source: String) throws -> [Token] {
             }
         }
 
-        return .stringLiteral(string, sourceIndex: startIndex)
+        return (.stringLiteral(string), startIndex)
     }
 
-    func extractIdentifier() -> Token {
+    func extractIdentifier() -> (TokenKind, Int) {
         var string = ""
         let startIndex = index
 
@@ -61,62 +61,88 @@ public func tokenize(source: String) throws -> [Token] {
             }
         }
 
-        return .identifier(string, sourceIndex: startIndex)
+        return (.identifier(string), startIndex)
+    }
+
+    func extractTrivia(untilBeforeNewLine: Bool) -> String {
+        var result: [Character] = []
+
+        while index < charactors.count {
+            if charactors[index].isNewline {
+                if untilBeforeNewLine {
+                    return String(result)
+                } else {
+                    result.append(charactors[index])
+                    index += 1
+                    continue
+                }
+            }
+
+            if charactors[index].isWhitespace {
+                result.append(charactors[index])
+                index += 1
+                continue
+            }
+
+            if index + 1 < charactors.count, String(charactors[index...index+1]) == "//" {
+                result.append(contentsOf: charactors[index...index+1])
+                index += 2
+
+                while index < charactors.count && !charactors[index].isNewline {
+                    result.append(charactors[index])
+                    index += 1
+                }
+
+                if !untilBeforeNewLine {
+                    result.append(charactors[index])
+                    index += 1
+                }
+                continue
+            }
+
+            if index + 1 < charactors.count, String(charactors[index...index+1]) == "/*" {
+                result.append(contentsOf: charactors[index...index+1])
+                index += 2
+
+                while (index + 1 < charactors.count && String(charactors[index...index+1]) != "*/") {
+                    result.append(charactors[index])
+                    index += 1
+                }
+
+                result.append(contentsOf: charactors[index...index+1])
+                index += 2
+                continue
+            }
+
+            break
+        }
+
+        return String(result)
     }
 
     // 文字数が多い物からチェックしないといけない
     // 例: <= の時に<を先にチェックすると<, =の2つのトークンになってしまう
-    let reservedKinds = Token.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
-    let keywordKinds = Token.KeywordKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
-    let typeKinds = Token.TypeKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    let reservedKinds = TokenKind.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    let keywordKinds = TokenKind.KeywordKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    let typeKinds = TokenKind.TypeKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
 
-root:
-    while index < charactors.count {
-        if charactors[index].isWhitespace {
-            index += 1
-            continue
-        }
-
-        if index + 1 < charactors.count, String(charactors[index...index+1]) == "//" {
-            index += 2
-
-            while (index < charactors.count && !charactors[index].isNewline) {
-                index += 1
-            }
-
-            index += 1
-            continue
-        }
-
-        if index + 1 < charactors.count, String(charactors[index...index+1]) == "/*" {
-            index += 2
-
-            while (index + 1 < charactors.count && String(charactors[index...index+1]) != "*/") {
-                index += 1
-            }
-
-            index += 2
-            continue
-        }
-
+    func extractTokenKind() throws -> (TokenKind, Int) {
         if charactors[index].isNumber {
-            tokens.append(extractNumber())
-            continue
+            return extractNumber()
         }
 
         if charactors[index] == "\"" {
-            tokens.append(extractString())
-            continue
+            return extractString()
         }
 
         for reservedKind in reservedKinds {
             let reservedString = reservedKind.rawValue
             if index + (reservedString.count - 1) < charactors.count,
                String(charactors[index..<index+reservedString.count]) == reservedString {
-                tokens.append(.reserved(reservedKind, sourceIndex: index))
+                let reserved = (TokenKind.reserved(reservedKind), index)
                 index += reservedString.count
 
-                continue root
+                return reserved
             }
         }
 
@@ -131,10 +157,10 @@ root:
                     break
                 }
 
-                tokens.append(.keyword(keywordKind, sourceIndex: index))
+                let keyword = (TokenKind.keyword(keywordKind), index)
                 index += keywordString.count
 
-                continue root
+                return keyword
             }
         }
 
@@ -149,19 +175,26 @@ root:
                     break
                 }
 
-                tokens.append(.type(typeKind, sourceIndex: index))
+                let type = (TokenKind.type(typeKind), index)
                 index += typeString.count
 
-                continue root
+                return type
             }
         }
 
         if charactors[index].isIdentifierCharactor {
-            tokens.append(extractIdentifier())
-            continue
+            return extractIdentifier()
         }
 
         throw TokenizeError.unknownToken(index: index)
+    }
+
+    while index < charactors.count {
+        let leadingTrivia = extractTrivia(untilBeforeNewLine: false)
+        let kind = try extractTokenKind()
+        let trailingTrivia = extractTrivia(untilBeforeNewLine: true)
+
+        tokens.append(Token(kind: kind.0, leadingTrivia: leadingTrivia, trailingTrivia: trailingTrivia, sourceIndex: kind.1))
     }
 
     return tokens

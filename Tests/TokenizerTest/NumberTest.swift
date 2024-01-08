@@ -4,21 +4,27 @@ import XCTest
 final class NumberTest: XCTestCase {
 
     func testNumber() throws {
-        let tokens = try tokenize(source: "5")
+        let source = "5"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .number("5", sourceIndex: 0)
+                Token(kind: .number("5"), sourceIndex: 0)
             ]
         )
     }
 
     func testNumberMultitoken() throws {
-        let tokens = try tokenize(source: "123")
+        let source = "123"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .number("123", sourceIndex: 0)
+                Token(kind: .number("123"), sourceIndex: 0)
             ]
         )
     }

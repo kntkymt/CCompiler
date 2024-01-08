@@ -16,8 +16,8 @@ public class TypeNode: TypeNodeProtocol {
     public let typeToken: Token
 
     public var memorySize: Int {
-        return switch typeToken {
-        case .type(let typeKind, _):
+        return switch typeToken.kind {
+        case .type(let typeKind):
             switch typeKind {
             case .int: 8
             case .char: 1
