@@ -4,61 +4,76 @@ import XCTest
 final class WhiteSpaceTest: XCTestCase {
 
     func testIgnoreSpaces() throws {
-        let tokens = try tokenize(source: "1 +   23")
+        let source = "1 +   23"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .number("1", sourceIndex: 0),
-                .reserved(.add, sourceIndex: 2),
-                .number("23", sourceIndex: 6)
+                Token(kind: .number("1"), trailingTrivia: " ", sourceIndex: 0),
+                Token(kind: .reserved(.add), trailingTrivia: "   ", sourceIndex: 2),
+                Token(kind: .number("23"), sourceIndex: 6)
             ]
         )
     }
 
     func testIgnoreTab() throws {
-        let tokens = try tokenize(source: "1 +  23")
+        let source = "1 +  23"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .number("1", sourceIndex: 0),
-                .reserved(.add, sourceIndex: 2),
-                .number("23", sourceIndex: 5)
+                Token(kind: .number("1"), trailingTrivia: " ", sourceIndex: 0),
+                Token(kind: .reserved(.add), trailingTrivia: "  ", sourceIndex: 2),
+                Token(kind: .number("23"), sourceIndex: 5)
             ]
         )
     }
 
     func testIgnoreBreak() throws {
-        let tokens = try tokenize(source: "1 +\n23")
+        let source = "1 +\n23"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .number("1", sourceIndex: 0),
-                .reserved(.add, sourceIndex: 2),
-                .number("23", sourceIndex: 4)
+                Token(kind: .number("1"), trailingTrivia: " ", sourceIndex: 0),
+                Token(kind: .reserved(.add), sourceIndex: 2),
+                Token(kind: .number("23"), leadingTrivia: "\n", sourceIndex: 4)
             ]
         )
     }
 
     func testLineComment() throws {
-        let tokens = try tokenize(source: "1 + // 234 \n 23")
+        let source = "1 + // 234 \n 23"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .number("1", sourceIndex: 0),
-                .reserved(.add, sourceIndex: 2),
-                .number("23", sourceIndex: 13)
+                Token(kind: .number("1"), trailingTrivia: " ", sourceIndex: 0),
+                Token(kind: .reserved(.add), trailingTrivia: " // 234 ", sourceIndex: 2),
+                Token(kind: .number("23"), leadingTrivia: "\n ", sourceIndex: 13)
             ]
         )
     }
 
     func testBlockComment() throws {
-        let tokens = try tokenize(source: "1 + /* 234 */ 23")
+        let source = "1 + /* 234 */ 23"
+        let tokens = try tokenize(source: source)
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
         XCTAssertEqual(
             tokens,
             [
-                .number("1", sourceIndex: 0),
-                .reserved(.add, sourceIndex: 2),
-                .number("23", sourceIndex: 14)
+                Token(kind: .number("1"), trailingTrivia: " ", sourceIndex: 0),
+                Token(kind: .reserved(.add), trailingTrivia: " /* 234 */ ", sourceIndex: 2),
+                Token(kind: .number("23"), sourceIndex: 14)
             ]
         )
     }

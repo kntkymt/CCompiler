@@ -4,11 +4,15 @@ import XCTest
 final class StringLiteralTest: XCTestCase {
 
     func testStringLiteral() throws {
-        let tokens = try tokenize(source: "\"aaaa\"")
+        let source = "\"aaaa\""
+        let tokens = try tokenize(source: source)
+
+        // FIXME: StringLiteralの両端のクオーテーションをどうするか
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, "aaaa")
         XCTAssertEqual(
             tokens,
             [
-                .stringLiteral("aaaa", sourceIndex: 0)
+                Token(kind: .stringLiteral("aaaa"), sourceIndex: 0)
             ]
         )
     }

@@ -53,17 +53,17 @@ public class PrefixOperatorExpressionNode: NodeProtocol {
     public let expression: any NodeProtocol
 
     public var operatorKind: OperatorKind {
-        switch `operator` {
-        case .reserved(.add, _):
+        switch `operator`.kind {
+        case .reserved(.add):
             return .plus
 
-        case .reserved(.sub, _):
+        case .reserved(.sub):
             return .minus
 
-        case .reserved(.mul, _):
+        case .reserved(.mul):
             return .reference
 
-        case .reserved(.and, _):
+        case .reserved(.and):
             return .address
 
         default:

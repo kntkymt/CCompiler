@@ -6,16 +6,16 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionDecl() throws {
         let tokens: [Token] = [
-            .type(.int, sourceIndex: 0),
-            .identifier("main", sourceIndex: 4),
-            .reserved(.parenthesisLeft, sourceIndex: 8),
-            .reserved(.parenthesisRight, sourceIndex: 9),
-            .reserved(.braceLeft, sourceIndex: 10),
-            .number("1", sourceIndex: 11),
-            .reserved(.semicolon, sourceIndex: 12),
-            .number("2", sourceIndex: 13),
-            .reserved(.semicolon, sourceIndex: 14),
-            .reserved(.braceRight, sourceIndex: 15)
+            Token(kind: .type(.int), sourceIndex: 0),
+            Token(kind: .identifier("main"), sourceIndex: 4),
+            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 8),
+            Token(kind: .reserved(.parenthesisRight), sourceIndex: 9),
+            Token(kind: .reserved(.braceLeft), sourceIndex: 10),
+            Token(kind: .number("1"), sourceIndex: 11),
+            Token(kind: .reserved(.semicolon), sourceIndex: 12),
+            Token(kind: .number("2"), sourceIndex: 13),
+            Token(kind: .reserved(.semicolon), sourceIndex: 14),
+            Token(kind: .reserved(.braceRight), sourceIndex: 15)
         ]
         let node = try Parser(tokens: tokens).parse()
 
@@ -49,17 +49,17 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionDeclPointer() throws {
         let tokens: [Token] = [
-            .type(.int, sourceIndex: 0),
-            .reserved(.mul, sourceIndex: 3),
-            .identifier("main", sourceIndex: 5),
-            .reserved(.parenthesisLeft, sourceIndex: 9),
-            .reserved(.parenthesisRight, sourceIndex: 10),
-            .reserved(.braceLeft, sourceIndex: 11),
-            .number("1", sourceIndex: 12),
-            .reserved(.semicolon, sourceIndex: 13),
-            .number("2", sourceIndex: 14),
-            .reserved(.semicolon, sourceIndex: 15),
-            .reserved(.braceRight, sourceIndex: 16)
+            Token(kind: .type(.int), sourceIndex: 0),
+            Token(kind: .reserved(.mul), sourceIndex: 3),
+            Token(kind: .identifier("main"), sourceIndex: 5),
+            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 9),
+            Token(kind: .reserved(.parenthesisRight), sourceIndex: 10),
+            Token(kind: .reserved(.braceLeft), sourceIndex: 11),
+            Token(kind: .number("1"), sourceIndex: 12),
+            Token(kind: .reserved(.semicolon), sourceIndex: 13),
+            Token(kind: .number("2"), sourceIndex: 14),
+            Token(kind: .reserved(.semicolon), sourceIndex: 15),
+            Token(kind: .reserved(.braceRight), sourceIndex: 16)
         ]
         let node = try Parser(tokens: tokens).parse()
 
@@ -93,10 +93,10 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionCall() throws {
         let tokens: [Token] = [
-            .identifier("main", sourceIndex: 0),
-            .reserved(.parenthesisLeft, sourceIndex: 4),
-            .reserved(.parenthesisRight, sourceIndex: 5),
-            .reserved(.semicolon, sourceIndex: 6)
+            Token(kind: .identifier("main"), sourceIndex: 0),
+            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 4),
+            Token(kind: .reserved(.parenthesisRight), sourceIndex: 5),
+            Token(kind: .reserved(.semicolon), sourceIndex: 6)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -118,19 +118,19 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionDeclWithParameter() throws {
         let tokens: [Token] = [
-            .type(.int, sourceIndex: 0),
-            .identifier("main", sourceIndex: 4),
-            .reserved(.parenthesisLeft, sourceIndex: 8),
-            .type(.int, sourceIndex: 9),
-            .identifier("a", sourceIndex: 13),
-            .reserved(.comma, sourceIndex: 14),
-            .type(.int, sourceIndex: 15),
-            .identifier("b", sourceIndex: 19),
-            .reserved(.parenthesisRight, sourceIndex: 20),
-            .reserved(.braceLeft, sourceIndex: 21),
-            .number("1", sourceIndex: 22),
-            .reserved(.semicolon, sourceIndex: 23),
-            .reserved(.braceRight, sourceIndex: 24)
+            Token(kind: .type(.int), sourceIndex: 0),
+            Token(kind: .identifier("main"), sourceIndex: 4),
+            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 8),
+            Token(kind: .type(.int), sourceIndex: 9),
+            Token(kind: .identifier("a"), sourceIndex: 13),
+            Token(kind: .reserved(.comma), sourceIndex: 14),
+            Token(kind: .type(.int), sourceIndex: 15),
+            Token(kind: .identifier("b"), sourceIndex: 19),
+            Token(kind: .reserved(.parenthesisRight), sourceIndex: 20),
+            Token(kind: .reserved(.braceLeft), sourceIndex: 21),
+            Token(kind: .number("1"), sourceIndex: 22),
+            Token(kind: .reserved(.semicolon), sourceIndex: 23),
+            Token(kind: .reserved(.braceRight), sourceIndex: 24)
         ]
         let node = try Parser(tokens: tokens).parse()
 
@@ -166,13 +166,13 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionCallWithArguments() throws {
         let tokens: [Token] = [
-            .identifier("main", sourceIndex: 0),
-            .reserved(.parenthesisLeft, sourceIndex: 4),
-            .number("1", sourceIndex: 5),
-            .reserved(.comma, sourceIndex: 6),
-            .identifier("a", sourceIndex: 7),
-            .reserved(.parenthesisRight, sourceIndex: 8),
-            .reserved(.semicolon, sourceIndex: 9)
+            Token(kind: .identifier("main"), sourceIndex: 0),
+            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 4),
+            Token(kind: .number("1"), sourceIndex: 5),
+            Token(kind: .reserved(.comma), sourceIndex: 6),
+            Token(kind: .identifier("a"), sourceIndex: 7),
+            Token(kind: .reserved(.parenthesisRight), sourceIndex: 8),
+            Token(kind: .reserved(.semicolon), sourceIndex: 9)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -200,22 +200,22 @@ final class FunctionTest: XCTestCase {
 
     func testFunctionDecls() throws {
         let tokens: [Token] = [
-            .type(.int, sourceIndex: 0),
-            .identifier("main", sourceIndex: 4),
-            .reserved(.parenthesisLeft, sourceIndex: 8),
-            .reserved(.parenthesisRight, sourceIndex: 9),
-            .reserved(.braceLeft, sourceIndex: 10),
-            .number("1", sourceIndex: 11),
-            .reserved(.semicolon, sourceIndex: 12),
-            .reserved(.braceRight, sourceIndex: 13),
-            .type(.int, sourceIndex: 14),
-            .identifier("fuga", sourceIndex: 18),
-            .reserved(.parenthesisLeft, sourceIndex: 22),
-            .reserved(.parenthesisRight, sourceIndex: 23),
-            .reserved(.braceLeft, sourceIndex: 24),
-            .number("1", sourceIndex: 25),
-            .reserved(.semicolon, sourceIndex: 26),
-            .reserved(.braceRight, sourceIndex: 27)
+            Token(kind: .type(.int), sourceIndex: 0),
+            Token(kind: .identifier("main"), sourceIndex: 4),
+            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 8),
+            Token(kind: .reserved(.parenthesisRight), sourceIndex: 9),
+            Token(kind: .reserved(.braceLeft), sourceIndex: 10),
+            Token(kind: .number("1"), sourceIndex: 11),
+            Token(kind: .reserved(.semicolon), sourceIndex: 12),
+            Token(kind: .reserved(.braceRight), sourceIndex: 13),
+            Token(kind: .type(.int), sourceIndex: 14),
+            Token(kind: .identifier("fuga"), sourceIndex: 18),
+            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 22),
+            Token(kind: .reserved(.parenthesisRight), sourceIndex: 23),
+            Token(kind: .reserved(.braceLeft), sourceIndex: 24),
+            Token(kind: .number("1"), sourceIndex: 25),
+            Token(kind: .reserved(.semicolon), sourceIndex: 26),
+            Token(kind: .reserved(.braceRight), sourceIndex: 27)
         ]
         let node = try Parser(tokens: tokens).parse()
 
@@ -264,11 +264,11 @@ final class FunctionTest: XCTestCase {
 
     func testSubscriptCall() throws {
         let tokens: [Token] = [
-            .identifier("a", sourceIndex: 0),
-            .reserved(.squareLeft, sourceIndex: 1),
-            .number("1", sourceIndex: 2),
-            .reserved(.squareRight, sourceIndex: 3),
-            .reserved(.semicolon, sourceIndex: 4)
+            Token(kind: .identifier("a"), sourceIndex: 0),
+            Token(kind: .reserved(.squareLeft), sourceIndex: 1),
+            Token(kind: .number("1"), sourceIndex: 2),
+            Token(kind: .reserved(.squareRight), sourceIndex: 3),
+            Token(kind: .reserved(.semicolon), sourceIndex: 4)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -290,13 +290,13 @@ final class FunctionTest: XCTestCase {
 
     func testSubscriptCall2() throws {
         let tokens: [Token] = [
-            .identifier("a", sourceIndex: 0),
-            .reserved(.squareLeft, sourceIndex: 1),
-            .number("1", sourceIndex: 2),
-            .reserved(.add, sourceIndex: 3),
-            .identifier("b", sourceIndex: 4),
-            .reserved(.squareRight, sourceIndex: 5),
-            .reserved(.semicolon, sourceIndex: 6)
+            Token(kind: .identifier("a"), sourceIndex: 0),
+            Token(kind: .reserved(.squareLeft), sourceIndex: 1),
+            Token(kind: .number("1"), sourceIndex: 2),
+            Token(kind: .reserved(.add), sourceIndex: 3),
+            Token(kind: .identifier("b"), sourceIndex: 4),
+            Token(kind: .reserved(.squareRight), sourceIndex: 5),
+            Token(kind: .reserved(.semicolon), sourceIndex: 6)
         ]
         let node = try Parser(tokens: tokens).stmt()
 

@@ -6,8 +6,8 @@ final class StringLiteralTest: XCTestCase {
 
     func testStringLiteral1() throws {
         let tokens: [Token] = [
-            .stringLiteral("a", sourceIndex: 0),
-            .reserved(.semicolon, sourceIndex: 1)
+            Token(kind: .stringLiteral("a"), sourceIndex: 0),
+            Token(kind: .reserved(.semicolon), sourceIndex: 1)
         ]
         let node = try Parser(tokens: tokens).stmt()
 
@@ -24,10 +24,10 @@ final class StringLiteralTest: XCTestCase {
 
     func testStringLiteral2() throws {
         let tokens: [Token] = [
-            .identifier("a", sourceIndex: 0),
-            .reserved(.assign, sourceIndex: 1),
-            .stringLiteral("a", sourceIndex: 2),
-            .reserved(.semicolon, sourceIndex: 3)
+            Token(kind: .identifier("a"), sourceIndex: 0),
+            Token(kind: .reserved(.assign), sourceIndex: 1),
+            Token(kind: .stringLiteral("a"), sourceIndex: 2),
+            Token(kind: .reserved(.semicolon), sourceIndex: 3)
         ]
         let node = try Parser(tokens: tokens).stmt()
 

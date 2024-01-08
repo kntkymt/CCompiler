@@ -108,35 +108,35 @@ public class BinaryOperatorNode: NodeProtocol {
     public let kind: NodeKind = .binaryOperator
 
     public var operatorKind: OperatorKind {
-        switch token {
-        case .reserved(.add, _):
+        switch token.kind {
+        case .reserved(.add):
             return .add
 
-        case .reserved(.sub, _):
+        case .reserved(.sub):
             return .sub
 
-        case .reserved(.mul, _):
+        case .reserved(.mul):
             return .mul
 
-        case .reserved(.div, _):
+        case .reserved(.div):
             return .div
 
-        case .reserved(.equal, _):
+        case .reserved(.equal):
             return .equal
 
-        case .reserved(.notEqual, _):
+        case .reserved(.notEqual):
             return .notEqual
 
-        case .reserved(.lessThan, _):
+        case .reserved(.lessThan):
             return .lessThan
 
-        case .reserved(.lessThanOrEqual, _):
+        case .reserved(.lessThanOrEqual):
             return .lessThanOrEqual
 
-        case .reserved(.greaterThan, _):
+        case .reserved(.greaterThan):
             return .greaterThan
 
-        case .reserved(.greaterThanOrEqual, _):
+        case .reserved(.greaterThanOrEqual):
             return .greaterThanOrEqual
 
         default:
