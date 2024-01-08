@@ -11,8 +11,15 @@ final class TypesTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .type(.int), trailingTrivia: " ", sourceIndex: 0),
-                Token(kind: .identifier("a"), sourceIndex: 4)
+                Token(
+                    kind: .type(.int),
+                    trailingTrivia: " ",
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .identifier("a"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 6))
+                )
             ]
         )
     }
@@ -25,7 +32,10 @@ final class TypesTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .identifier("inta"), sourceIndex: 0)
+                Token(
+                    kind: .identifier("inta"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 5))
+                )
             ]
         )
     }
@@ -38,8 +48,15 @@ final class TypesTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .type(.char), trailingTrivia: " ", sourceIndex: 0),
-                Token(kind: .identifier("a"), sourceIndex: 5)
+                Token(
+                    kind: .type(.char),
+                    trailingTrivia: " ",
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 5))
+                ),
+                Token(
+                    kind: .identifier("a"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 6), end: SourceLocation(line: 1, column: 7))
+                )
             ]
         )
     }
@@ -52,7 +69,10 @@ final class TypesTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .identifier("chara"), sourceIndex: 0)
+                Token(
+                    kind: .identifier("chara"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 6))
+                )
             ]
         )
     }

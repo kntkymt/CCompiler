@@ -5,14 +5,16 @@ import Tokenizer
 final class IfTest: XCTestCase {
 
     func testIf() throws {
-        let tokens: [Token] = [
-            Token(kind: .keyword(.if), sourceIndex: 0),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 2),
-            Token(kind: .number("1"), sourceIndex: 3),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 4),
-            Token(kind: .number("2"), sourceIndex: 5),
-            Token(kind: .reserved(.semicolon), sourceIndex: 6)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .keyword(.if),
+                .reserved(.parenthesisLeft),
+                .number("1"),
+                .reserved(.parenthesisRight),
+                .number("2"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -37,17 +39,19 @@ final class IfTest: XCTestCase {
     }
 
     func testIfElse() throws {
-        let tokens: [Token] = [
-            Token(kind: .keyword(.if), sourceIndex: 0),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 2),
-            Token(kind: .number("1"), sourceIndex: 3),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 4),
-            Token(kind: .number("2"), sourceIndex: 5),
-            Token(kind: .reserved(.semicolon), sourceIndex: 6),
-            Token(kind: .keyword(.else), sourceIndex: 7),
-            Token(kind: .number("3"), sourceIndex: 8),
-            Token(kind: .reserved(.semicolon), sourceIndex: 9)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .keyword(.if),
+                .reserved(.parenthesisLeft),
+                .number("1"),
+                .reserved(.parenthesisRight),
+                .number("2"),
+                .reserved(.semicolon),
+                .keyword(.else),
+                .number("3"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)

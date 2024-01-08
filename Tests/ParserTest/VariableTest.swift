@@ -5,11 +5,13 @@ import Tokenizer
 final class VariableTest: XCTestCase {
 
     func testDeclVariable() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .identifier("a"), sourceIndex: 4),
-            Token(kind: .reserved(.semicolon), sourceIndex: 5)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .identifier("a"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -27,13 +29,15 @@ final class VariableTest: XCTestCase {
     }
 
     func testDeclAndInitVariable() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .identifier("a"), sourceIndex: 4),
-            Token(kind: .reserved(.assign), sourceIndex: 5),
-            Token(kind: .number("1"), sourceIndex: 6),
-            Token(kind: .reserved(.semicolon), sourceIndex: 7)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .identifier("a"),
+                .reserved(.assign),
+                .number("1"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -53,12 +57,14 @@ final class VariableTest: XCTestCase {
     }
 
     func testDeclVariablePointer() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .reserved(.mul), sourceIndex: 3),
-            Token(kind: .identifier("a"), sourceIndex: 5),
-            Token(kind: .reserved(.semicolon), sourceIndex: 6)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .reserved(.mul),
+                .identifier("a"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -79,13 +85,15 @@ final class VariableTest: XCTestCase {
     }
 
     func testDeclVariablePointer2() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .reserved(.mul), sourceIndex: 3),
-            Token(kind: .reserved(.mul), sourceIndex: 4),
-            Token(kind: .identifier("a"), sourceIndex: 6),
-            Token(kind: .reserved(.semicolon), sourceIndex: 7)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .reserved(.mul),
+                .reserved(.mul),
+                .identifier("a"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -110,14 +118,16 @@ final class VariableTest: XCTestCase {
 
     // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclVariableArray() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .identifier("a"), sourceIndex: 4),
-            Token(kind: .reserved(.squareLeft), sourceIndex: 5),
-            Token(kind: .number("4"), sourceIndex: 6),
-            Token(kind: .reserved(.squareRight), sourceIndex: 7),
-            Token(kind: .reserved(.semicolon), sourceIndex: 8)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .identifier("a"),
+                .reserved(.squareLeft),
+                .number("4"),
+                .reserved(.squareRight),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
@@ -139,20 +149,22 @@ final class VariableTest: XCTestCase {
 
     // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclAndInitVariableArray() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .identifier("a"), sourceIndex: 4),
-            Token(kind: .reserved(.squareLeft), sourceIndex: 5),
-            Token(kind: .number("2"), sourceIndex: 6),
-            Token(kind: .reserved(.squareRight), sourceIndex: 7),
-            Token(kind: .reserved(.assign), sourceIndex: 8),
-            Token(kind: .reserved(.braceLeft), sourceIndex: 9),
-            Token(kind: .number("1"), sourceIndex: 10),
-            Token(kind: .reserved(.comma), sourceIndex: 11),
-            Token(kind: .number("2"), sourceIndex: 12),
-            Token(kind: .reserved(.braceRight), sourceIndex: 13),
-            Token(kind: .reserved(.semicolon), sourceIndex: 14)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .identifier("a"),
+                .reserved(.squareLeft),
+                .number("2"),
+                .reserved(.squareRight),
+                .reserved(.assign),
+                .reserved(.braceLeft),
+                .number("1"),
+                .reserved(.comma),
+                .number("2"),
+                .reserved(.braceRight),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
@@ -183,16 +195,18 @@ final class VariableTest: XCTestCase {
 
     // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclAndInitVariableStringLiteral() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.char), sourceIndex: 0),
-            Token(kind: .identifier("a"), sourceIndex: 4),
-            Token(kind: .reserved(.squareLeft), sourceIndex: 5),
-            Token(kind: .number("2"), sourceIndex: 6),
-            Token(kind: .reserved(.squareRight), sourceIndex: 7),
-            Token(kind: .reserved(.assign), sourceIndex: 8),
-            Token(kind: .stringLiteral("ai"), sourceIndex: 9),
-            Token(kind: .reserved(.semicolon), sourceIndex: 13)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.char),
+                .identifier("a"),
+                .reserved(.squareLeft),
+                .number("2"),
+                .reserved(.squareRight),
+                .reserved(.assign),
+                .stringLiteral("ai"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
@@ -216,15 +230,17 @@ final class VariableTest: XCTestCase {
 
     // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclVariableArrayPointer() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .reserved(.mul), sourceIndex: 3),
-            Token(kind: .identifier("a"), sourceIndex: 4),
-            Token(kind: .reserved(.squareLeft), sourceIndex: 5),
-            Token(kind: .number("4"), sourceIndex: 6),
-            Token(kind: .reserved(.squareRight), sourceIndex: 7),
-            Token(kind: .reserved(.semicolon), sourceIndex: 8)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .reserved(.mul),
+                .identifier("a"),
+                .reserved(.squareLeft),
+                .number("4"),
+                .reserved(.squareRight),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
@@ -245,11 +261,13 @@ final class VariableTest: XCTestCase {
     }
 
     func testGlobalVariableDecl() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .identifier("a"), sourceIndex: 4),
-            Token(kind: .reserved(.semicolon), sourceIndex: 5)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .identifier("a"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).parse()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -271,12 +289,14 @@ final class VariableTest: XCTestCase {
     }
 
     func testGlobalVariableDeclPointer() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .reserved(.mul), sourceIndex: 3),
-            Token(kind: .identifier("a"), sourceIndex: 5),
-            Token(kind: .reserved(.semicolon), sourceIndex: 6)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .reserved(.mul),
+                .identifier("a"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).parse()
 
         XCTAssertEqual(node.sourceTokens, tokens)

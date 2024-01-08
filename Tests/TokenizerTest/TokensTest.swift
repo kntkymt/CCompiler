@@ -10,9 +10,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.add), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 2)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.add),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }
@@ -25,9 +34,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.sub), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 2)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.sub),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }
@@ -40,9 +58,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.mul), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 2)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.mul),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }
@@ -55,9 +82,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.div), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 2)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.div),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }
@@ -70,8 +106,14 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .reserved(.and), sourceIndex: 0),
-                Token(kind: .identifier("a"), sourceIndex: 1)
+                Token(
+                    kind: .reserved(.and),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .identifier("a"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                )
             ]
         )
     }
@@ -84,9 +126,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 0),
-                Token(kind: .number("1"), sourceIndex: 1),
-                Token(kind: .reserved(.parenthesisRight), sourceIndex: 2)
+                Token(
+                    kind: .reserved(.parenthesisLeft),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .reserved(.parenthesisRight),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }
@@ -99,9 +150,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .reserved(.squareLeft), sourceIndex: 0),
-                Token(kind: .number("1"), sourceIndex: 1),
-                Token(kind: .reserved(.squareRight), sourceIndex: 2)
+                Token(
+                    kind: .reserved(.squareLeft),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .reserved(.squareRight),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }
@@ -114,10 +174,22 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .reserved(.braceLeft), sourceIndex: 0),
-                Token(kind: .number("1"), sourceIndex: 1),
-                Token(kind: .reserved(.semicolon), sourceIndex: 2),
-                Token(kind: .reserved(.braceRight), sourceIndex: 3)
+                Token(
+                    kind: .reserved(.braceLeft),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .reserved(.semicolon),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .reserved(.braceRight),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                )
             ]
         )
     }
@@ -130,9 +202,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.equal), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 3)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.equal),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                )
             ]
         )
     }
@@ -145,9 +226,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.notEqual), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 3)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.notEqual),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                )
             ]
         )
     }
@@ -160,9 +250,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.greaterThan), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 2)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.greaterThan),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }
@@ -175,9 +274,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.greaterThanOrEqual), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 3)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.greaterThanOrEqual),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                )
             ]
         )
     }
@@ -190,9 +298,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.lessThan), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 2)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.lessThan),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }
@@ -205,9 +322,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.lessThanOrEqual), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 3)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.lessThanOrEqual),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                )
             ]
         )
     }
@@ -220,9 +346,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .identifier("a"), sourceIndex: 0),
-                Token(kind: .reserved(.assign), sourceIndex: 1),
-                Token(kind: .number("1"), sourceIndex: 2),
+                Token(
+                    kind: .identifier("a"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.assign),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
             ]
         )
     }
@@ -235,8 +370,14 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.semicolon), sourceIndex: 1),
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.semicolon),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
             ]
         )
     }
@@ -249,9 +390,18 @@ final class TokensTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("1"), sourceIndex: 0),
-                Token(kind: .reserved(.comma), sourceIndex: 1),
-                Token(kind: .number("2"), sourceIndex: 2)
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .reserved(.comma),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }

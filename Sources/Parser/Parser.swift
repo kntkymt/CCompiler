@@ -1,7 +1,7 @@
 import Tokenizer
 
 public enum ParseError: Error, Equatable {
-    case invalidSyntax(index: Int)
+    case invalidSyntax(location: SourceLocation)
 }
 
 public final class Parser {
@@ -20,7 +20,7 @@ public final class Parser {
     @discardableResult
     func consumeIdentifierToken() throws -> Token {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
 
         if case .identifier = tokens[index].kind {
@@ -28,14 +28,14 @@ public final class Parser {
             index += 1
             return token
         } else {
-            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+            throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
     func consumeNumberToken() throws -> Token {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
 
         if case .number = tokens[index].kind {
@@ -43,14 +43,14 @@ public final class Parser {
             index += 1
             return token
         } else {
-            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+            throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
     func consumeStringLiteralToken() throws -> Token {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
 
         if case .stringLiteral = tokens[index].kind {
@@ -58,14 +58,14 @@ public final class Parser {
             index += 1
             return token
         } else {
-            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+            throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
     func consumeReservedToken(_ reservedKind: TokenKind.ReservedKind) throws -> Token {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
 
         if case .reserved(let kind) = tokens[index].kind, kind == reservedKind {
@@ -73,14 +73,14 @@ public final class Parser {
             index += 1
             return token
         } else {
-            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+            throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
     func consumeKeywordToken(_ keywordKind: TokenKind.KeywordKind) throws -> Token {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
 
         if case .keyword(let kind) = tokens[index].kind, kind == keywordKind {
@@ -88,14 +88,14 @@ public final class Parser {
             index += 1
             return token
         } else {
-            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+            throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     @discardableResult
     func consumeTypeToken() throws -> Token {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
 
         if case .type = tokens[index].kind {
@@ -103,7 +103,7 @@ public final class Parser {
             index += 1
             return token
         } else {
-            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+            throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
@@ -112,7 +112,7 @@ public final class Parser {
 
     public func parse() throws -> SourceFileNode {
         if tokens.isEmpty {
-            throw ParseError.invalidSyntax(index: 0)
+            throw ParseError.invalidSyntax(location: .startOfFile)
         }
 
         return try program()
@@ -161,7 +161,7 @@ public final class Parser {
     // functionParameters = functionParameter+
     func functionParameters() throws -> [FunctionParameterNode] {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
         var results: [FunctionParameterNode] = []
 
@@ -215,7 +215,7 @@ public final class Parser {
     //         | "return" expr ";"
     func stmt() throws -> BlockItemNode {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
         switch tokens[index].kind {
         case .reserved(.braceLeft):
@@ -431,7 +431,7 @@ public final class Parser {
         var node = try equality()
 
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
 
         if case .reserved(.assign) = tokens[index].kind {
@@ -609,17 +609,17 @@ public final class Parser {
     //       | ("*" | "&") unary
     func unary() throws -> any NodeProtocol {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
 
         switch tokens[index].kind {
         case .keyword(.sizeof):
             try consumeKeywordToken(.sizeof)
 
-            let unary = try unary()
+            _ = try unary()
 
             // FIXME: どうやって式の型を判断する？
-            return IntegerLiteralNode(token: Token(kind: .number("8"), sourceIndex: unary.sourceTokens[0].sourceIndex))
+            return IntegerLiteralNode(token: Token(kind: .number("8"), sourceRange: SourceRange(start: .startOfFile, end: .startOfFile)))
 
         case .reserved(.add):
             return PrefixOperatorExpressionNode(
@@ -662,7 +662,7 @@ public final class Parser {
     //         | "(" expr ")"
     func primary() throws -> any NodeProtocol {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
 
         switch tokens[index].kind {
@@ -720,14 +720,14 @@ public final class Parser {
             }
 
         default:
-            throw ParseError.invalidSyntax(index: tokens[index].sourceIndex)
+            throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
         }
     }
 
     // exprList = exprList+
     func exprList() throws -> [ExpressionListItemNode] {
         if index >= tokens.count {
-            throw ParseError.invalidSyntax(index: tokens.last.map { $0.sourceIndex + 1 } ?? 0)
+            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
         }
         var results: [ExpressionListItemNode] = []
         results.append(try exprListItem())

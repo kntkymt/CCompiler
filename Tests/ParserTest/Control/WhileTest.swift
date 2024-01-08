@@ -5,14 +5,16 @@ import Tokenizer
 final class WhileTest: XCTestCase {
 
     func testWhile() throws {
-        let tokens: [Token] = [
-            Token(kind: .keyword(.while), sourceIndex: 0),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 5),
-            Token(kind: .number("1"), sourceIndex: 6),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 7),
-            Token(kind: .number("2"), sourceIndex: 8),
-            Token(kind: .reserved(.semicolon), sourceIndex: 9)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .keyword(.while),
+                .reserved(.parenthesisLeft),
+                .number("1"),
+                .reserved(.parenthesisRight),
+                .number("2"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -36,15 +38,19 @@ final class WhileTest: XCTestCase {
 
     func testWhileNoExpr() throws {
         do {
-            _ = try Parser(tokens: [
-                Token(kind: .keyword(.while), sourceIndex: 0),
-                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 5),
-                Token(kind: .number("1"), sourceIndex: 6),
-                Token(kind: .reserved(.parenthesisRight), sourceIndex: 7),
-                Token(kind: .reserved(.semicolon), sourceIndex: 8)
-            ]).stmt()
+            _ = try Parser(
+                tokens: buildTokens(
+                    kinds: [
+                        .keyword(.while),
+                        .reserved(.parenthesisLeft),
+                        .number("1"),
+                        .reserved(.parenthesisRight),
+                        .reserved(.semicolon)
+                    ]
+                )
+            ).stmt()
         } catch let error as ParseError {
-            XCTAssertEqual(error, .invalidSyntax(index: 8))
+            XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 9)))
         }
     }
 }

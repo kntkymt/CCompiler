@@ -5,18 +5,20 @@ import Tokenizer
 final class FunctionTest: XCTestCase {
 
     func testFunctionDecl() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .identifier("main"), sourceIndex: 4),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 8),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 9),
-            Token(kind: .reserved(.braceLeft), sourceIndex: 10),
-            Token(kind: .number("1"), sourceIndex: 11),
-            Token(kind: .reserved(.semicolon), sourceIndex: 12),
-            Token(kind: .number("2"), sourceIndex: 13),
-            Token(kind: .reserved(.semicolon), sourceIndex: 14),
-            Token(kind: .reserved(.braceRight), sourceIndex: 15)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .identifier("main"),
+                .reserved(.parenthesisLeft),
+                .reserved(.parenthesisRight),
+                .reserved(.braceLeft),
+                .number("1"),
+                .reserved(.semicolon),
+                .number("2"),
+                .reserved(.semicolon),
+                .reserved(.braceRight)
+            ]
+        )
         let node = try Parser(tokens: tokens).parse()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -48,19 +50,21 @@ final class FunctionTest: XCTestCase {
     }
 
     func testFunctionDeclPointer() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .reserved(.mul), sourceIndex: 3),
-            Token(kind: .identifier("main"), sourceIndex: 5),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 9),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 10),
-            Token(kind: .reserved(.braceLeft), sourceIndex: 11),
-            Token(kind: .number("1"), sourceIndex: 12),
-            Token(kind: .reserved(.semicolon), sourceIndex: 13),
-            Token(kind: .number("2"), sourceIndex: 14),
-            Token(kind: .reserved(.semicolon), sourceIndex: 15),
-            Token(kind: .reserved(.braceRight), sourceIndex: 16)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .reserved(.mul),
+                .identifier("main"),
+                .reserved(.parenthesisLeft),
+                .reserved(.parenthesisRight),
+                .reserved(.braceLeft),
+                .number("1"),
+                .reserved(.semicolon),
+                .number("2"),
+                .reserved(.semicolon),
+                .reserved(.braceRight)
+            ]
+        )
         let node = try Parser(tokens: tokens).parse()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -92,12 +96,14 @@ final class FunctionTest: XCTestCase {
     }
 
     func testFunctionCall() throws {
-        let tokens: [Token] = [
-            Token(kind: .identifier("main"), sourceIndex: 0),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 4),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 5),
-            Token(kind: .reserved(.semicolon), sourceIndex: 6)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .identifier("main"),
+                .reserved(.parenthesisLeft),
+                .reserved(.parenthesisRight),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -117,21 +123,23 @@ final class FunctionTest: XCTestCase {
     }
 
     func testFunctionDeclWithParameter() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .identifier("main"), sourceIndex: 4),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 8),
-            Token(kind: .type(.int), sourceIndex: 9),
-            Token(kind: .identifier("a"), sourceIndex: 13),
-            Token(kind: .reserved(.comma), sourceIndex: 14),
-            Token(kind: .type(.int), sourceIndex: 15),
-            Token(kind: .identifier("b"), sourceIndex: 19),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 20),
-            Token(kind: .reserved(.braceLeft), sourceIndex: 21),
-            Token(kind: .number("1"), sourceIndex: 22),
-            Token(kind: .reserved(.semicolon), sourceIndex: 23),
-            Token(kind: .reserved(.braceRight), sourceIndex: 24)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .identifier("main"),
+                .reserved(.parenthesisLeft),
+                .type(.int),
+                .identifier("a"),
+                .reserved(.comma),
+                .type(.int),
+                .identifier("b"),
+                .reserved(.parenthesisRight),
+                .reserved(.braceLeft),
+                .number("1"),
+                .reserved(.semicolon),
+                .reserved(.braceRight)
+            ]
+        )
         let node = try Parser(tokens: tokens).parse()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -165,15 +173,17 @@ final class FunctionTest: XCTestCase {
     }
 
     func testFunctionCallWithArguments() throws {
-        let tokens: [Token] = [
-            Token(kind: .identifier("main"), sourceIndex: 0),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 4),
-            Token(kind: .number("1"), sourceIndex: 5),
-            Token(kind: .reserved(.comma), sourceIndex: 6),
-            Token(kind: .identifier("a"), sourceIndex: 7),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 8),
-            Token(kind: .reserved(.semicolon), sourceIndex: 9)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .identifier("main"),
+                .reserved(.parenthesisLeft),
+                .number("1"),
+                .reserved(.comma),
+                .identifier("a"),
+                .reserved(.parenthesisRight),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -199,24 +209,26 @@ final class FunctionTest: XCTestCase {
     }
 
     func testFunctionDecls() throws {
-        let tokens: [Token] = [
-            Token(kind: .type(.int), sourceIndex: 0),
-            Token(kind: .identifier("main"), sourceIndex: 4),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 8),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 9),
-            Token(kind: .reserved(.braceLeft), sourceIndex: 10),
-            Token(kind: .number("1"), sourceIndex: 11),
-            Token(kind: .reserved(.semicolon), sourceIndex: 12),
-            Token(kind: .reserved(.braceRight), sourceIndex: 13),
-            Token(kind: .type(.int), sourceIndex: 14),
-            Token(kind: .identifier("fuga"), sourceIndex: 18),
-            Token(kind: .reserved(.parenthesisLeft), sourceIndex: 22),
-            Token(kind: .reserved(.parenthesisRight), sourceIndex: 23),
-            Token(kind: .reserved(.braceLeft), sourceIndex: 24),
-            Token(kind: .number("1"), sourceIndex: 25),
-            Token(kind: .reserved(.semicolon), sourceIndex: 26),
-            Token(kind: .reserved(.braceRight), sourceIndex: 27)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .identifier("main"),
+                .reserved(.parenthesisLeft),
+                .reserved(.parenthesisRight),
+                .reserved(.braceLeft),
+                .number("1"),
+                .reserved(.semicolon),
+                .reserved(.braceRight),
+                .type(.int),
+                .identifier("fuga"),
+                .reserved(.parenthesisLeft),
+                .reserved(.parenthesisRight),
+                .reserved(.braceLeft),
+                .number("1"),
+                .reserved(.semicolon),
+                .reserved(.braceRight)
+            ]
+        )
         let node = try Parser(tokens: tokens).parse()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -263,13 +275,15 @@ final class FunctionTest: XCTestCase {
     }
 
     func testSubscriptCall() throws {
-        let tokens: [Token] = [
-            Token(kind: .identifier("a"), sourceIndex: 0),
-            Token(kind: .reserved(.squareLeft), sourceIndex: 1),
-            Token(kind: .number("1"), sourceIndex: 2),
-            Token(kind: .reserved(.squareRight), sourceIndex: 3),
-            Token(kind: .reserved(.semicolon), sourceIndex: 4)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .identifier("a"),
+                .reserved(.squareLeft),
+                .number("1"),
+                .reserved(.squareRight),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -289,15 +303,17 @@ final class FunctionTest: XCTestCase {
     }
 
     func testSubscriptCall2() throws {
-        let tokens: [Token] = [
-            Token(kind: .identifier("a"), sourceIndex: 0),
-            Token(kind: .reserved(.squareLeft), sourceIndex: 1),
-            Token(kind: .number("1"), sourceIndex: 2),
-            Token(kind: .reserved(.add), sourceIndex: 3),
-            Token(kind: .identifier("b"), sourceIndex: 4),
-            Token(kind: .reserved(.squareRight), sourceIndex: 5),
-            Token(kind: .reserved(.semicolon), sourceIndex: 6)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .identifier("a"),
+                .reserved(.squareLeft),
+                .number("1"),
+                .reserved(.add),
+                .identifier("b"),
+                .reserved(.squareRight),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)

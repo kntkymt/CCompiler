@@ -11,7 +11,10 @@ final class KeywordsTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .keyword(.return), sourceIndex: 0)
+                Token(
+                    kind: .keyword(.return),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 7))
+                )
             ]
         )
     }
@@ -24,8 +27,15 @@ final class KeywordsTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .keyword(.return), trailingTrivia: " ", sourceIndex: 0),
-                Token(kind: .number("2"), sourceIndex: 7)
+                Token(
+                    kind: .keyword(.return),
+                    trailingTrivia: " ", 
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 7))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 9))
+                )
             ]
         )
     }
@@ -38,8 +48,14 @@ final class KeywordsTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .keyword(.return), sourceIndex: 0),
-                Token(kind: .reserved(.semicolon), sourceIndex: 6)
+                Token(
+                    kind: .keyword(.return),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 7))
+                ),
+                Token(
+                    kind: .reserved(.semicolon),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 8))
+                )
             ]
         )
     }
@@ -52,7 +68,10 @@ final class KeywordsTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .identifier("returnX"), sourceIndex: 0)
+                Token(
+                    kind: .identifier("returnX"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 8))
+                )
             ]
         )
     }
@@ -65,7 +84,10 @@ final class KeywordsTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .identifier("return2"), sourceIndex: 0)
+                Token(
+                    kind: .identifier("return2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 8))
+                )
             ]
         )
     }
@@ -78,12 +100,31 @@ final class KeywordsTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .keyword(.if), sourceIndex: 0),
-                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 2),
-                Token(kind: .number("1"), sourceIndex: 3),
-                Token(kind: .reserved(.parenthesisRight), sourceIndex: 4),
-                Token(kind: .keyword(.else), trailingTrivia: " ", sourceIndex: 5),
-                Token(kind: .number("2"), sourceIndex: 10)
+                Token(
+                    kind: .keyword(.if),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .reserved(.parenthesisLeft),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                ),
+                Token(
+                    kind: .reserved(.parenthesisRight),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 6))
+                ),
+                Token(
+                    kind: .keyword(.else),
+                    trailingTrivia: " ",
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 6), end: SourceLocation(line: 1, column: 10))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 11), end: SourceLocation(line: 1, column: 12))
+                )
             ]
         )
     }
@@ -96,10 +137,22 @@ final class KeywordsTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .keyword(.while), sourceIndex: 0),
-                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 5),
-                Token(kind: .number("1"), sourceIndex: 6),
-                Token(kind: .reserved(.parenthesisRight), sourceIndex: 7),
+                Token(
+                    kind: .keyword(.while),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 6))
+                ),
+                Token(
+                    kind: .reserved(.parenthesisLeft),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 6), end: SourceLocation(line: 1, column: 7))
+                ),
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 8))
+                ),
+                Token(
+                    kind: .reserved(.parenthesisRight),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 9))
+                ),
             ]
         )
     }
@@ -112,14 +165,38 @@ final class KeywordsTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .keyword(.for), sourceIndex: 0),
-                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 3),
-                Token(kind: .number("1"), sourceIndex: 4),
-                Token(kind: .reserved(.semicolon), sourceIndex: 5),
-                Token(kind: .number("2"), sourceIndex: 6),
-                Token(kind: .reserved(.semicolon), sourceIndex: 7),
-                Token(kind: .number("3"), sourceIndex: 8),
-                Token(kind: .reserved(.parenthesisRight), sourceIndex: 9),
+                Token(
+                    kind: .keyword(.for),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .reserved(.parenthesisLeft),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                ),
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 6))
+                ),
+                Token(
+                    kind: .reserved(.semicolon),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 6), end: SourceLocation(line: 1, column: 7))
+                ),
+                Token(
+                    kind: .number("2"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 8))
+                ),
+                Token(
+                    kind: .reserved(.semicolon),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 9))
+                ),
+                Token(
+                    kind: .number("3"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 9), end: SourceLocation(line: 1, column: 10))
+                ),
+                Token(
+                    kind: .reserved(.parenthesisRight),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 10), end: SourceLocation(line: 1, column: 11))
+                ),
             ]
         )
     }
@@ -132,10 +209,22 @@ final class KeywordsTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .keyword(.sizeof), sourceIndex: 0),
-                Token(kind: .reserved(.parenthesisLeft), sourceIndex: 6),
-                Token(kind: .number("1"), sourceIndex: 7),
-                Token(kind: .reserved(.parenthesisRight), sourceIndex: 8),
+                Token(
+                    kind: .keyword(.sizeof),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 7))
+                ),
+                Token(
+                    kind: .reserved(.parenthesisLeft),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 8))
+                ),
+                Token(
+                    kind: .number("1"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 9))
+                ),
+                Token(
+                    kind: .reserved(.parenthesisRight),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 9), end: SourceLocation(line: 1, column: 10))
+                ),
             ]
         )
     }

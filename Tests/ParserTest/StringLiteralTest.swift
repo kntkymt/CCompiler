@@ -5,10 +5,12 @@ import Tokenizer
 final class StringLiteralTest: XCTestCase {
 
     func testStringLiteral1() throws {
-        let tokens: [Token] = [
-            Token(kind: .stringLiteral("a"), sourceIndex: 0),
-            Token(kind: .reserved(.semicolon), sourceIndex: 1)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .stringLiteral("a"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)
@@ -23,12 +25,14 @@ final class StringLiteralTest: XCTestCase {
     }
 
     func testStringLiteral2() throws {
-        let tokens: [Token] = [
-            Token(kind: .identifier("a"), sourceIndex: 0),
-            Token(kind: .reserved(.assign), sourceIndex: 1),
-            Token(kind: .stringLiteral("a"), sourceIndex: 2),
-            Token(kind: .reserved(.semicolon), sourceIndex: 3)
-        ]
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .identifier("a"),
+                .reserved(.assign),
+                .stringLiteral("a"),
+                .reserved(.semicolon)
+            ]
+        )
         let node = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(node.sourceTokens, tokens)

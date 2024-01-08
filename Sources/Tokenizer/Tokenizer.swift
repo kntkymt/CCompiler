@@ -1,5 +1,5 @@
 public enum TokenizeError: Error, Equatable {
-    case unknownToken(index: Int)
+    case unknownToken(location: SourceLocation)
 }
 
 public class Tokenizer {
@@ -7,7 +7,18 @@ public class Tokenizer {
     // MARK: - Property
 
     private let charactors: [Character]
-    public var index = 0
+
+    private var currentSourceLocation = SourceLocation(line: 1, column: 1)
+    private var index = 0 {
+        willSet {
+            if charactors[index].isNewline {
+                currentSourceLocation.line += 1
+                currentSourceLocation.column = 1
+            } else {
+                currentSourceLocation.column += (newValue - index)
+            }
+        }
+    }
 
     // MARK: - Initializer
 
@@ -22,10 +33,23 @@ public class Tokenizer {
 
         while index < charactors.count {
             let leadingTrivia = extractTrivia(untilBeforeNewLine: false)
+            // FIXME: triviaで終わっていたら無視, EOF TokenのleadingTriviaにして解決すべき
+            guard index < charactors.count else { break }
+
+            // sourceLocationにtriviaは含まない
+            let startLocation = currentSourceLocation
             let kind = try extractTokenKind()
+            let endLocation = currentSourceLocation
+
             let trailingTrivia = extractTrivia(untilBeforeNewLine: true)
 
-            tokens.append(Token(kind: kind.0, leadingTrivia: leadingTrivia, trailingTrivia: trailingTrivia, sourceIndex: kind.1))
+            let token = Token(
+                kind: kind,
+                leadingTrivia: leadingTrivia,
+                trailingTrivia: trailingTrivia,
+                sourceRange: SourceRange(start: startLocation, end: endLocation)
+            )
+            tokens.append(token)
         }
 
         return tokens
@@ -33,9 +57,8 @@ public class Tokenizer {
 
     // MARK: - Private
 
-    private func extractNumber() -> (TokenKind, Int) {
+    private func extractNumber() -> TokenKind {
         var string = ""
-        let startIndex = index
 
         while index < charactors.count {
             let nextToken = charactors[index]
@@ -47,12 +70,11 @@ public class Tokenizer {
             }
         }
 
-        return (.number(string), startIndex)
+        return .number(string)
     }
 
-    private func extractString() -> (TokenKind, Int) {
+    private func extractString() -> TokenKind {
         var string = ""
-        let startIndex = index
 
         // 開始の"
         index += 1
@@ -69,12 +91,11 @@ public class Tokenizer {
             }
         }
 
-        return (.stringLiteral(string), startIndex)
+        return .stringLiteral(string)
     }
 
-    private func extractIdentifier() -> (TokenKind, Int) {
+    private func extractIdentifier() -> TokenKind {
         var string = ""
-        let startIndex = index
 
         while index < charactors.count {
             let nextToken = charactors[index]
@@ -86,7 +107,7 @@ public class Tokenizer {
             }
         }
 
-        return (.identifier(string), startIndex)
+        return .identifier(string)
     }
 
     private func extractTrivia(untilBeforeNewLine: Bool) -> String {
@@ -151,7 +172,7 @@ public class Tokenizer {
     private let keywordKinds = TokenKind.KeywordKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
     private let typeKinds = TokenKind.TypeKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
 
-    private func extractTokenKind() throws -> (TokenKind, Int) {
+    private func extractTokenKind() throws -> TokenKind {
         if charactors[index].isNumber {
             return extractNumber()
         }
@@ -164,7 +185,7 @@ public class Tokenizer {
             let reservedString = reservedKind.rawValue
             if index + (reservedString.count - 1) < charactors.count,
                String(charactors[index..<index+reservedString.count]) == reservedString {
-                let reserved = (TokenKind.reserved(reservedKind), index)
+                let reserved = TokenKind.reserved(reservedKind)
                 index += reservedString.count
 
                 return reserved
@@ -182,7 +203,7 @@ public class Tokenizer {
                     break
                 }
 
-                let keyword = (TokenKind.keyword(keywordKind), index)
+                let keyword = TokenKind.keyword(keywordKind)
                 index += keywordString.count
 
                 return keyword
@@ -200,7 +221,7 @@ public class Tokenizer {
                     break
                 }
 
-                let type = (TokenKind.type(typeKind), index)
+                let type = TokenKind.type(typeKind)
                 index += typeString.count
 
                 return type
@@ -211,7 +232,7 @@ public class Tokenizer {
             return extractIdentifier()
         }
 
-        throw TokenizeError.unknownToken(index: index)
+        throw TokenizeError.unknownToken(location: currentSourceLocation)
     }
 }
 

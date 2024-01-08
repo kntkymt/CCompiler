@@ -7,7 +7,7 @@ final class TokenizeErrorTest: XCTestCase {
         do {
             _ = try Tokenizer(source:  "1 ^").tokenize()
         } catch let error as TokenizeError {
-            XCTAssertEqual(error, TokenizeError.unknownToken(index: 2))
+            XCTAssertEqual(error, TokenizeError.unknownToken(location: SourceLocation(line: 1, column: 3)))
         }
     }
 }

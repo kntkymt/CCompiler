@@ -37,16 +37,20 @@ struct Ccompiler: ParsableCommand {
                 print("failed to write")
             }
         } catch let error as CompileError {
+            let lineSplitedSource = source.split { $0.isNewline }
             switch error {
-            case .invalidSyntax(let index):
-                print(source)
-                print(String(repeating: " ", count: index) + "^不正な文法です")
-            case .invalidToken(let index):
-                print(source)
-                print(String(repeating: " ", count: index) + "^不正な文字です")
-            case .noSuchVariable(let variableName, let index):
-                print(source)
-                print(String(repeating: " ", count: index) + "^変数\(variableName)は存在しません")
+            case .invalidSyntax(let location):
+                print("\(inputPath.absoluteString.dropFirst(7)):\(location.line):\(location.column)")
+                print(lineSplitedSource[location.line - 1])
+                print(String(repeating: " ", count: location.column - 1) + "^不正な文法です")
+            case .invalidToken(let location):
+                print("\(inputPath.absoluteString.dropFirst(7)):\(location.line):\(location.column)")
+                print(lineSplitedSource[location.line - 1])
+                print(String(repeating: " ", count: location.column - 1) + "^不正な文字です")
+            case .noSuchVariable(let variableName, let location):
+                print("\(inputPath.absoluteString.dropFirst(7)):\(location.line):\(location.column)")
+                print(lineSplitedSource[location.line - 1])
+                print(String(repeating: " ", count: location.column - 1) + "^変数\(variableName)は存在しません")
 
             case .unknown:
                 print("不明なコンパイルエラー")

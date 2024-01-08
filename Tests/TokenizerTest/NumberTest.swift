@@ -11,7 +11,10 @@ final class NumberTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("5"), sourceIndex: 0)
+                Token(
+                    kind: .number("5"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                )
             ]
         )
     }
@@ -24,7 +27,10 @@ final class NumberTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .number("123"), sourceIndex: 0)
+                Token(
+                    kind: .number("123"),
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }

@@ -12,7 +12,10 @@ final class StringLiteralTest: XCTestCase {
         XCTAssertEqual(
             tokens,
             [
-                Token(kind: .stringLiteral("aaaa"), sourceIndex: 0)
+                Token(
+                    kind: .stringLiteral("aaaa"),
+                    sourceRange: SourceRange(start: .init(line: 1, column: 1), end: .init(line: 1, column: 7))
+                )
             ]
         )
     }
