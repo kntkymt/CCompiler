@@ -21,11 +21,11 @@ final class AssignTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IdentifierNode(token: tokens[0]),
-                    operator: AssignNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IdentifierNode(baseName: TokenNode(token: tokens[0])),
+                    operator: AssignNode(equal: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -49,15 +49,15 @@ final class AssignTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IdentifierNode(token: tokens[0]),
-                    operator: AssignNode(token: tokens[1]),
+                    left: IdentifierNode(baseName: TokenNode(token: tokens[0])),
+                    operator: AssignNode(equal: TokenNode(token: tokens[1])),
                     right: InfixOperatorExpressionNode(
-                        left: IdentifierNode(token: tokens[2]),
-                        operator: AssignNode(token: tokens[3]),
-                        right: IntegerLiteralNode(token: tokens[4])
+                        left: IdentifierNode(baseName: TokenNode(token: tokens[2])),
+                        operator: AssignNode(equal: TokenNode(token: tokens[3])),
+                        right: IntegerLiteralNode(literal: TokenNode(token: tokens[4]))
                     )
                 ),
-                semicolonToken: tokens[5]
+                semicolon: TokenNode(token: tokens[5])
             )
         )
     }
@@ -80,11 +80,11 @@ final class AssignTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: AssignNode(token: tokens[1]),
-                    right: IntegerLiteralNode(token: tokens[2])
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: AssignNode(equal: TokenNode(token: tokens[1])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }

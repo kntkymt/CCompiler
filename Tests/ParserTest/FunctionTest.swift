@@ -29,18 +29,18 @@ final class FunctionTest: XCTestCase {
                 statements: [
                     BlockItemNode(
                         item: FunctionDeclNode(
-                            returnTypeNode: TypeNode(typeToken: tokens[0]),
-                            functionNameToken: tokens[1],
-                            parenthesisLeftToken: tokens[2],
-                            parameterNodes: [],
-                            parenthesisRightToken: tokens[3],
+                            returnType: TypeNode(type: TokenNode(token: tokens[0])),
+                            functionName: TokenNode(token: tokens[1]),
+                            parenthesisLeft: TokenNode(token: tokens[2]),
+                            parameters: [],
+                            parenthesisRight: TokenNode(token: tokens[3]),
                             block: BlockStatementNode(
-                                braceLeftToken: tokens[4],
+                                braceLeft: TokenNode(token: tokens[4]),
                                 items: [
-                                    BlockItemNode(item: IntegerLiteralNode(token: tokens[5]), semicolonToken: tokens[6]),
-                                    BlockItemNode(item: IntegerLiteralNode(token: tokens[7]), semicolonToken: tokens[8]),
+                                    BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[5])), semicolon: TokenNode(token: tokens[6])),
+                                    BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[7])), semicolon: TokenNode(token: tokens[8])),
                                 ],
-                                braceRightToken: tokens[9]
+                                braceRight: TokenNode(token: tokens[9])
                             )
                         )
                     )
@@ -75,18 +75,18 @@ final class FunctionTest: XCTestCase {
                 statements: [
                     BlockItemNode(
                         item: FunctionDeclNode(
-                            returnTypeNode: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]),
-                            functionNameToken: tokens[2],
-                            parenthesisLeftToken: tokens[3],
-                            parameterNodes: [],
-                            parenthesisRightToken: tokens[4],
+                            returnType: PointerTypeNode(referenceType: TypeNode(type: TokenNode(token: tokens[0])), pointer: TokenNode(token: tokens[1])),
+                            functionName: TokenNode(token: tokens[2]),
+                            parenthesisLeft: TokenNode(token: tokens[3]),
+                            parameters: [],
+                            parenthesisRight: TokenNode(token: tokens[4]),
                             block: BlockStatementNode(
-                                braceLeftToken: tokens[5],
+                                braceLeft: TokenNode(token: tokens[5]),
                                 items: [
-                                    BlockItemNode(item: IntegerLiteralNode(token: tokens[6]), semicolonToken: tokens[7]),
-                                    BlockItemNode(item: IntegerLiteralNode(token: tokens[8]), semicolonToken: tokens[9]),
+                                    BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[6])), semicolon: TokenNode(token: tokens[7])),
+                                    BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[8])), semicolon: TokenNode(token: tokens[9])),
                                 ],
-                                braceRightToken: tokens[10]
+                                braceRight: TokenNode(token: tokens[10])
                             )
                         )
                     )
@@ -112,12 +112,12 @@ final class FunctionTest: XCTestCase {
             node,
             BlockItemNode(
                 item: FunctionCallExpressionNode(
-                    identifierToken: tokens[0],
-                    parenthesisLeftToken: tokens[1],
+                    identifier: TokenNode(token: tokens[0]),
+                    parenthesisLeft: TokenNode(token: tokens[1]),
                     arguments: [],
-                    parenthesisRightToken: tokens[2]
+                    parenthesisRight: TokenNode(token: tokens[2])
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -150,20 +150,20 @@ final class FunctionTest: XCTestCase {
                 statements: [
                     BlockItemNode(
                         item: FunctionDeclNode(
-                            returnTypeNode: TypeNode(typeToken: tokens[0]),
-                            functionNameToken: tokens[1],
-                            parenthesisLeftToken: tokens[2],
-                            parameterNodes: [
-                                FunctionParameterNode(type: TypeNode(typeToken: tokens[3]), identifierToken: tokens[4], commaToken: tokens[5]),
-                                FunctionParameterNode(type: TypeNode(typeToken: tokens[6]), identifierToken: tokens[7])
+                            returnType: TypeNode(type: TokenNode(token: tokens[0])),
+                            functionName: TokenNode(token: tokens[1]),
+                            parenthesisLeft: TokenNode(token: tokens[2]),
+                            parameters: [
+                                FunctionParameterNode(type: TypeNode(type: TokenNode(token: tokens[3])), identifier: TokenNode(token: tokens[4]), comma: TokenNode(token: tokens[5])),
+                                FunctionParameterNode(type: TypeNode(type: TokenNode(token: tokens[6])), identifier: TokenNode(token: tokens[7]))
                             ],
-                            parenthesisRightToken: tokens[8],
+                            parenthesisRight: TokenNode(token: tokens[8]),
                             block: BlockStatementNode(
-                                braceLeftToken: tokens[9],
+                                braceLeft: TokenNode(token: tokens[9]),
                                 items: [
-                                    BlockItemNode(item: IntegerLiteralNode(token: tokens[10]), semicolonToken: tokens[11]),
+                                    BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[10])), semicolon: TokenNode(token: tokens[11])),
                                 ],
-                                braceRightToken: tokens[12]
+                                braceRight: TokenNode(token: tokens[12])
                             )
                         )
                     )
@@ -192,18 +192,18 @@ final class FunctionTest: XCTestCase {
             node,
             BlockItemNode(
                 item: FunctionCallExpressionNode(
-                    identifierToken: tokens[0],
-                    parenthesisLeftToken: tokens[1],
+                    identifier: TokenNode(token: tokens[0]),
+                    parenthesisLeft: TokenNode(token: tokens[1]),
                     arguments: [
                         ExpressionListItemNode(
-                            expression: IntegerLiteralNode(token: tokens[2]),
-                            comma: tokens[3]
+                            expression: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                            comma: TokenNode(token: tokens[3])
                         ),
-                        ExpressionListItemNode(expression: IdentifierNode(token: tokens[4]))
+                        ExpressionListItemNode(expression: IdentifierNode(baseName: TokenNode(token: tokens[4])))
                     ],
-                    parenthesisRightToken: tokens[5]
+                    parenthesisRight: TokenNode(token: tokens[5])
                 ),
-                semicolonToken: tokens[6]
+                semicolon: TokenNode(token: tokens[6])
             )
         )
     }
@@ -239,33 +239,33 @@ final class FunctionTest: XCTestCase {
                 statements: [
                     BlockItemNode(
                         item: FunctionDeclNode(
-                            returnTypeNode: TypeNode(typeToken: tokens[0]),
-                            functionNameToken: tokens[1],
-                            parenthesisLeftToken: tokens[2],
-                            parameterNodes: [],
-                            parenthesisRightToken: tokens[3],
+                            returnType: TypeNode(type: TokenNode(token: tokens[0])),
+                            functionName: TokenNode(token: tokens[1]),
+                            parenthesisLeft: TokenNode(token: tokens[2]),
+                            parameters: [],
+                            parenthesisRight: TokenNode(token: tokens[3]),
                             block: BlockStatementNode(
-                                braceLeftToken: tokens[4],
+                                braceLeft: TokenNode(token: tokens[4]),
                                 items: [
-                                    BlockItemNode(item: IntegerLiteralNode(token: tokens[5]), semicolonToken: tokens[6])
+                                    BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[5])), semicolon: TokenNode(token: tokens[6]))
                                 ],
-                                braceRightToken: tokens[7]
+                                braceRight: TokenNode(token: tokens[7])
                             )
                         )
                     ),
                     BlockItemNode(
                         item: FunctionDeclNode(
-                            returnTypeNode: TypeNode(typeToken: tokens[8]),
-                            functionNameToken: tokens[9],
-                            parenthesisLeftToken: tokens[10],
-                            parameterNodes: [],
-                            parenthesisRightToken: tokens[11],
+                            returnType: TypeNode(type: TokenNode(token: tokens[8])),
+                            functionName: TokenNode(token: tokens[9]),
+                            parenthesisLeft: TokenNode(token: tokens[10]),
+                            parameters: [],
+                            parenthesisRight: TokenNode(token: tokens[11]),
                             block: BlockStatementNode(
-                                braceLeftToken: tokens[12],
+                                braceLeft: TokenNode(token: tokens[12]),
                                 items: [
-                                    BlockItemNode(item: IntegerLiteralNode(token: tokens[13]), semicolonToken: tokens[14])
+                                    BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[13])), semicolon: TokenNode(token: tokens[14]))
                                 ],
-                                braceRightToken: tokens[15]
+                                braceRight: TokenNode(token: tokens[15])
                             )
                         )
                     )
@@ -292,12 +292,12 @@ final class FunctionTest: XCTestCase {
             node,
             BlockItemNode(
                 item: SubscriptCallExpressionNode(
-                    identifierNode: IdentifierNode(token: tokens[0]),
-                    squareLeftToken: tokens[1],
-                    argument: IntegerLiteralNode(token: tokens[2]),
-                    squareRightToken: tokens[3]
+                    identifier: IdentifierNode(baseName: TokenNode(token: tokens[0])),
+                    squareLeft: TokenNode(token: tokens[1]),
+                    argument: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                    squareRight: TokenNode(token: tokens[3])
                 ),
-                semicolonToken: tokens[4]
+                semicolon: TokenNode(token: tokens[4])
             )
         )
     }
@@ -322,16 +322,16 @@ final class FunctionTest: XCTestCase {
             node,
             BlockItemNode(
                 item: SubscriptCallExpressionNode(
-                    identifierNode: IdentifierNode(token: tokens[0]),
-                    squareLeftToken: tokens[1],
+                    identifier: IdentifierNode(baseName: TokenNode(token: tokens[0])),
+                    squareLeft: TokenNode(token: tokens[1]),
                     argument: InfixOperatorExpressionNode(
-                        left: IntegerLiteralNode(token: tokens[2]),
-                        operator: BinaryOperatorNode(token: tokens[3]),
-                        right: IdentifierNode(token: tokens[4])
+                        left: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                        operator: BinaryOperatorNode(operator: TokenNode(token: tokens[3])),
+                        right: IdentifierNode(baseName: TokenNode(token: tokens[4]))
                     ),
-                    squareRightToken: tokens[5]
+                    squareRight: TokenNode(token: tokens[5])
                 ),
-                semicolonToken: tokens[6]
+                semicolon: TokenNode(token: tokens[6])
             )
         )
     }

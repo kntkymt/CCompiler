@@ -24,14 +24,14 @@ final class OperatorPriorityTest: XCTestCase {
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
                     left: InfixOperatorExpressionNode(
-                        left: IntegerLiteralNode(token: tokens[0]),
-                        operator: BinaryOperatorNode(token: tokens[1]),
-                        right: IntegerLiteralNode(token: tokens[2])
+                        left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                        operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                        right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                     ),
-                    operator: BinaryOperatorNode(token: tokens[3]),
-                    right: IntegerLiteralNode(token: tokens[4])
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[3])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[4]))
                 ),
-                semicolonToken: tokens[5]
+                semicolon: TokenNode(token: tokens[5])
             )
         )
     }
@@ -56,14 +56,14 @@ final class OperatorPriorityTest: XCTestCase {
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
                     left: InfixOperatorExpressionNode(
-                        left: IntegerLiteralNode(token: tokens[0]),
-                        operator: BinaryOperatorNode(token: tokens[1]),
-                        right: IntegerLiteralNode(token: tokens[2])
+                        left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                        operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
+                        right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
                     ),
-                    operator: BinaryOperatorNode(token: tokens[3]),
-                    right: IntegerLiteralNode(token: tokens[4])
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[3])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[4]))
                 ),
-                semicolonToken: tokens[5]
+                semicolon: TokenNode(token: tokens[5])
             )
         )
     }
@@ -87,15 +87,15 @@ final class OperatorPriorityTest: XCTestCase {
             node,
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(token: tokens[0]),
-                    operator: BinaryOperatorNode(token: tokens[1]),
+                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
                     right: InfixOperatorExpressionNode(
-                        left: IntegerLiteralNode(token: tokens[2]),
-                        operator: BinaryOperatorNode(token: tokens[3]),
-                        right: IntegerLiteralNode(token: tokens[4])
+                        left: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                        operator: BinaryOperatorNode(operator: TokenNode(token: tokens[3])),
+                        right: IntegerLiteralNode(literal: TokenNode(token: tokens[4]))
                     )
                 ),
-                semicolonToken: tokens[5]
+                semicolon: TokenNode(token: tokens[5])
             )
         )
     }
@@ -122,18 +122,18 @@ final class OperatorPriorityTest: XCTestCase {
             BlockItemNode(
                 item: InfixOperatorExpressionNode(
                     left: TupleExpressionNode(
-                        parenthesisLeftToken: tokens[0],
+                        parenthesisLeft: TokenNode(token: tokens[0]),
                         expression: InfixOperatorExpressionNode(
-                            left: IntegerLiteralNode(token: tokens[1]),
-                            operator: BinaryOperatorNode(token: tokens[2]),
-                            right: IntegerLiteralNode(token: tokens[3])
+                            left: IntegerLiteralNode(literal: TokenNode(token: tokens[1])),
+                            operator: BinaryOperatorNode(operator: TokenNode(token: tokens[2])),
+                            right: IntegerLiteralNode(literal: TokenNode(token: tokens[3]))
                         ),
-                        parenthesisRightToken: tokens[4]
+                        parenthesisRight: TokenNode(token: tokens[4])
                     ),
-                    operator: BinaryOperatorNode(token: tokens[5]),
-                    right: IntegerLiteralNode(token: tokens[6])
+                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[5])),
+                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[6]))
                 ),
-                semicolonToken: tokens[7]
+                semicolon: TokenNode(token: tokens[7])
             )
         )
     }

@@ -23,13 +23,13 @@ final class WhileTest: XCTestCase {
             node,
             BlockItemNode(
                 item: WhileStatementNode(
-                    whileToken: tokens[0],
-                    parenthesisLeftToken: tokens[1],
-                    condition: IntegerLiteralNode(token: tokens[2]),
-                    parenthesisRightToken: tokens[3],
+                    while: TokenNode(token: tokens[0]),
+                    parenthesisLeft: TokenNode(token: tokens[1]),
+                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                    parenthesisRight: TokenNode(token: tokens[3]),
                     body: BlockItemNode(
-                        item: IntegerLiteralNode(token: tokens[4]),
-                        semicolonToken: tokens[5]
+                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
+                        semicolon: TokenNode(token: tokens[5])
                     )
                 )
             )

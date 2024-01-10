@@ -8,13 +8,13 @@ public struct Token: Equatable {
     public var sourceRange: SourceRange
 
     /// without trivia
-    public var value: String {
-        kind.value
+    public var text: String {
+        kind.text
     }
 
     /// with trivia
     public var description: String {
-        leadingTrivia + kind.value + trailingTrivia
+        leadingTrivia + kind.text + trailingTrivia
     }
 
     // MARK: - Initializer
@@ -72,7 +72,7 @@ public enum TokenKind: Equatable {
     case identifier(_ value: String)
     case type(_ kind: TypeKind)
 
-    public var value: String {
+    public var text: String {
         switch self {
         case .reserved(let kind):
             return kind.rawValue
@@ -84,7 +84,7 @@ public enum TokenKind: Equatable {
             return value
 
         case .stringLiteral(let value):
-            return value
+            return "\"" + value + "\""
 
         case .identifier(let value):
             return value

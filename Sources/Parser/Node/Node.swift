@@ -1,6 +1,8 @@
 import Tokenizer
 
 public enum NodeKind {
+    case token
+
     case integerLiteral
     case identifier
     case stringLiteral
@@ -38,6 +40,12 @@ public protocol NodeProtocol: Equatable {
     var kind: NodeKind { get }
     var sourceTokens: [Token] { get }
     var children: [any NodeProtocol] { get }
+}
+
+public extension NodeProtocol {
+    var sourceTokens: [Token] {
+        children.flatMap { $0.sourceTokens }
+    }
 }
 
 extension NodeProtocol {

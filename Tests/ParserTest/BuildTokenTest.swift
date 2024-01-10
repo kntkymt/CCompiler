@@ -7,7 +7,7 @@ func buildTokens(kinds: [TokenKind]) -> [Token] {
 
     for kind in kinds {
         let start = SourceLocation(line: 1, column: column)
-        column += kind.value.count
+        column += kind.text.count
         let end = SourceLocation(line: 1, column: column)
 
         let token = Token(

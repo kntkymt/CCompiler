@@ -27,17 +27,17 @@ final class ForTest: XCTestCase {
             node,
             BlockItemNode(
                 item: ForStatementNode(
-                    forToken: tokens[0],
-                    parenthesisLeftToken: tokens[1],
-                    pre: IntegerLiteralNode(token: tokens[2]),
-                    firstSemicolonToken: tokens[3],
-                    condition: IntegerLiteralNode(token: tokens[4]),
-                    secondSemicolonToken: tokens[5],
-                    post: IntegerLiteralNode(token: tokens[6]),
-                    parenthesisRightToken: tokens[7],
+                    for: TokenNode(token: tokens[0]),
+                    parenthesisLeft: TokenNode(token: tokens[1]),
+                    pre: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                    firstSemicolon: TokenNode(token: tokens[3]),
+                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
+                    secondSemicolon: TokenNode(token: tokens[5]),
+                    post: IntegerLiteralNode(literal: TokenNode(token: tokens[6])),
+                    parenthesisRight: TokenNode(token: tokens[7]),
                     body: BlockItemNode(
-                        item: IntegerLiteralNode(token: tokens[8]),
-                        semicolonToken: tokens[9]
+                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[8])),
+                        semicolon: TokenNode(token: tokens[9])
                     )
                 )
             )
@@ -71,22 +71,22 @@ final class ForTest: XCTestCase {
             node,
             BlockItemNode(
                 item: ForStatementNode(
-                    forToken: tokens[0],
-                    parenthesisLeftToken: tokens[1],
-                    pre: IntegerLiteralNode(token: tokens[2]),
-                    firstSemicolonToken: tokens[3],
-                    condition: IntegerLiteralNode(token: tokens[4]),
-                    secondSemicolonToken: tokens[5],
-                    post: IntegerLiteralNode(token: tokens[6]),
-                    parenthesisRightToken: tokens[7],
+                    for: TokenNode(token: tokens[0]),
+                    parenthesisLeft: TokenNode(token: tokens[1]),
+                    pre: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                    firstSemicolon: TokenNode(token: tokens[3]),
+                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
+                    secondSemicolon: TokenNode(token: tokens[5]),
+                    post: IntegerLiteralNode(literal: TokenNode(token: tokens[6])),
+                    parenthesisRight: TokenNode(token: tokens[7]),
                     body: BlockItemNode(
                         item: BlockStatementNode(
-                            braceLeftToken: tokens[8],
+                            braceLeft: TokenNode(token: tokens[8]),
                             items: [
-                                BlockItemNode(item: IntegerLiteralNode(token: tokens[9]), semicolonToken: tokens[10]),
-                                BlockItemNode(item: IntegerLiteralNode(token: tokens[11]), semicolonToken: tokens[12])
+                                BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[9])), semicolon: TokenNode(token: tokens[10])),
+                                BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[11])), semicolon: TokenNode(token: tokens[12]))
                             ],
-                            braceRightToken: tokens[13]
+                            braceRight: TokenNode(token: tokens[13])
                         )
                     )
                 )
@@ -114,17 +114,17 @@ final class ForTest: XCTestCase {
             node,
             BlockItemNode(
                 item: ForStatementNode(
-                    forToken: tokens[0],
-                    parenthesisLeftToken: tokens[1],
+                    for: TokenNode(token: tokens[0]),
+                    parenthesisLeft: TokenNode(token: tokens[1]),
                     pre: nil,
-                    firstSemicolonToken: tokens[2],
+                    firstSemicolon: TokenNode(token: tokens[2]),
                     condition: nil,
-                    secondSemicolonToken: tokens[3],
+                    secondSemicolon: TokenNode(token: tokens[3]),
                     post: nil,
-                    parenthesisRightToken: tokens[4],
+                    parenthesisRight: TokenNode(token: tokens[4]),
                     body: BlockItemNode(
-                        item: IntegerLiteralNode(token: tokens[5]),
-                        semicolonToken: tokens[6]
+                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[5])),
+                        semicolon: TokenNode(token: tokens[6])
                     )
                 )
             )

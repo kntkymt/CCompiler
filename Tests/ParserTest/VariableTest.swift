@@ -20,10 +20,10 @@ final class VariableTest: XCTestCase {
             node,
             BlockItemNode(
                 item: VariableDeclNode(
-                    type: TypeNode(typeToken: tokens[0]),
-                    identifierToken: tokens[1]
+                    type: TypeNode(type: TokenNode(token: tokens[0])),
+                    identifier: TokenNode(token: tokens[1])
                 ),
-                semicolonToken: tokens[2]
+                semicolon: TokenNode(token: tokens[2])
             )
         )
     }
@@ -46,12 +46,12 @@ final class VariableTest: XCTestCase {
             node,
             BlockItemNode(
                 item: VariableDeclNode(
-                    type: TypeNode(typeToken: tokens[0]),
-                    identifierToken: tokens[1],
-                    initializerToken: tokens[2],
-                    initializerExpr: IntegerLiteralNode(token: tokens[3])
+                    type: TypeNode(type: TokenNode(token: tokens[0])),
+                    identifier: TokenNode(token: tokens[1]),
+                    equal: TokenNode(token: tokens[2]),
+                    initializerExpr: IntegerLiteralNode(literal: TokenNode(token: tokens[3]))
                 ),
-                semicolonToken: tokens[4]
+                semicolon: TokenNode(token: tokens[4])
             )
         )
     }
@@ -74,12 +74,12 @@ final class VariableTest: XCTestCase {
             BlockItemNode(
                 item: VariableDeclNode(
                     type: PointerTypeNode(
-                        referenceType: TypeNode(typeToken: tokens[0]),
-                        pointerToken: tokens[1]
+                        referenceType: TypeNode(type: TokenNode(token: tokens[0])),
+                        pointer: TokenNode(token: tokens[1])
                     ),
-                    identifierToken: tokens[2]
+                    identifier: TokenNode(token: tokens[2])
                 ),
-                semicolonToken: tokens[3]
+                semicolon: TokenNode(token: tokens[3])
             )
         )
     }
@@ -104,14 +104,14 @@ final class VariableTest: XCTestCase {
                 item: VariableDeclNode(
                     type: PointerTypeNode(
                         referenceType: PointerTypeNode(
-                            referenceType: TypeNode(typeToken: tokens[0]),
-                            pointerToken: tokens[1]
+                            referenceType: TypeNode(type: TokenNode(token: tokens[0])),
+                            pointer: TokenNode(token: tokens[1])
                         ),
-                        pointerToken: tokens[2]
+                        pointer: TokenNode(token: tokens[2])
                     ),
-                    identifierToken: tokens[3]
+                    identifier: TokenNode(token: tokens[3])
                 ),
-                semicolonToken: tokens[4]
+                semicolon: TokenNode(token: tokens[4])
             )
         )
     }
@@ -135,14 +135,14 @@ final class VariableTest: XCTestCase {
             BlockItemNode(
                 item: VariableDeclNode(
                     type: ArrayTypeNode(
-                        elementType: TypeNode(typeToken: tokens[0]),
-                        squareLeftToken: tokens[2],
-                        arraySizeToken: tokens[3],
-                        squareRightToken: tokens[4]
+                        elementType: TypeNode(type: TokenNode(token: tokens[0])),
+                        squareLeft: TokenNode(token: tokens[2]),
+                        arraySize: TokenNode(token: tokens[3]),
+                        squareRight: TokenNode(token: tokens[4])
                     ),
-                    identifierToken: tokens[1]
+                    identifier: TokenNode(token: tokens[1])
                 ),
-                semicolonToken: tokens[5]
+                semicolon: TokenNode(token: tokens[5])
             )
         )
     }
@@ -172,23 +172,23 @@ final class VariableTest: XCTestCase {
             BlockItemNode(
                 item: VariableDeclNode(
                     type: ArrayTypeNode(
-                        elementType: TypeNode(typeToken: tokens[0]),
-                        squareLeftToken: tokens[2],
-                        arraySizeToken: tokens[3],
-                        squareRightToken: tokens[4]
+                        elementType: TypeNode(type: TokenNode(token: tokens[0])),
+                        squareLeft: TokenNode(token: tokens[2]),
+                        arraySize: TokenNode(token: tokens[3]),
+                        squareRight: TokenNode(token: tokens[4])
                     ),
-                    identifierToken: tokens[1],
-                    initializerToken: tokens[5],
+                    identifier: TokenNode(token: tokens[1]),
+                    equal: TokenNode(token: tokens[5]),
                     initializerExpr: ArrayExpressionNode(
-                        braceLeft: tokens[6],
+                        braceLeft: TokenNode(token: tokens[6]),
                         exprListNodes: [
-                            ExpressionListItemNode(expression: IntegerLiteralNode(token: tokens[7]), comma: tokens[8]),
-                            ExpressionListItemNode(expression: IntegerLiteralNode(token: tokens[9]))
+                            ExpressionListItemNode(expression: IntegerLiteralNode(literal: TokenNode(token: tokens[7])), comma: TokenNode(token: tokens[8])),
+                            ExpressionListItemNode(expression: IntegerLiteralNode(literal: TokenNode(token: tokens[9])))
                         ],
-                        braceRight: tokens[10]
+                        braceRight: TokenNode(token: tokens[10])
                     )
                 ),
-                semicolonToken: tokens[11]
+                semicolon: TokenNode(token: tokens[11])
             )
         )
     }
@@ -214,16 +214,16 @@ final class VariableTest: XCTestCase {
             BlockItemNode(
                 item: VariableDeclNode(
                     type: ArrayTypeNode(
-                        elementType: TypeNode(typeToken: tokens[0]),
-                        squareLeftToken: tokens[2],
-                        arraySizeToken: tokens[3],
-                        squareRightToken: tokens[4]
+                        elementType: TypeNode(type: TokenNode(token: tokens[0])),
+                        squareLeft: TokenNode(token: tokens[2]),
+                        arraySize: TokenNode(token: tokens[3]),
+                        squareRight: TokenNode(token: tokens[4])
                     ),
-                    identifierToken: tokens[1],
-                    initializerToken: tokens[5],
-                    initializerExpr: StringLiteralNode(token: tokens[6])
+                    identifier: TokenNode(token: tokens[1]),
+                    equal: TokenNode(token: tokens[5]),
+                    initializerExpr: StringLiteralNode(literal: TokenNode(token: tokens[6]))
                 ),
-                semicolonToken: tokens[7]
+                semicolon: TokenNode(token: tokens[7])
             )
         )
     }
@@ -248,14 +248,14 @@ final class VariableTest: XCTestCase {
             BlockItemNode(
                 item: VariableDeclNode(
                     type: ArrayTypeNode(
-                        elementType: PointerTypeNode(referenceType: TypeNode(typeToken: tokens[0]), pointerToken: tokens[1]),
-                        squareLeftToken: tokens[3],
-                        arraySizeToken: tokens[4],
-                        squareRightToken: tokens[5]
+                        elementType: PointerTypeNode(referenceType: TypeNode(type: TokenNode(token: tokens[0])), pointer: TokenNode(token: tokens[1])),
+                        squareLeft: TokenNode(token: tokens[3]),
+                        arraySize: TokenNode(token: tokens[4]),
+                        squareRight: TokenNode(token: tokens[5])
                     ),
-                    identifierToken: tokens[2]
+                    identifier: TokenNode(token: tokens[2])
                 ),
-                semicolonToken: tokens[6]
+                semicolon: TokenNode(token: tokens[6])
             )
         )
     }
@@ -278,10 +278,10 @@ final class VariableTest: XCTestCase {
                 statements: [
                     BlockItemNode(
                         item: VariableDeclNode(
-                            type: TypeNode(typeToken: tokens[0]),
-                            identifierToken: tokens[1]
+                            type: TypeNode(type: TokenNode(token: tokens[0])),
+                            identifier: TokenNode(token: tokens[1])
                         ),
-                        semicolonToken: tokens[2]
+                        semicolon: TokenNode(token: tokens[2])
                     )
                 ]
             )
@@ -308,12 +308,12 @@ final class VariableTest: XCTestCase {
                     BlockItemNode(
                         item: VariableDeclNode(
                             type: PointerTypeNode(
-                                referenceType: TypeNode(typeToken: tokens[0]),
-                                pointerToken: tokens[1]
+                                referenceType: TypeNode(type: TokenNode(token: tokens[0])),
+                                pointer: TokenNode(token: tokens[1])
                             ),
-                            identifierToken: tokens[2]
+                            identifier: TokenNode(token: tokens[2])
                         ),
-                        semicolonToken: tokens[3]
+                        semicolon: TokenNode(token: tokens[3])
                     )
                 ]
             )
