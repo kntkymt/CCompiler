@@ -591,6 +591,12 @@ public final class Generator {
                 } else {
                     throw GenerateError.invalidSyntax(location: node.sourceTokens[0].sourceRange.start)
                 }
+
+            case .sizeof:
+                // FIXME: どうやって式の型を推測する？
+                // 今はとりあえず固定で8
+                result += "    mov x0, #8\n"
+                result += "    str x0, [sp, #-16]!\n"
             }
 
             return result
