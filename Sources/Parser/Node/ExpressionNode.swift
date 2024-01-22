@@ -36,6 +36,9 @@ public class PrefixOperatorExpressionNode: NodeProtocol {
 
         /// `&`
         case address
+
+        /// `sizeof`
+        case sizeof
     }
 
     // MARK: - Property
@@ -61,6 +64,9 @@ public class PrefixOperatorExpressionNode: NodeProtocol {
 
         case .reserved(.and):
             return .address
+
+        case .keyword(.sizeof):
+            return .sizeof
 
         default:
             fatalError()
