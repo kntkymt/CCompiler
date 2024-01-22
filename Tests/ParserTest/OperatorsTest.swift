@@ -373,17 +373,18 @@ final class OperatorsTest: XCTestCase {
         )
         let node = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(node.sourceTokens, tokens)
+
         XCTAssertEqual(
             node,
             BlockItemNode(
-                item: IntegerLiteralNode(
-                    literal: TokenNode(token: Token(
-                        kind: .number("8"),
-                        sourceRange: SourceRange(
-                            start: SourceLocation(line: 1, column: 1),
-                            end: SourceLocation(line: 1, column: 1)
-                        )
-                    ))
+                item: PrefixOperatorExpressionNode(
+                    operator: TokenNode(token: tokens[0]),
+                    expression: TupleExpressionNode(
+                        parenthesisLeft: TokenNode(token: tokens[1]),
+                        expression: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
+                        parenthesisRight: TokenNode(token: tokens[3])
+                    )
                 ),
                 semicolon: TokenNode(token: tokens[4])
             )

@@ -614,12 +614,10 @@ public final class Parser {
 
         switch tokens[index].kind {
         case .keyword(.sizeof):
-            try consumeKeywordToken(.sizeof)
-
-            _ = try unary()
-
-            // FIXME: どうやって式の型を判断する？
-            return IntegerLiteralNode(literal: TokenNode(token: Token(kind: .number("8"), sourceRange: SourceRange(start: .startOfFile, end: .startOfFile))))
+            return PrefixOperatorExpressionNode(
+                operator: try consumeKeywordToken(.sizeof),
+                expression: try unary()
+            )
 
         case .reserved(.add):
             return PrefixOperatorExpressionNode(
