@@ -14,6 +14,10 @@ final class KeywordsTest: XCTestCase {
                 Token(
                     kind: .keyword(.return),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 7))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 7))
                 )
             ]
         )
@@ -35,6 +39,10 @@ final class KeywordsTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 9))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 9), end: SourceLocation(line: 1, column: 9))
                 )
             ]
         )
@@ -55,6 +63,10 @@ final class KeywordsTest: XCTestCase {
                 Token(
                     kind: .reserved(.semicolon),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 8))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 8))
                 )
             ]
         )
@@ -71,6 +83,10 @@ final class KeywordsTest: XCTestCase {
                 Token(
                     kind: .identifier("returnX"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 8))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 8))
                 )
             ]
         )
@@ -87,6 +103,10 @@ final class KeywordsTest: XCTestCase {
                 Token(
                     kind: .identifier("return2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 8))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 8))
                 )
             ]
         )
@@ -124,6 +144,10 @@ final class KeywordsTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 11), end: SourceLocation(line: 1, column: 12))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 12), end: SourceLocation(line: 1, column: 12))
                 )
             ]
         )
@@ -153,6 +177,10 @@ final class KeywordsTest: XCTestCase {
                     kind: .reserved(.parenthesisRight),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 9))
                 ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 9), end: SourceLocation(line: 1, column: 9))
+                )
             ]
         )
     }
@@ -197,6 +225,10 @@ final class KeywordsTest: XCTestCase {
                     kind: .reserved(.parenthesisRight),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 10), end: SourceLocation(line: 1, column: 11))
                 ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 11), end: SourceLocation(line: 1, column: 11))
+                )
             ]
         )
     }
@@ -225,6 +257,10 @@ final class KeywordsTest: XCTestCase {
                     kind: .reserved(.parenthesisRight),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 9), end: SourceLocation(line: 1, column: 10))
                 ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 10), end: SourceLocation(line: 1, column: 10))
+                )
             ]
         )
     }

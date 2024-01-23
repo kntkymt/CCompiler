@@ -21,6 +21,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )
@@ -45,6 +49,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )
@@ -69,6 +77,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )
@@ -93,6 +105,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )
@@ -113,6 +129,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .identifier("a"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 3))
                 )
             ]
         )
@@ -137,6 +157,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .reserved(.parenthesisRight),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )
@@ -161,6 +185,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .reserved(.squareRight),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )
@@ -189,6 +217,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .reserved(.braceRight),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 5))
                 )
             ]
         )
@@ -213,6 +245,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 5))
                 )
             ]
         )
@@ -237,6 +273,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 5))
                 )
             ]
         )
@@ -261,6 +301,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )
@@ -285,6 +329,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 5))
                 )
             ]
         )
@@ -309,6 +357,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )
@@ -333,6 +385,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 5))
                 )
             ]
         )
@@ -358,6 +414,10 @@ final class TokensTest: XCTestCase {
                     kind: .number("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
+                )
             ]
         )
     }
@@ -378,6 +438,10 @@ final class TokensTest: XCTestCase {
                     kind: .reserved(.semicolon),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 3))
+                )
             ]
         )
     }
@@ -401,6 +465,10 @@ final class TokensTest: XCTestCase {
                 Token(
                     kind: .number("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )

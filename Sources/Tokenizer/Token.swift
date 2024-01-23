@@ -72,6 +72,8 @@ public enum TokenKind: Equatable {
     case identifier(_ value: String)
     case type(_ kind: TypeKind)
 
+    case endOfFile
+
     public var text: String {
         switch self {
         case .reserved(let kind):
@@ -91,6 +93,9 @@ public enum TokenKind: Equatable {
 
         case .type(let kind):
             return kind.rawValue
+
+        case .endOfFile:
+            return ""
         }
     }
 

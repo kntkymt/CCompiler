@@ -33,8 +33,6 @@ public class Tokenizer {
 
         while index < charactors.count {
             let leadingTrivia = extractTrivia(untilBeforeNewLine: false)
-            // FIXME: triviaで終わっていたら無視, EOF TokenのleadingTriviaにして解決すべき
-            guard index < charactors.count else { break }
 
             // sourceLocationにtriviaは含まない
             let startLocation = currentSourceLocation
@@ -50,6 +48,10 @@ public class Tokenizer {
                 sourceRange: SourceRange(start: startLocation, end: endLocation)
             )
             tokens.append(token)
+        }
+
+        if let lastToken = tokens.last, lastToken.kind != .endOfFile {
+            tokens.append(Token(kind: .endOfFile, sourceRange: SourceRange(start: currentSourceLocation, end: currentSourceLocation)))
         }
 
         return tokens
@@ -139,7 +141,7 @@ public class Tokenizer {
                     index += 1
                 }
 
-                if !untilBeforeNewLine {
+                if index < charactors.count, !untilBeforeNewLine {
                     result.append(charactors[index])
                     index += 1
                 }
@@ -173,6 +175,10 @@ public class Tokenizer {
     private let typeKinds = TokenKind.TypeKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
 
     private func extractTokenKind() throws -> TokenKind {
+        if index >= charactors.count {
+            return .endOfFile
+        }
+
         if charactors[index].isNumber {
             return extractNumber()
         }
