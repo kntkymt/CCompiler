@@ -12,6 +12,7 @@ final class ParseErrorTest: XCTestCase {
                         .number("1"),
                         .reserved(.add),
                         .reserved(.semicolon),
+                        .endOfFile
                     ]
                 )
             ).stmt()
@@ -28,6 +29,7 @@ final class ParseErrorTest: XCTestCase {
                         .reserved(.mul),
                         .number("1"),
                         .reserved(.semicolon),
+                        .endOfFile
                     ]
                 )
             ).stmt()
@@ -46,6 +48,7 @@ final class ParseErrorTest: XCTestCase {
                         .reserved(.mul),
                         .number("2"),
                         .reserved(.semicolon),
+                        .endOfFile
                     ]
                 )
             ).stmt()
@@ -70,6 +73,7 @@ final class ParseErrorTest: XCTestCase {
                         .number("1"),
                         .reserved(.add),
                         .number("2"),
+                        .endOfFile
                     ]
                 )
             ).stmt()

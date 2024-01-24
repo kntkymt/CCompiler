@@ -9,12 +9,13 @@ final class VariableTest: XCTestCase {
             kinds: [
                 .type(.int),
                 .identifier("a"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,
@@ -35,12 +36,13 @@ final class VariableTest: XCTestCase {
                 .identifier("a"),
                 .reserved(.assign),
                 .number("1"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,
@@ -62,12 +64,13 @@ final class VariableTest: XCTestCase {
                 .type(.int),
                 .reserved(.mul),
                 .identifier("a"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,
@@ -91,12 +94,13 @@ final class VariableTest: XCTestCase {
                 .reserved(.mul),
                 .reserved(.mul),
                 .identifier("a"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,
@@ -125,7 +129,8 @@ final class VariableTest: XCTestCase {
                 .reserved(.squareLeft),
                 .number("4"),
                 .reserved(.squareRight),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
@@ -162,7 +167,8 @@ final class VariableTest: XCTestCase {
                 .reserved(.comma),
                 .number("2"),
                 .reserved(.braceRight),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
@@ -204,7 +210,8 @@ final class VariableTest: XCTestCase {
                 .reserved(.squareRight),
                 .reserved(.assign),
                 .stringLiteral("ai"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
@@ -238,7 +245,8 @@ final class VariableTest: XCTestCase {
                 .reserved(.squareLeft),
                 .number("4"),
                 .reserved(.squareRight),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
@@ -265,7 +273,8 @@ final class VariableTest: XCTestCase {
             kinds: [
                 .type(.int),
                 .identifier("a"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).parse()
@@ -283,7 +292,8 @@ final class VariableTest: XCTestCase {
                         ),
                         semicolon: TokenNode(token: tokens[2])
                     )
-                ]
+                ], 
+                endOfFile: TokenNode(token: tokens[3])
             )
         )
     }
@@ -294,7 +304,8 @@ final class VariableTest: XCTestCase {
                 .type(.int),
                 .reserved(.mul),
                 .identifier("a"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).parse()
@@ -315,7 +326,8 @@ final class VariableTest: XCTestCase {
                         ),
                         semicolon: TokenNode(token: tokens[3])
                     )
-                ]
+                ],
+                endOfFile: TokenNode(token: tokens[4])
             )
         )
     }

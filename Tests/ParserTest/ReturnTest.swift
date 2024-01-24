@@ -10,11 +10,12 @@ final class ReturnTest: XCTestCase {
                 .keyword(.return),
                 .number("2"),
                 .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,
@@ -35,6 +36,7 @@ final class ReturnTest: XCTestCase {
                     kinds: [
                         .keyword(.return),
                         .reserved(.semicolon),
+                        .endOfFile
                     ]
                 )
             ).stmt()

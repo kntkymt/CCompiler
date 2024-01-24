@@ -19,10 +19,6 @@ public final class Parser {
 
     @discardableResult
     func consumeIdentifierToken() throws -> TokenNode {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
-
         if case .identifier = tokens[index].kind {
             let token = tokens[index]
             index += 1
@@ -34,10 +30,6 @@ public final class Parser {
 
     @discardableResult
     func consumeNumberToken() throws -> TokenNode {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
-
         if case .number = tokens[index].kind {
             let token = tokens[index]
             index += 1
@@ -49,10 +41,6 @@ public final class Parser {
 
     @discardableResult
     func consumeStringLiteralToken() throws -> TokenNode {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
-
         if case .stringLiteral = tokens[index].kind {
             let token = tokens[index]
             index += 1
@@ -64,10 +52,6 @@ public final class Parser {
 
     @discardableResult
     func consumeReservedToken(_ reservedKind: TokenKind.ReservedKind) throws -> TokenNode {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
-
         if case .reserved(let kind) = tokens[index].kind, kind == reservedKind {
             let token = tokens[index]
             index += 1
@@ -79,10 +63,6 @@ public final class Parser {
 
     @discardableResult
     func consumeKeywordToken(_ keywordKind: TokenKind.KeywordKind) throws -> TokenNode {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
-
         if case .keyword(let kind) = tokens[index].kind, kind == keywordKind {
             let token = tokens[index]
             index += 1
@@ -94,11 +74,18 @@ public final class Parser {
 
     @discardableResult
     func consumeTypeToken() throws -> TokenNode {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
-
         if case .type = tokens[index].kind {
+            let token = tokens[index]
+            index += 1
+            return TokenNode(token: token)
+        } else {
+            throw ParseError.invalidSyntax(location: tokens[index].sourceRange.start)
+        }
+    }
+
+    @discardableResult
+    func consumeEndOfFileToken() throws -> TokenNode {
+        if case .endOfFile = tokens[index].kind {
             let token = tokens[index]
             index += 1
             return TokenNode(token: token)
@@ -124,17 +111,17 @@ public final class Parser {
     func program() throws -> SourceFileNode {
         var statements: [BlockItemNode] = []
 
-        while index < tokens.count {
+        while tokens[index].kind != .endOfFile {
 
             let type = try type()
             let identifier = try consumeIdentifierToken()
 
             // functionDecl = type ident "(" functionParameters? ")" block
-            if index < tokens.count, case .reserved(.parenthesisLeft) = tokens[index].kind {
+            if case .reserved(.parenthesisLeft) = tokens[index].kind {
                 let parenthesisLeft = try consumeReservedToken(.parenthesisLeft)
 
                 var parameters: [FunctionParameterNode] = []
-                if index < tokens.count, case .type = tokens[index].kind {
+                if case .type = tokens[index].kind {
                     parameters = try functionParameters()
                 }
 
@@ -155,19 +142,17 @@ public final class Parser {
             }
         }
 
-        return SourceFileNode(statements: statements)
+        let endOfFile = try consumeEndOfFileToken()
+        return SourceFileNode(statements: statements, endOfFile: endOfFile)
     }
 
     // functionParameters = functionParameter+
     func functionParameters() throws -> [FunctionParameterNode] {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
         var results: [FunctionParameterNode] = []
 
         results.append(try functionParameter())
 
-        while index < tokens.count {
+        while tokens[index].kind != .endOfFile {
             if case .reserved(.parenthesisRight) = tokens[index].kind {
                 break
             }
@@ -183,7 +168,7 @@ public final class Parser {
         var type = try type()
         let identifier = try consumeIdentifierToken()
 
-        if index < tokens.count, case .reserved(.squareLeft) = tokens[index].kind {
+        if case .reserved(.squareLeft) = tokens[index].kind {
             type = ArrayTypeNode(
                 elementType: type,
                 squareLeft: try consumeReservedToken(.squareLeft),
@@ -192,7 +177,7 @@ public final class Parser {
             )
         }
 
-        if index < tokens.count, case .reserved(.comma) = tokens[index].kind {
+        if case .reserved(.comma) = tokens[index].kind {
             return FunctionParameterNode(
                 type: type,
                 identifier: identifier,
@@ -214,9 +199,6 @@ public final class Parser {
     //         | "for" "(" expr? ";" expr? ";" expr? ")" stmt
     //         | "return" expr ";"
     func stmt() throws -> BlockItemNode {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
         switch tokens[index].kind {
         case .reserved(.braceLeft):
             return BlockItemNode(item: try block())
@@ -235,7 +217,7 @@ public final class Parser {
 
             var elseToken: TokenNode?
             var falseStatement: BlockItemNode?
-            if index < tokens.count, case .keyword(.else) = tokens[index].kind {
+            if case .keyword(.else) = tokens[index].kind {
                 elseToken = try consumeKeywordToken(.else)
                 falseStatement = try stmt()
             }
@@ -334,8 +316,8 @@ public final class Parser {
         let braceLeft = try consumeReservedToken(.braceLeft)
 
         var items: [BlockItemNode] = []
-        while index < tokens.count {
-            if index < tokens.count, case .reserved(.braceRight) = tokens[index].kind {
+        while tokens[index].kind != .endOfFile {
+            if case .reserved(.braceRight) = tokens[index].kind {
                 break
             }
 
@@ -356,7 +338,7 @@ public final class Parser {
         var type = if let variableType { variableType } else { try type() }
         let identifier = if let identifier { identifier } else { try consumeIdentifierToken() }
 
-        if index < tokens.count, case .reserved(.squareLeft) = tokens[index].kind {
+        if case .reserved(.squareLeft) = tokens[index].kind {
             type = ArrayTypeNode(
                 elementType: type,
                 squareLeft: try consumeReservedToken(.squareLeft),
@@ -365,7 +347,7 @@ public final class Parser {
             )
         }
 
-        if index < tokens.count, case .reserved(.assign) = tokens[index].kind {
+        if case .reserved(.assign) = tokens[index].kind {
             let initializer = try consumeReservedToken(.assign)
 
             switch tokens[index].kind {
@@ -409,7 +391,7 @@ public final class Parser {
     func type() throws -> any TypeNodeProtocol {
         var node: any TypeNodeProtocol = TypeNode(type: try consumeTypeToken())
 
-        while index < tokens.count {
+        while tokens[index].kind != .endOfFile {
             if case .reserved(.mul) = tokens[index].kind {
                 let mulToken = try consumeReservedToken(.mul)
                 node = PointerTypeNode(referenceType: node, pointer: mulToken)
@@ -430,10 +412,6 @@ public final class Parser {
     func assign() throws -> any NodeProtocol {
         var node = try equality()
 
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
-
         if case .reserved(.assign) = tokens[index].kind {
             let token = try consumeReservedToken(.assign)
             let rightNode = try assign()
@@ -452,7 +430,7 @@ public final class Parser {
     func equality() throws -> any NodeProtocol {
         var node = try relational()
 
-        while index < tokens.count {
+        while tokens[index].kind != .endOfFile {
             switch tokens[index].kind {
             case .reserved(.equal):
                 let token = try consumeReservedToken(.equal)
@@ -486,7 +464,7 @@ public final class Parser {
     func relational() throws -> any NodeProtocol {
         var node = try add()
 
-        while index < tokens.count {
+        while tokens[index].kind != .endOfFile {
             switch tokens[index].kind {
             case .reserved(.lessThan):
                 let token = try consumeReservedToken(.lessThan)
@@ -540,7 +518,7 @@ public final class Parser {
     func add() throws -> any NodeProtocol {
         var node = try mul()
 
-        while index < tokens.count {
+        while tokens[index].kind != .endOfFile {
             switch tokens[index].kind {
             case .reserved(.add):
                 let addToken = try consumeReservedToken(.add)
@@ -574,7 +552,7 @@ public final class Parser {
     func mul() throws -> any NodeProtocol {
         var node = try unary()
 
-        while index < tokens.count {
+        while tokens[index].kind != .endOfFile {
             switch tokens[index].kind {
             case .reserved(.mul):
                 let mulToken = try consumeReservedToken(.mul)
@@ -608,10 +586,6 @@ public final class Parser {
     //       | ("+" | "-")? primary
     //       | ("*" | "&") unary
     func unary() throws -> any NodeProtocol {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
-
         switch tokens[index].kind {
         case .keyword(.sizeof):
             return PrefixOperatorExpressionNode(
@@ -659,10 +633,6 @@ public final class Parser {
     //         | ident ( ("( exprList? )") | ("[" expr "]") )?
     //         | "(" expr ")"
     func primary() throws -> any NodeProtocol {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
-
         switch tokens[index].kind {
         case .reserved(.parenthesisLeft):
             return TupleExpressionNode(
@@ -686,11 +656,11 @@ public final class Parser {
         case .identifier:
             let identifierToken = try consumeIdentifierToken()
 
-            if index < tokens.count, case .reserved(.parenthesisLeft) = tokens[index].kind {
+            if case .reserved(.parenthesisLeft) = tokens[index].kind {
                 let parenthesisLeft = try consumeReservedToken(.parenthesisLeft)
 
                 var argments: [ExpressionListItemNode] = []
-                if index < tokens.count {
+                if tokens[index].kind != .endOfFile {
                     if case .reserved(.parenthesisRight) = tokens[index].kind {
 
                     } else {
@@ -706,7 +676,7 @@ public final class Parser {
                     arguments: argments,
                     parenthesisRight: parenthesisRight
                 )
-            } else if index < tokens.count, case .reserved(.squareLeft) = tokens[index].kind {
+            } else if case .reserved(.squareLeft) = tokens[index].kind {
                 return SubscriptCallExpressionNode(
                     identifier: IdentifierNode(baseName: identifierToken),
                     squareLeft: try consumeReservedToken(.squareLeft),
@@ -724,13 +694,10 @@ public final class Parser {
 
     // exprList = exprList+
     func exprList() throws -> [ExpressionListItemNode] {
-        if index >= tokens.count {
-            throw ParseError.invalidSyntax(location: tokens.last.map { $0.sourceRange.end } ?? .startOfFile)
-        }
         var results: [ExpressionListItemNode] = []
         results.append(try exprListItem())
 
-        while index < tokens.count {
+        while tokens[index].kind != .endOfFile {
             if case .reserved = tokens[index].kind {
                 // ), }だったら
                 break
@@ -745,7 +712,7 @@ public final class Parser {
     // exprListItem = expr ","?
     func exprListItem() throws -> ExpressionListItemNode {
         let expr = try expr()
-        if index < tokens.count, case .reserved(.comma) = tokens[index].kind {
+        if case .reserved(.comma) = tokens[index].kind {
             return ExpressionListItemNode(
                 expression: expr,
                 comma: try consumeReservedToken(.comma)

@@ -12,12 +12,13 @@ final class WhileTest: XCTestCase {
                 .number("1"),
                 .reserved(.parenthesisRight),
                 .number("2"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,
@@ -45,7 +46,8 @@ final class WhileTest: XCTestCase {
                         .reserved(.parenthesisLeft),
                         .number("1"),
                         .reserved(.parenthesisRight),
-                        .reserved(.semicolon)
+                        .reserved(.semicolon),
+                        .endOfFile
                     ]
                 )
             ).stmt()

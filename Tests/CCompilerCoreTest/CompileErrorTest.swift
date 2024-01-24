@@ -48,7 +48,7 @@ final class CompileErrorTest: XCTestCase {
         do {
             _ = try compile("int main(){a = 0;}")
         } catch let error as CompileError {
-            XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 19)))
+            XCTAssertEqual(error, .noSuchVariable(variableName: "a", location: SourceLocation(line: 1, column: 12)))
         }
     }
 }

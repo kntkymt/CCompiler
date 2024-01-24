@@ -255,14 +255,16 @@ public class SourceFileNode: NodeProtocol {
 
     public let kind: NodeKind = .sourceFile
     public var children: [any NodeProtocol] {
-        statements
+        statements + [endOfFile]
     }
 
     public let statements: [BlockItemNode]
+    public let endOfFile: TokenNode
 
     // MARK: - Initializer
 
-    public init(statements: [BlockItemNode]) {
+    public init(statements: [BlockItemNode], endOfFile: TokenNode) {
         self.statements = statements
+        self.endOfFile = endOfFile
     }
 }
