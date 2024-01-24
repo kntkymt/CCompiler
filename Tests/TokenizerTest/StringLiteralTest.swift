@@ -14,6 +14,10 @@ final class StringLiteralTest: XCTestCase {
                 Token(
                     kind: .stringLiteral("aaaa"),
                     sourceRange: SourceRange(start: .init(line: 1, column: 1), end: .init(line: 1, column: 7))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 7))
                 )
             ]
         )

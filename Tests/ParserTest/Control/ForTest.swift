@@ -60,7 +60,7 @@ final class ForTest: XCTestCase {
                 .reserved(.semicolon),
                 .number("5"),
                 .reserved(.semicolon),
-                .reserved(.braceRight),
+                .reserved(.braceRight)
             ]
         )
         let node = try Parser(tokens: tokens).stmt()

@@ -14,6 +14,10 @@ final class IdentifierTest: XCTestCase {
                 Token(
                     kind: .identifier("a"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 2))
                 )
             ]
         )
@@ -38,6 +42,10 @@ final class IdentifierTest: XCTestCase {
                 Token(
                     kind: .identifier("b"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 4))
                 )
             ]
         )
@@ -54,6 +62,10 @@ final class IdentifierTest: XCTestCase {
                 Token(
                     kind: .identifier("ab"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 3))
                 )
             ]
         )
@@ -75,6 +87,10 @@ final class IdentifierTest: XCTestCase {
                 Token(
                     kind: .identifier("hoge"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 8))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 8))
                 )
             ]
         )
@@ -91,6 +107,10 @@ final class IdentifierTest: XCTestCase {
                 Token(
                     kind: .identifier("AB"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 3))
                 )
             ]
         )
@@ -107,6 +127,10 @@ final class IdentifierTest: XCTestCase {
                 Token(
                     kind: .identifier("A2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 3))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 3))
                 )
             ]
         )
@@ -123,6 +147,10 @@ final class IdentifierTest: XCTestCase {
                 Token(
                     kind: .identifier("_"), 
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
+                ),
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 2))
                 )
             ]
         )

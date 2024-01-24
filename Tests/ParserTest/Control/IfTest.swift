@@ -12,12 +12,13 @@ final class IfTest: XCTestCase {
                 .number("1"),
                 .reserved(.parenthesisRight),
                 .number("2"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,
@@ -49,12 +50,13 @@ final class IfTest: XCTestCase {
                 .reserved(.semicolon),
                 .keyword(.else),
                 .number("3"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,

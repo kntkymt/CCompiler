@@ -12,7 +12,7 @@ final class OperatorPriorityTest: XCTestCase {
                 .number("2"),
                 .reserved(.add),
                 .number("3"),
-                .reserved(.semicolon),
+                .reserved(.semicolon)
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
@@ -44,7 +44,7 @@ final class OperatorPriorityTest: XCTestCase {
                 .number("2"),
                 .reserved(.mul),
                 .number("3"),
-                .reserved(.semicolon),
+                .reserved(.semicolon)
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
@@ -76,7 +76,7 @@ final class OperatorPriorityTest: XCTestCase {
                 .number("2"),
                 .reserved(.mul),
                 .number("3"),
-                .reserved(.semicolon),
+                .reserved(.semicolon)
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
@@ -110,7 +110,7 @@ final class OperatorPriorityTest: XCTestCase {
                 .reserved(.parenthesisRight),
                 .reserved(.mul),
                 .number("3"),
-                .reserved(.semicolon),
+                .reserved(.semicolon)
             ]
         )
         let node = try Parser(tokens: tokens).stmt()

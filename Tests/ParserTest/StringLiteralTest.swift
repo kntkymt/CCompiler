@@ -8,12 +8,13 @@ final class StringLiteralTest: XCTestCase {
         let tokens: [Token] = buildTokens(
             kinds: [
                 .stringLiteral("a"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,
@@ -30,12 +31,13 @@ final class StringLiteralTest: XCTestCase {
                 .identifier("a"),
                 .reserved(.assign),
                 .stringLiteral("a"),
-                .reserved(.semicolon)
+                .reserved(.semicolon),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
             node,

@@ -16,7 +16,8 @@ final class FunctionTest: XCTestCase {
                 .reserved(.semicolon),
                 .number("2"),
                 .reserved(.semicolon),
-                .reserved(.braceRight)
+                .reserved(.braceRight),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).parse()
@@ -44,7 +45,8 @@ final class FunctionTest: XCTestCase {
                             )
                         )
                     )
-                ]
+                ],
+                endOfFile: TokenNode(token: tokens[10])
             )
         )
     }
@@ -62,7 +64,8 @@ final class FunctionTest: XCTestCase {
                 .reserved(.semicolon),
                 .number("2"),
                 .reserved(.semicolon),
-                .reserved(.braceRight)
+                .reserved(.braceRight),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).parse()
@@ -90,7 +93,8 @@ final class FunctionTest: XCTestCase {
                             )
                         )
                     )
-                ]
+                ],
+                endOfFile: TokenNode(token: tokens[11])
             )
         )
     }
@@ -137,7 +141,8 @@ final class FunctionTest: XCTestCase {
                 .reserved(.braceLeft),
                 .number("1"),
                 .reserved(.semicolon),
-                .reserved(.braceRight)
+                .reserved(.braceRight),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).parse()
@@ -167,7 +172,8 @@ final class FunctionTest: XCTestCase {
                             )
                         )
                     )
-                ]
+                ],
+                endOfFile: TokenNode(token: tokens[13])
             )
         )
     }
@@ -226,7 +232,8 @@ final class FunctionTest: XCTestCase {
                 .reserved(.braceLeft),
                 .number("1"),
                 .reserved(.semicolon),
-                .reserved(.braceRight)
+                .reserved(.braceRight),
+                .endOfFile
             ]
         )
         let node = try Parser(tokens: tokens).parse()
@@ -269,7 +276,8 @@ final class FunctionTest: XCTestCase {
                             )
                         )
                     )
-                ]
+                ],
+                endOfFile: TokenNode(token: tokens[16])
             )
         )
     }
