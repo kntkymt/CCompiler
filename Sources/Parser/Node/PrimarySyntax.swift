@@ -1,14 +1,14 @@
 import Tokenizer
 
-public class TokenNode: NodeProtocol {
+public class TokenSyntax: SyntaxProtocol {
 
     // MARK: - Property
 
-    public let kind: NodeKind = .token
+    public let kind: SyntaxKind = .token
     public var sourceTokens: [Token] {
         [token]
     }
-    public let children: [any NodeProtocol] = []
+    public let children: [any SyntaxProtocol] = []
     
     public let token: Token
 
@@ -29,61 +29,61 @@ public class TokenNode: NodeProtocol {
     }
 }
 
-public class IntegerLiteralNode: NodeProtocol {
+public class IntegerLiteralSyntax: SyntaxProtocol {
 
     // MARK: - Property
 
-    public let kind: NodeKind = .integerLiteral
-    public var children: [any NodeProtocol] {
+    public let kind: SyntaxKind = .integerLiteral
+    public var children: [any SyntaxProtocol] {
         [literal]
     }
 
-    public let literal: TokenNode
+    public let literal: TokenSyntax
 
     // MARK: - Initializer
 
-    public init(literal: TokenNode) {
+    public init(literal: TokenSyntax) {
         self.literal = literal
     }
 }
 
-public class StringLiteralNode: NodeProtocol {
+public class StringLiteralSyntax: SyntaxProtocol {
 
     // MARK: - Property
 
-    public let kind: NodeKind = .stringLiteral
-    public var children: [any NodeProtocol] {
+    public let kind: SyntaxKind = .stringLiteral
+    public var children: [any SyntaxProtocol] {
         [literal]
     }
 
-    public let literal: TokenNode
+    public let literal: TokenSyntax
 
     // MARK: - Initializer
 
-    public init(literal: TokenNode) {
+    public init(literal: TokenSyntax) {
         self.literal = literal
     }
 }
 
-public class IdentifierNode: NodeProtocol {
+public class IdentifierSyntax: SyntaxProtocol {
 
     // MARK: - Property
 
-    public let kind: NodeKind = .identifier
-    public var children: [any NodeProtocol] {
+    public let kind: SyntaxKind = .identifier
+    public var children: [any SyntaxProtocol] {
         [baseName]
     }
 
-    public let baseName: TokenNode
+    public let baseName: TokenSyntax
 
     // MARK: - Initializer
 
-    public init(baseName: TokenNode) {
+    public init(baseName: TokenSyntax) {
         self.baseName = baseName
     }
 }
 
-public class BinaryOperatorNode: NodeProtocol {
+public class BinaryOperatorSyntax: SyntaxProtocol {
 
     public enum OperatorKind {
         /// `+`
@@ -119,7 +119,7 @@ public class BinaryOperatorNode: NodeProtocol {
 
     // MARK: - Property
 
-    public let kind: NodeKind = .binaryOperator
+    public let kind: SyntaxKind = .binaryOperator
 
     public var operatorKind: OperatorKind {
         switch `operator`.tokenKind {
@@ -157,33 +157,33 @@ public class BinaryOperatorNode: NodeProtocol {
             fatalError()
         }
     }
-    public var children: [any NodeProtocol] {
+    public var children: [any SyntaxProtocol] {
         [`operator`]
     }
 
-    public let `operator`: TokenNode
+    public let `operator`: TokenSyntax
 
     // MARK: - Initializer
 
-    public init(operator: TokenNode) {
+    public init(operator: TokenSyntax) {
         self.operator = `operator`
     }
 }
 
-public class AssignNode: NodeProtocol {
+public class AssignSyntax: SyntaxProtocol {
 
     // MARK: - Property
 
-    public let kind: NodeKind = .assign
-    public var children: [any NodeProtocol] {
+    public let kind: SyntaxKind = .assign
+    public var children: [any SyntaxProtocol] {
         [equal]
     }
 
-    public let equal: TokenNode
+    public let equal: TokenSyntax
 
     // MARK: - Initializer
 
-    public init(equal: TokenNode) {
+    public init(equal: TokenSyntax) {
         self.equal = equal
     }
 }

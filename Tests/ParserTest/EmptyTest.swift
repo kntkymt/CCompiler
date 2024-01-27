@@ -10,13 +10,13 @@ final class EmptyTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).parse()
+        let syntax = try Parser(tokens: tokens).parse()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            SourceFileNode(statements: [], endOfFile: TokenNode(token: tokens[0]))
+            syntax,
+            SourceFileSyntax(statements: [], endOfFile: TokenSyntax(token: tokens[0]))
         )
     }
 }

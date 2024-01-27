@@ -13,18 +13,18 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: VariableDeclNode(
-                    type: TypeNode(type: TokenNode(token: tokens[0])),
-                    identifier: TokenNode(token: tokens[1])
+            syntax,
+            BlockItemSyntax(
+                item: VariableDeclSyntax(
+                    type: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                    identifier: TokenSyntax(token: tokens[1])
                 ),
-                semicolon: TokenNode(token: tokens[2])
+                semicolon: TokenSyntax(token: tokens[2])
             )
         )
     }
@@ -40,20 +40,20 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: VariableDeclNode(
-                    type: TypeNode(type: TokenNode(token: tokens[0])),
-                    identifier: TokenNode(token: tokens[1]),
-                    equal: TokenNode(token: tokens[2]),
-                    initializerExpr: IntegerLiteralNode(literal: TokenNode(token: tokens[3]))
+            syntax,
+            BlockItemSyntax(
+                item: VariableDeclSyntax(
+                    type: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                    identifier: TokenSyntax(token: tokens[1]),
+                    equal: TokenSyntax(token: tokens[2]),
+                    initializerExpr: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[3]))
                 ),
-                semicolon: TokenNode(token: tokens[4])
+                semicolon: TokenSyntax(token: tokens[4])
             )
         )
     }
@@ -68,21 +68,21 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: VariableDeclNode(
-                    type: PointerTypeNode(
-                        referenceType: TypeNode(type: TokenNode(token: tokens[0])),
-                        pointer: TokenNode(token: tokens[1])
+            syntax,
+            BlockItemSyntax(
+                item: VariableDeclSyntax(
+                    type: PointerTypeSyntax(
+                        referenceType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                        pointer: TokenSyntax(token: tokens[1])
                     ),
-                    identifier: TokenNode(token: tokens[2])
+                    identifier: TokenSyntax(token: tokens[2])
                 ),
-                semicolon: TokenNode(token: tokens[3])
+                semicolon: TokenSyntax(token: tokens[3])
             )
         )
     }
@@ -98,24 +98,24 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: VariableDeclNode(
-                    type: PointerTypeNode(
-                        referenceType: PointerTypeNode(
-                            referenceType: TypeNode(type: TokenNode(token: tokens[0])),
-                            pointer: TokenNode(token: tokens[1])
+            syntax,
+            BlockItemSyntax(
+                item: VariableDeclSyntax(
+                    type: PointerTypeSyntax(
+                        referenceType: PointerTypeSyntax(
+                            referenceType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                            pointer: TokenSyntax(token: tokens[1])
                         ),
-                        pointer: TokenNode(token: tokens[2])
+                        pointer: TokenSyntax(token: tokens[2])
                     ),
-                    identifier: TokenNode(token: tokens[3])
+                    identifier: TokenSyntax(token: tokens[3])
                 ),
-                semicolon: TokenNode(token: tokens[4])
+                semicolon: TokenSyntax(token: tokens[4])
             )
         )
     }
@@ -133,21 +133,21 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: VariableDeclNode(
-                    type: ArrayTypeNode(
-                        elementType: TypeNode(type: TokenNode(token: tokens[0])),
-                        squareLeft: TokenNode(token: tokens[2]),
-                        arraySize: TokenNode(token: tokens[3]),
-                        squareRight: TokenNode(token: tokens[4])
+            syntax,
+            BlockItemSyntax(
+                item: VariableDeclSyntax(
+                    type: ArrayTypeSyntax(
+                        elementType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                        squareLeft: TokenSyntax(token: tokens[2]),
+                        arraySize: TokenSyntax(token: tokens[3]),
+                        squareRight: TokenSyntax(token: tokens[4])
                     ),
-                    identifier: TokenNode(token: tokens[1])
+                    identifier: TokenSyntax(token: tokens[1])
                 ),
-                semicolon: TokenNode(token: tokens[5])
+                semicolon: TokenSyntax(token: tokens[5])
             )
         )
     }
@@ -171,30 +171,30 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: VariableDeclNode(
-                    type: ArrayTypeNode(
-                        elementType: TypeNode(type: TokenNode(token: tokens[0])),
-                        squareLeft: TokenNode(token: tokens[2]),
-                        arraySize: TokenNode(token: tokens[3]),
-                        squareRight: TokenNode(token: tokens[4])
+            syntax,
+            BlockItemSyntax(
+                item: VariableDeclSyntax(
+                    type: ArrayTypeSyntax(
+                        elementType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                        squareLeft: TokenSyntax(token: tokens[2]),
+                        arraySize: TokenSyntax(token: tokens[3]),
+                        squareRight: TokenSyntax(token: tokens[4])
                     ),
-                    identifier: TokenNode(token: tokens[1]),
-                    equal: TokenNode(token: tokens[5]),
-                    initializerExpr: ArrayExpressionNode(
-                        braceLeft: TokenNode(token: tokens[6]),
-                        exprListNodes: [
-                            ExpressionListItemNode(expression: IntegerLiteralNode(literal: TokenNode(token: tokens[7])), comma: TokenNode(token: tokens[8])),
-                            ExpressionListItemNode(expression: IntegerLiteralNode(literal: TokenNode(token: tokens[9])))
+                    identifier: TokenSyntax(token: tokens[1]),
+                    equal: TokenSyntax(token: tokens[5]),
+                    initializerExpr: ArrayExprSyntax(
+                        braceLeft: TokenSyntax(token: tokens[6]),
+                        exprListSyntaxs: [
+                            ExprListItemSyntax(expression: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[7])), comma: TokenSyntax(token: tokens[8])),
+                            ExprListItemSyntax(expression: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[9])))
                         ],
-                        braceRight: TokenNode(token: tokens[10])
+                        braceRight: TokenSyntax(token: tokens[10])
                     )
                 ),
-                semicolon: TokenNode(token: tokens[11])
+                semicolon: TokenSyntax(token: tokens[11])
             )
         )
     }
@@ -214,23 +214,23 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: VariableDeclNode(
-                    type: ArrayTypeNode(
-                        elementType: TypeNode(type: TokenNode(token: tokens[0])),
-                        squareLeft: TokenNode(token: tokens[2]),
-                        arraySize: TokenNode(token: tokens[3]),
-                        squareRight: TokenNode(token: tokens[4])
+            syntax,
+            BlockItemSyntax(
+                item: VariableDeclSyntax(
+                    type: ArrayTypeSyntax(
+                        elementType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                        squareLeft: TokenSyntax(token: tokens[2]),
+                        arraySize: TokenSyntax(token: tokens[3]),
+                        squareRight: TokenSyntax(token: tokens[4])
                     ),
-                    identifier: TokenNode(token: tokens[1]),
-                    equal: TokenNode(token: tokens[5]),
-                    initializerExpr: StringLiteralNode(literal: TokenNode(token: tokens[6]))
+                    identifier: TokenSyntax(token: tokens[1]),
+                    equal: TokenSyntax(token: tokens[5]),
+                    initializerExpr: StringLiteralSyntax(literal: TokenSyntax(token: tokens[6]))
                 ),
-                semicolon: TokenNode(token: tokens[7])
+                semicolon: TokenSyntax(token: tokens[7])
             )
         )
     }
@@ -249,21 +249,21 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: VariableDeclNode(
-                    type: ArrayTypeNode(
-                        elementType: PointerTypeNode(referenceType: TypeNode(type: TokenNode(token: tokens[0])), pointer: TokenNode(token: tokens[1])),
-                        squareLeft: TokenNode(token: tokens[3]),
-                        arraySize: TokenNode(token: tokens[4]),
-                        squareRight: TokenNode(token: tokens[5])
+            syntax,
+            BlockItemSyntax(
+                item: VariableDeclSyntax(
+                    type: ArrayTypeSyntax(
+                        elementType: PointerTypeSyntax(referenceType: TypeSyntax(type: TokenSyntax(token: tokens[0])), pointer: TokenSyntax(token: tokens[1])),
+                        squareLeft: TokenSyntax(token: tokens[3]),
+                        arraySize: TokenSyntax(token: tokens[4]),
+                        squareRight: TokenSyntax(token: tokens[5])
                     ),
-                    identifier: TokenNode(token: tokens[2])
+                    identifier: TokenSyntax(token: tokens[2])
                 ),
-                semicolon: TokenNode(token: tokens[6])
+                semicolon: TokenSyntax(token: tokens[6])
             )
         )
     }
@@ -277,23 +277,23 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).parse()
+        let syntax = try Parser(tokens: tokens).parse()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            SourceFileNode(
+            syntax,
+            SourceFileSyntax(
                 statements: [
-                    BlockItemNode(
-                        item: VariableDeclNode(
-                            type: TypeNode(type: TokenNode(token: tokens[0])),
-                            identifier: TokenNode(token: tokens[1])
+                    BlockItemSyntax(
+                        item: VariableDeclSyntax(
+                            type: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                            identifier: TokenSyntax(token: tokens[1])
                         ),
-                        semicolon: TokenNode(token: tokens[2])
+                        semicolon: TokenSyntax(token: tokens[2])
                     )
                 ], 
-                endOfFile: TokenNode(token: tokens[3])
+                endOfFile: TokenSyntax(token: tokens[3])
             )
         )
     }
@@ -308,26 +308,26 @@ final class VariableTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).parse()
+        let syntax = try Parser(tokens: tokens).parse()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            SourceFileNode(
+            syntax,
+            SourceFileSyntax(
                 statements: [
-                    BlockItemNode(
-                        item: VariableDeclNode(
-                            type: PointerTypeNode(
-                                referenceType: TypeNode(type: TokenNode(token: tokens[0])),
-                                pointer: TokenNode(token: tokens[1])
+                    BlockItemSyntax(
+                        item: VariableDeclSyntax(
+                            type: PointerTypeSyntax(
+                                referenceType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                                pointer: TokenSyntax(token: tokens[1])
                             ),
-                            identifier: TokenNode(token: tokens[2])
+                            identifier: TokenSyntax(token: tokens[2])
                         ),
-                        semicolon: TokenNode(token: tokens[3])
+                        semicolon: TokenSyntax(token: tokens[3])
                     )
                 ],
-                endOfFile: TokenNode(token: tokens[4])
+                endOfFile: TokenSyntax(token: tokens[4])
             )
         )
     }

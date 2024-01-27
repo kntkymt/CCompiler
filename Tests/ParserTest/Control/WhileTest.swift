@@ -16,21 +16,21 @@ final class WhileTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: WhileStatementNode(
-                    while: TokenNode(token: tokens[0]),
-                    parenthesisLeft: TokenNode(token: tokens[1]),
-                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
-                    parenthesisRight: TokenNode(token: tokens[3]),
-                    body: BlockItemNode(
-                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
-                        semicolon: TokenNode(token: tokens[5])
+            syntax,
+            BlockItemSyntax(
+                item: WhileStatementSyntax(
+                    while: TokenSyntax(token: tokens[0]),
+                    parenthesisLeft: TokenSyntax(token: tokens[1]),
+                    condition: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
+                    parenthesisRight: TokenSyntax(token: tokens[3]),
+                    body: BlockItemSyntax(
+                        item: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4])),
+                        semicolon: TokenSyntax(token: tokens[5])
                     )
                 )
             )

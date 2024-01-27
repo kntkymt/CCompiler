@@ -13,18 +13,18 @@ final class ReturnTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: ReturnStatementNode(
-                    return: TokenNode(token: tokens[0]),
-                    expression: IntegerLiteralNode(literal: TokenNode(token: tokens[1]))
+            syntax,
+            BlockItemSyntax(
+                item: ReturnStatementSyntax(
+                    return: TokenSyntax(token: tokens[0]),
+                    expression: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[1]))
                 ),
-                semicolon: TokenNode(token: tokens[2])
+                semicolon: TokenSyntax(token: tokens[2])
             )
         )
     }

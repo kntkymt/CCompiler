@@ -1,6 +1,6 @@
 import Tokenizer
 
-public enum NodeKind {
+public enum SyntaxKind {
     case token
 
     case integerLiteral
@@ -36,42 +36,42 @@ public enum NodeKind {
     case sourceFile
 }
 
-public protocol NodeProtocol: Equatable {
-    var kind: NodeKind { get }
+public protocol SyntaxProtocol: Equatable {
+    var kind: SyntaxKind { get }
     var sourceTokens: [Token] { get }
-    var children: [any NodeProtocol] { get }
+    var children: [any SyntaxProtocol] { get }
 }
 
-public extension NodeProtocol {
+public extension SyntaxProtocol {
     var sourceTokens: [Token] {
         children.flatMap { $0.sourceTokens }
     }
 }
 
-extension NodeProtocol {
+extension SyntaxProtocol {
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        AnyNode(lhs) == AnyNode(rhs)
+        AnySyntax(lhs) == AnySyntax(rhs)
     }
 }
 
-public final class AnyNode: NodeProtocol {
+public final class AnySyntax: SyntaxProtocol {
 
-    public let kind: NodeKind
+    public let kind: SyntaxKind
     public let sourceTokens: [Token]
-    public let children: [any NodeProtocol]
+    public let children: [any SyntaxProtocol]
 
-    public init(_ node: any NodeProtocol) {
-        self.sourceTokens = node.sourceTokens
-        self.children = node.children
-        self.kind = node.kind
+    public init(_ syntax: any SyntaxProtocol) {
+        self.sourceTokens = syntax.sourceTokens
+        self.children = syntax.children
+        self.kind = syntax.kind
     }
 
-    public static func == (lhs: AnyNode, rhs: AnyNode) -> Bool {
+    public static func == (lhs: AnySyntax, rhs: AnySyntax) -> Bool {
         lhs.kind == rhs.kind 
         && lhs.sourceTokens == rhs.sourceTokens
         && lhs.children.count == rhs.children.count
         && zip(lhs.children, rhs.children).allSatisfy { lhsChild, rhsChild in
-            AnyNode(lhsChild) == AnyNode(rhsChild)
+            AnySyntax(lhsChild) == AnySyntax(rhsChild)
         }
     }
 }
