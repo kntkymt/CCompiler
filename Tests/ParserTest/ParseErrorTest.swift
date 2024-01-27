@@ -16,25 +16,10 @@ final class ParseErrorTest: XCTestCase {
                     ]
                 )
             ).stmt()
+
+            XCTFail()
         } catch let error as ParseError {
             XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 3)))
-        }
-    }
-
-    func testInvalidPosition() throws {
-        do {
-            _ = try Parser(
-                tokens: buildTokens(
-                    kinds: [
-                        .reserved(.mul),
-                        .number("1"),
-                        .reserved(.semicolon),
-                        .endOfFile
-                    ]
-                )
-            ).stmt()
-        } catch let error as ParseError {
-            XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 1)))
         }
     }
 
@@ -45,23 +30,17 @@ final class ParseErrorTest: XCTestCase {
                     kinds: [
                         .number("1"),
                         .reserved(.add),
-                        .reserved(.mul),
+                        .reserved(.div),
                         .number("2"),
                         .reserved(.semicolon),
                         .endOfFile
                     ]
                 )
             ).stmt()
+
+            XCTFail()
         } catch let error as ParseError {
             XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 3)))
-        }
-    }
-
-    func testEmpty() throws {
-        do {
-            _ = try Parser(tokens: []).parse()
-        } catch let error as ParseError {
-            XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 1)))
         }
     }
 
@@ -77,6 +56,8 @@ final class ParseErrorTest: XCTestCase {
                     ]
                 )
             ).stmt()
+
+            XCTFail()
         } catch let error as ParseError {
             XCTAssertEqual(error, .invalidSyntax(location: SourceLocation(line: 1, column: 4)))
         }

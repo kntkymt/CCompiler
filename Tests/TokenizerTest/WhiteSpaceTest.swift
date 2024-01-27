@@ -187,4 +187,20 @@ a = 1
             ]
         )
     }
+
+    func testEmpty() throws {
+        let source = ""
+        let tokens = try Tokenizer(source: source).tokenize()
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
+        XCTAssertEqual(
+            tokens,
+            [
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 1))
+                )
+            ]
+        )
+    }
 }
