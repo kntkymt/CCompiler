@@ -37,7 +37,7 @@ final class KeywordsTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 7))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 9))
                 ),
                 Token(
@@ -129,7 +129,7 @@ final class KeywordsTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
                 ),
                 Token(
@@ -142,7 +142,7 @@ final class KeywordsTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 6), end: SourceLocation(line: 1, column: 10))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 11), end: SourceLocation(line: 1, column: 12))
                 ),
                 Token(
@@ -170,7 +170,7 @@ final class KeywordsTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 6), end: SourceLocation(line: 1, column: 7))
                 ),
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 8))
                 ),
                 Token(
@@ -202,7 +202,7 @@ final class KeywordsTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
                 ),
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 6))
                 ),
                 Token(
@@ -210,7 +210,7 @@ final class KeywordsTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 6), end: SourceLocation(line: 1, column: 7))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 8))
                 ),
                 Token(
@@ -218,7 +218,7 @@ final class KeywordsTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 9))
                 ),
                 Token(
-                    kind: .number("3"),
+                    kind: .integerLiteral("3"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 9), end: SourceLocation(line: 1, column: 10))
                 ),
                 Token(
@@ -250,7 +250,7 @@ final class KeywordsTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 8))
                 ),
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 8), end: SourceLocation(line: 1, column: 9))
                 ),
                 Token(

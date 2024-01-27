@@ -9,13 +9,13 @@ final class ForTest: XCTestCase {
             kinds: [
                 .keyword(.for),
                 .reserved(.parenthesisLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon),
-                .number("3"),
+                .integerLiteral("3"),
                 .reserved(.parenthesisRight),
-                .number("4"),
+                .integerLiteral("4"),
                 .reserved(.semicolon)
             ]
         )
@@ -49,16 +49,16 @@ final class ForTest: XCTestCase {
             kinds: [
                 .keyword(.for),
                 .reserved(.parenthesisLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon),
-                .number("3"),
+                .integerLiteral("3"),
                 .reserved(.parenthesisRight),
                 .reserved(.braceLeft),
-                .number("4"),
+                .integerLiteral("4"),
                 .reserved(.semicolon),
-                .number("5"),
+                .integerLiteral("5"),
                 .reserved(.semicolon),
                 .reserved(.braceRight)
             ]
@@ -102,7 +102,7 @@ final class ForTest: XCTestCase {
                 .reserved(.semicolon),
                 .reserved(.semicolon),
                 .reserved(.parenthesisRight),
-                .number("4"),
+                .integerLiteral("4"),
                 .reserved(.semicolon)
             ]
         )

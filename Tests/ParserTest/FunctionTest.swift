@@ -12,9 +12,9 @@ final class FunctionTest: XCTestCase {
                 .reserved(.parenthesisLeft),
                 .reserved(.parenthesisRight),
                 .reserved(.braceLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon),
                 .reserved(.braceRight),
                 .endOfFile
@@ -60,9 +60,9 @@ final class FunctionTest: XCTestCase {
                 .reserved(.parenthesisLeft),
                 .reserved(.parenthesisRight),
                 .reserved(.braceLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon),
                 .reserved(.braceRight),
                 .endOfFile
@@ -139,7 +139,7 @@ final class FunctionTest: XCTestCase {
                 .identifier("b"),
                 .reserved(.parenthesisRight),
                 .reserved(.braceLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon),
                 .reserved(.braceRight),
                 .endOfFile
@@ -183,7 +183,7 @@ final class FunctionTest: XCTestCase {
             kinds: [
                 .identifier("main"),
                 .reserved(.parenthesisLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.comma),
                 .identifier("a"),
                 .reserved(.parenthesisRight),
@@ -222,7 +222,7 @@ final class FunctionTest: XCTestCase {
                 .reserved(.parenthesisLeft),
                 .reserved(.parenthesisRight),
                 .reserved(.braceLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon),
                 .reserved(.braceRight),
                 .type(.int),
@@ -230,7 +230,7 @@ final class FunctionTest: XCTestCase {
                 .reserved(.parenthesisLeft),
                 .reserved(.parenthesisRight),
                 .reserved(.braceLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon),
                 .reserved(.braceRight),
                 .endOfFile
@@ -287,7 +287,7 @@ final class FunctionTest: XCTestCase {
             kinds: [
                 .identifier("a"),
                 .reserved(.squareLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.squareRight),
                 .reserved(.semicolon)
             ]
@@ -315,7 +315,7 @@ final class FunctionTest: XCTestCase {
             kinds: [
                 .identifier("a"),
                 .reserved(.squareLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.add),
                 .identifier("b"),
                 .reserved(.squareRight),

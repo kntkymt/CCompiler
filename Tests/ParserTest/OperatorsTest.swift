@@ -7,9 +7,9 @@ final class OperatorsTest: XCTestCase {
     func testAdd() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.add),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -33,9 +33,9 @@ final class OperatorsTest: XCTestCase {
     func testSub() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.sub),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -59,9 +59,9 @@ final class OperatorsTest: XCTestCase {
     func testMul() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.mul),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -85,9 +85,9 @@ final class OperatorsTest: XCTestCase {
     func testDiv() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.div),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -112,7 +112,7 @@ final class OperatorsTest: XCTestCase {
         let tokens: [Token] = buildTokens(
             kinds: [
                 .reserved(.add),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon)
             ]
         )
@@ -136,7 +136,7 @@ final class OperatorsTest: XCTestCase {
         let tokens: [Token] = buildTokens(
             kinds: [
                 .reserved(.sub),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon)
             ]
         )
@@ -207,9 +207,9 @@ final class OperatorsTest: XCTestCase {
     func testEqual() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.equal),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -233,9 +233,9 @@ final class OperatorsTest: XCTestCase {
     func testNotEqual() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.notEqual),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -259,9 +259,9 @@ final class OperatorsTest: XCTestCase {
     func testGreaterThan() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.greaterThan),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -285,9 +285,9 @@ final class OperatorsTest: XCTestCase {
     func testGreaterThanOrEqual() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.greaterThanOrEqual),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -311,9 +311,9 @@ final class OperatorsTest: XCTestCase {
     func testLessThan() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.lessThan),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -337,9 +337,9 @@ final class OperatorsTest: XCTestCase {
     func testLessThanOrEqual() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.lessThanOrEqual),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -366,7 +366,7 @@ final class OperatorsTest: XCTestCase {
             kinds: [
                 .keyword(.sizeof),
                 .reserved(.parenthesisLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.parenthesisRight),
                 .reserved(.semicolon)
             ]

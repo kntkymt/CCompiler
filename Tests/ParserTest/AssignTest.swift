@@ -9,7 +9,7 @@ final class AssignTest: XCTestCase {
             kinds: [
                 .identifier("a"),
                 .reserved(.assign),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -37,7 +37,7 @@ final class AssignTest: XCTestCase {
                 .reserved(.assign),
                 .identifier("b"),
                 .reserved(.assign),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )
@@ -66,9 +66,9 @@ final class AssignTest: XCTestCase {
     func testAssingToNumber() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.assign),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon)
             ]
         )

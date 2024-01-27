@@ -35,7 +35,7 @@ final class VariableTest: XCTestCase {
                 .type(.int),
                 .identifier("a"),
                 .reserved(.assign),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.semicolon),
                 .endOfFile
             ]
@@ -127,7 +127,7 @@ final class VariableTest: XCTestCase {
                 .type(.int),
                 .identifier("a"),
                 .reserved(.squareLeft),
-                .number("4"),
+                .integerLiteral("4"),
                 .reserved(.squareRight),
                 .reserved(.semicolon),
                 .endOfFile
@@ -159,13 +159,13 @@ final class VariableTest: XCTestCase {
                 .type(.int),
                 .identifier("a"),
                 .reserved(.squareLeft),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.squareRight),
                 .reserved(.assign),
                 .reserved(.braceLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.comma),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.braceRight),
                 .reserved(.semicolon),
                 .endOfFile
@@ -206,7 +206,7 @@ final class VariableTest: XCTestCase {
                 .type(.char),
                 .identifier("a"),
                 .reserved(.squareLeft),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.squareRight),
                 .reserved(.assign),
                 .stringLiteral("ai"),
@@ -243,7 +243,7 @@ final class VariableTest: XCTestCase {
                 .reserved(.mul),
                 .identifier("a"),
                 .reserved(.squareLeft),
-                .number("4"),
+                .integerLiteral("4"),
                 .reserved(.squareRight),
                 .reserved(.semicolon),
                 .endOfFile

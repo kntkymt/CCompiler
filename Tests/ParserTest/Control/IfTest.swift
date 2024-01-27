@@ -9,9 +9,9 @@ final class IfTest: XCTestCase {
             kinds: [
                 .keyword(.if),
                 .reserved(.parenthesisLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.parenthesisRight),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon),
                 .endOfFile
             ]
@@ -44,12 +44,12 @@ final class IfTest: XCTestCase {
             kinds: [
                 .keyword(.if),
                 .reserved(.parenthesisLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.parenthesisRight),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon),
                 .keyword(.else),
-                .number("3"),
+                .integerLiteral("3"),
                 .reserved(.semicolon),
                 .endOfFile
             ]

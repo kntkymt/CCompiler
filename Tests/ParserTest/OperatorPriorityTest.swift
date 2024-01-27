@@ -7,11 +7,11 @@ final class OperatorPriorityTest: XCTestCase {
     func testAddPriority() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.add),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.add),
-                .number("3"),
+                .integerLiteral("3"),
                 .reserved(.semicolon)
             ]
         )
@@ -39,11 +39,11 @@ final class OperatorPriorityTest: XCTestCase {
     func testMulPriority() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.mul),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.mul),
-                .number("3"),
+                .integerLiteral("3"),
                 .reserved(.semicolon)
             ]
         )
@@ -71,11 +71,11 @@ final class OperatorPriorityTest: XCTestCase {
     func testAddAndMulPriority() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.add),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.mul),
-                .number("3"),
+                .integerLiteral("3"),
                 .reserved(.semicolon)
             ]
         )
@@ -104,12 +104,12 @@ final class OperatorPriorityTest: XCTestCase {
         let tokens: [Token] = buildTokens(
             kinds: [
                 .reserved(.parenthesisLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.add),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.parenthesisRight),
                 .reserved(.mul),
-                .number("3"),
+                .integerLiteral("3"),
                 .reserved(.semicolon)
             ]
         )

@@ -12,7 +12,7 @@ final class WhiteSpaceTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     trailingTrivia: " ",
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
@@ -22,7 +22,7 @@ final class WhiteSpaceTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("23"),
+                    kind: .integerLiteral("23"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 7), end: SourceLocation(line: 1, column: 9))
                 ),
                 Token(
@@ -42,7 +42,7 @@ final class WhiteSpaceTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     trailingTrivia: " ",
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
@@ -52,7 +52,7 @@ final class WhiteSpaceTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("23"),
+                    kind: .integerLiteral("23"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 6), end: SourceLocation(line: 1, column: 8))
                 ),
                 Token(
@@ -72,7 +72,7 @@ final class WhiteSpaceTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     trailingTrivia: " ",
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
@@ -81,7 +81,7 @@ final class WhiteSpaceTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("23"),
+                    kind: .integerLiteral("23"),
                     leadingTrivia: "\n",
                     sourceRange: SourceRange(start: SourceLocation(line: 2, column: 1), end: SourceLocation(line: 2, column: 3))
                 ),
@@ -102,7 +102,7 @@ final class WhiteSpaceTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     trailingTrivia: " ",
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
@@ -112,7 +112,7 @@ final class WhiteSpaceTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("23"),
+                    kind: .integerLiteral("23"),
                     leadingTrivia: "\n ",
                     sourceRange: SourceRange(start: SourceLocation(line: 2, column: 2), end: SourceLocation(line: 2, column: 4))
                 ),
@@ -133,7 +133,7 @@ final class WhiteSpaceTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     trailingTrivia: " ",
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
@@ -143,7 +143,7 @@ final class WhiteSpaceTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("23"),
+                    kind: .integerLiteral("23"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 15), end: SourceLocation(line: 1, column: 17))
                 ),
                 Token(
@@ -176,13 +176,29 @@ a = 1
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 5), end: SourceLocation(line: 1, column: 6))
                 ),
                 Token(
                     kind: .endOfFile,
                     leadingTrivia: "\n// a",
                     sourceRange: SourceRange(start: SourceLocation(line: 2, column: 5), end: SourceLocation(line: 2, column: 5))
+                )
+            ]
+        )
+    }
+
+    func testEmpty() throws {
+        let source = ""
+        let tokens = try Tokenizer(source: source).tokenize()
+
+        XCTAssertEqual(tokens.reduce("") { $0 + $1.description }, source)
+        XCTAssertEqual(
+            tokens,
+            [
+                Token(
+                    kind: .endOfFile,
+                    sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 1))
                 )
             ]
         )

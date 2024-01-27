@@ -8,7 +8,7 @@ final class ReturnTest: XCTestCase {
         let tokens: [Token] = buildTokens(
             kinds: [
                 .keyword(.return),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon),
                 .endOfFile
             ]
