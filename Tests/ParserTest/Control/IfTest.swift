@@ -16,21 +16,21 @@ final class IfTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: IfStatementNode(
-                    if: TokenNode(token: tokens[0]),
-                    parenthesisLeft: TokenNode(token: tokens[1]),
-                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
-                    parenthesisRight: TokenNode(token: tokens[3]),
-                    trueBody: BlockItemNode(
-                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
-                        semicolon: TokenNode(token: tokens[5])
+            syntax,
+            BlockItemSyntax(
+                item: IfStatementSyntax(
+                    if: TokenSyntax(token: tokens[0]),
+                    parenthesisLeft: TokenSyntax(token: tokens[1]),
+                    condition: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
+                    parenthesisRight: TokenSyntax(token: tokens[3]),
+                    trueBody: BlockItemSyntax(
+                        item: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4])),
+                        semicolon: TokenSyntax(token: tokens[5])
                     ),
                     else: nil,
                     falseBody: nil
@@ -54,26 +54,26 @@ final class IfTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: IfStatementNode(
-                    if: TokenNode(token: tokens[0]),
-                    parenthesisLeft: TokenNode(token: tokens[1]),
-                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
-                    parenthesisRight: TokenNode(token: tokens[3]),
-                    trueBody: BlockItemNode(
-                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
-                        semicolon: TokenNode(token: tokens[5])
+            syntax,
+            BlockItemSyntax(
+                item: IfStatementSyntax(
+                    if: TokenSyntax(token: tokens[0]),
+                    parenthesisLeft: TokenSyntax(token: tokens[1]),
+                    condition: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
+                    parenthesisRight: TokenSyntax(token: tokens[3]),
+                    trueBody: BlockItemSyntax(
+                        item: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4])),
+                        semicolon: TokenSyntax(token: tokens[5])
                     ),
-                    else: TokenNode(token: tokens[6]),
-                    falseBody: BlockItemNode(
-                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[7])),
-                        semicolon: TokenNode(token: tokens[8])
+                    else: TokenSyntax(token: tokens[6]),
+                    falseBody: BlockItemSyntax(
+                        item: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[7])),
+                        semicolon: TokenSyntax(token: tokens[8])
                     )
                 )
             )

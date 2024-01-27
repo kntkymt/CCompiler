@@ -15,23 +15,23 @@ final class OperatorPriorityTest: XCTestCase {
                 .reserved(.semicolon)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: InfixOperatorExpressionNode(
-                    left: InfixOperatorExpressionNode(
-                        left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
-                        operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
-                        right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
+            syntax,
+            BlockItemSyntax(
+                item: InfixOperatorExprSyntax(
+                    left: InfixOperatorExprSyntax(
+                        left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
+                        operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                        right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                     ),
-                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[3])),
-                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[4]))
+                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[3])),
+                    right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4]))
                 ),
-                semicolon: TokenNode(token: tokens[5])
+                semicolon: TokenSyntax(token: tokens[5])
             )
         )
     }
@@ -47,23 +47,23 @@ final class OperatorPriorityTest: XCTestCase {
                 .reserved(.semicolon)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: InfixOperatorExpressionNode(
-                    left: InfixOperatorExpressionNode(
-                        left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
-                        operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
-                        right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
+            syntax,
+            BlockItemSyntax(
+                item: InfixOperatorExprSyntax(
+                    left: InfixOperatorExprSyntax(
+                        left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
+                        operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                        right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                     ),
-                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[3])),
-                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[4]))
+                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[3])),
+                    right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4]))
                 ),
-                semicolon: TokenNode(token: tokens[5])
+                semicolon: TokenSyntax(token: tokens[5])
             )
         )
     }
@@ -79,23 +79,23 @@ final class OperatorPriorityTest: XCTestCase {
                 .reserved(.semicolon)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
-                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[1])),
-                    right: InfixOperatorExpressionNode(
-                        left: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
-                        operator: BinaryOperatorNode(operator: TokenNode(token: tokens[3])),
-                        right: IntegerLiteralNode(literal: TokenNode(token: tokens[4]))
+            syntax,
+            BlockItemSyntax(
+                item: InfixOperatorExprSyntax(
+                    left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
+                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    right: InfixOperatorExprSyntax(
+                        left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
+                        operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[3])),
+                        right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4]))
                     )
                 ),
-                semicolon: TokenNode(token: tokens[5])
+                semicolon: TokenSyntax(token: tokens[5])
             )
         )
     }
@@ -113,27 +113,27 @@ final class OperatorPriorityTest: XCTestCase {
                 .reserved(.semicolon)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: InfixOperatorExpressionNode(
-                    left: TupleExpressionNode(
-                        parenthesisLeft: TokenNode(token: tokens[0]),
-                        expression: InfixOperatorExpressionNode(
-                            left: IntegerLiteralNode(literal: TokenNode(token: tokens[1])),
-                            operator: BinaryOperatorNode(operator: TokenNode(token: tokens[2])),
-                            right: IntegerLiteralNode(literal: TokenNode(token: tokens[3]))
+            syntax,
+            BlockItemSyntax(
+                item: InfixOperatorExprSyntax(
+                    left: TupleExprSyntax(
+                        parenthesisLeft: TokenSyntax(token: tokens[0]),
+                        expression: InfixOperatorExprSyntax(
+                            left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[1])),
+                            operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[2])),
+                            right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[3]))
                         ),
-                        parenthesisRight: TokenNode(token: tokens[4])
+                        parenthesisRight: TokenSyntax(token: tokens[4])
                     ),
-                    operator: BinaryOperatorNode(operator: TokenNode(token: tokens[5])),
-                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[6]))
+                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[5])),
+                    right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[6]))
                 ),
-                semicolon: TokenNode(token: tokens[7])
+                semicolon: TokenSyntax(token: tokens[7])
             )
         )
     }

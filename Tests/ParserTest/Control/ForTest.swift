@@ -19,25 +19,25 @@ final class ForTest: XCTestCase {
                 .reserved(.semicolon)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: ForStatementNode(
-                    for: TokenNode(token: tokens[0]),
-                    parenthesisLeft: TokenNode(token: tokens[1]),
-                    pre: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
-                    firstSemicolon: TokenNode(token: tokens[3]),
-                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
-                    secondSemicolon: TokenNode(token: tokens[5]),
-                    post: IntegerLiteralNode(literal: TokenNode(token: tokens[6])),
-                    parenthesisRight: TokenNode(token: tokens[7]),
-                    body: BlockItemNode(
-                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[8])),
-                        semicolon: TokenNode(token: tokens[9])
+            syntax,
+            BlockItemSyntax(
+                item: ForStatementSyntax(
+                    for: TokenSyntax(token: tokens[0]),
+                    parenthesisLeft: TokenSyntax(token: tokens[1]),
+                    pre: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
+                    firstSemicolon: TokenSyntax(token: tokens[3]),
+                    condition: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4])),
+                    secondSemicolon: TokenSyntax(token: tokens[5]),
+                    post: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[6])),
+                    parenthesisRight: TokenSyntax(token: tokens[7]),
+                    body: BlockItemSyntax(
+                        item: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[8])),
+                        semicolon: TokenSyntax(token: tokens[9])
                     )
                 )
             )
@@ -63,30 +63,30 @@ final class ForTest: XCTestCase {
                 .reserved(.braceRight)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: ForStatementNode(
-                    for: TokenNode(token: tokens[0]),
-                    parenthesisLeft: TokenNode(token: tokens[1]),
-                    pre: IntegerLiteralNode(literal: TokenNode(token: tokens[2])),
-                    firstSemicolon: TokenNode(token: tokens[3]),
-                    condition: IntegerLiteralNode(literal: TokenNode(token: tokens[4])),
-                    secondSemicolon: TokenNode(token: tokens[5]),
-                    post: IntegerLiteralNode(literal: TokenNode(token: tokens[6])),
-                    parenthesisRight: TokenNode(token: tokens[7]),
-                    body: BlockItemNode(
-                        item: BlockStatementNode(
-                            braceLeft: TokenNode(token: tokens[8]),
+            syntax,
+            BlockItemSyntax(
+                item: ForStatementSyntax(
+                    for: TokenSyntax(token: tokens[0]),
+                    parenthesisLeft: TokenSyntax(token: tokens[1]),
+                    pre: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
+                    firstSemicolon: TokenSyntax(token: tokens[3]),
+                    condition: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4])),
+                    secondSemicolon: TokenSyntax(token: tokens[5]),
+                    post: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[6])),
+                    parenthesisRight: TokenSyntax(token: tokens[7]),
+                    body: BlockItemSyntax(
+                        item: BlockStatementSyntax(
+                            braceLeft: TokenSyntax(token: tokens[8]),
                             items: [
-                                BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[9])), semicolon: TokenNode(token: tokens[10])),
-                                BlockItemNode(item: IntegerLiteralNode(literal: TokenNode(token: tokens[11])), semicolon: TokenNode(token: tokens[12]))
+                                BlockItemSyntax(item: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[9])), semicolon: TokenSyntax(token: tokens[10])),
+                                BlockItemSyntax(item: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[11])), semicolon: TokenSyntax(token: tokens[12]))
                             ],
-                            braceRight: TokenNode(token: tokens[13])
+                            braceRight: TokenSyntax(token: tokens[13])
                         )
                     )
                 )
@@ -94,7 +94,7 @@ final class ForTest: XCTestCase {
         )
     }
 
-    func testForNoNodes() throws {
+    func testForNoSyntaxs() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
                 .keyword(.for),
@@ -106,25 +106,25 @@ final class ForTest: XCTestCase {
                 .reserved(.semicolon)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: ForStatementNode(
-                    for: TokenNode(token: tokens[0]),
-                    parenthesisLeft: TokenNode(token: tokens[1]),
+            syntax,
+            BlockItemSyntax(
+                item: ForStatementSyntax(
+                    for: TokenSyntax(token: tokens[0]),
+                    parenthesisLeft: TokenSyntax(token: tokens[1]),
                     pre: nil,
-                    firstSemicolon: TokenNode(token: tokens[2]),
+                    firstSemicolon: TokenSyntax(token: tokens[2]),
                     condition: nil,
-                    secondSemicolon: TokenNode(token: tokens[3]),
+                    secondSemicolon: TokenSyntax(token: tokens[3]),
                     post: nil,
-                    parenthesisRight: TokenNode(token: tokens[4]),
-                    body: BlockItemNode(
-                        item: IntegerLiteralNode(literal: TokenNode(token: tokens[5])),
-                        semicolon: TokenNode(token: tokens[6])
+                    parenthesisRight: TokenSyntax(token: tokens[4]),
+                    body: BlockItemSyntax(
+                        item: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[5])),
+                        semicolon: TokenSyntax(token: tokens[6])
                     )
                 )
             )

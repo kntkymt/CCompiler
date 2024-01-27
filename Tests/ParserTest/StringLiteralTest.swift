@@ -12,15 +12,15 @@ final class StringLiteralTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: StringLiteralNode(literal: TokenNode(token: tokens[0])),
-                semicolon: TokenNode(token: tokens[1])
+            syntax,
+            BlockItemSyntax(
+                item: StringLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
+                semicolon: TokenSyntax(token: tokens[1])
             )
         )
     }
@@ -35,19 +35,19 @@ final class StringLiteralTest: XCTestCase {
                 .endOfFile
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens.dropLast())
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: InfixOperatorExpressionNode(
-                    left: IdentifierNode(baseName: TokenNode(token: tokens[0])),
-                    operator: AssignNode(equal: TokenNode(token: tokens[1])),
-                    right: StringLiteralNode(literal: TokenNode(token: tokens[2]))
+            syntax,
+            BlockItemSyntax(
+                item: InfixOperatorExprSyntax(
+                    left: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    operator: AssignSyntax(equal: TokenSyntax(token: tokens[1])),
+                    right: StringLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
-                semicolon: TokenNode(token: tokens[3])
+                semicolon: TokenSyntax(token: tokens[3])
             )
         )
     }

@@ -13,19 +13,19 @@ final class AssignTest: XCTestCase {
                 .reserved(.semicolon)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: InfixOperatorExpressionNode(
-                    left: IdentifierNode(baseName: TokenNode(token: tokens[0])),
-                    operator: AssignNode(equal: TokenNode(token: tokens[1])),
-                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
+            syntax,
+            BlockItemSyntax(
+                item: InfixOperatorExprSyntax(
+                    left: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    operator: AssignSyntax(equal: TokenSyntax(token: tokens[1])),
+                    right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
-                semicolon: TokenNode(token: tokens[3])
+                semicolon: TokenSyntax(token: tokens[3])
             )
         )
     }
@@ -41,23 +41,23 @@ final class AssignTest: XCTestCase {
                 .reserved(.semicolon)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: InfixOperatorExpressionNode(
-                    left: IdentifierNode(baseName: TokenNode(token: tokens[0])),
-                    operator: AssignNode(equal: TokenNode(token: tokens[1])),
-                    right: InfixOperatorExpressionNode(
-                        left: IdentifierNode(baseName: TokenNode(token: tokens[2])),
-                        operator: AssignNode(equal: TokenNode(token: tokens[3])),
-                        right: IntegerLiteralNode(literal: TokenNode(token: tokens[4]))
+            syntax,
+            BlockItemSyntax(
+                item: InfixOperatorExprSyntax(
+                    left: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    operator: AssignSyntax(equal: TokenSyntax(token: tokens[1])),
+                    right: InfixOperatorExprSyntax(
+                        left: IdentifierSyntax(baseName: TokenSyntax(token: tokens[2])),
+                        operator: AssignSyntax(equal: TokenSyntax(token: tokens[3])),
+                        right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4]))
                     )
                 ),
-                semicolon: TokenNode(token: tokens[5])
+                semicolon: TokenSyntax(token: tokens[5])
             )
         )
     }
@@ -72,19 +72,19 @@ final class AssignTest: XCTestCase {
                 .reserved(.semicolon)
             ]
         )
-        let node = try Parser(tokens: tokens).stmt()
+        let syntax = try Parser(tokens: tokens).stmt()
 
-        XCTAssertEqual(node.sourceTokens, tokens)
+        XCTAssertEqual(syntax.sourceTokens, tokens)
 
         XCTAssertEqual(
-            node,
-            BlockItemNode(
-                item: InfixOperatorExpressionNode(
-                    left: IntegerLiteralNode(literal: TokenNode(token: tokens[0])),
-                    operator: AssignNode(equal: TokenNode(token: tokens[1])),
-                    right: IntegerLiteralNode(literal: TokenNode(token: tokens[2]))
+            syntax,
+            BlockItemSyntax(
+                item: InfixOperatorExprSyntax(
+                    left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
+                    operator: AssignSyntax(equal: TokenSyntax(token: tokens[1])),
+                    right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
-                semicolon: TokenNode(token: tokens[3])
+                semicolon: TokenSyntax(token: tokens[3])
             )
         )
     }
