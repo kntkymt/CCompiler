@@ -14,7 +14,7 @@ public struct Token: Equatable {
 
     /// with trivia
     public var description: String {
-        leadingTrivia + kind.text + trailingTrivia
+        leadingTrivia + text + trailingTrivia
     }
 
     // MARK: - Initializer
@@ -61,9 +61,70 @@ extension SourceLocation {
     public static let startOfFile = SourceLocation(line: 1, column: 1)
 }
 
-public enum TokenKind: Equatable {
+/// TokenKindはAssociatedValuesがあって比較に不便なため
+/// AssociatedValuesを抜いたもの
+public enum TokenSpec: Equatable {
 
-    // MARK: - Property
+    case reserved(_ kind: ReservedKind)
+    case keyword(_ kind: KeywordKind)
+    case integerLiteral
+    case stringLiteral
+    case identifier
+    case type
+
+    case endOfFile
+
+    public static func ~= (spec: TokenSpec, token: Token) -> Bool {
+        switch spec {
+        case .reserved(let kind):
+            if case .reserved(let tokenKind) = token.kind {
+                return kind == tokenKind
+            } else {
+                return false
+            }
+
+        case .keyword(let kind):
+            if case .keyword(let tokenKind) = token.kind {
+                return kind == tokenKind
+            } else {
+                return false
+            }
+
+        case .integerLiteral:
+            if case .number = token.kind {
+                return true
+            } else {
+                return false
+            }
+
+        case .stringLiteral:
+            if case .stringLiteral = token.kind {
+                return true
+            } else {
+                return false
+            }
+
+        case .identifier:
+            if case .identifier = token.kind {
+                return true
+            } else {
+                return false
+            }
+
+        case .type:
+            if case .type = token.kind {
+                return true
+            } else {
+                return false
+            }
+
+        case .endOfFile:
+            return token.kind == .endOfFile
+        }
+    }
+}
+
+public enum TokenKind: Equatable {
 
     case reserved(_ kind: ReservedKind)
     case keyword(_ kind: KeywordKind)
@@ -73,6 +134,8 @@ public enum TokenKind: Equatable {
     case type(_ kind: TypeKind)
 
     case endOfFile
+
+    // MARK: - Property
 
     public var text: String {
         switch self {
@@ -98,81 +161,81 @@ public enum TokenKind: Equatable {
             return ""
         }
     }
+}
 
-    public enum ReservedKind: String, CaseIterable {
-        /// `+`
-        case add = "+"
+public enum ReservedKind: String, CaseIterable {
+    /// `+`
+    case add = "+"
 
-        /// `-`
-        case sub = "-"
+    /// `-`
+    case sub = "-"
 
-        /// `*`
-        case mul = "*"
+    /// `*`
+    case mul = "*"
 
-        /// `/`
-        case div = "/"
+    /// `/`
+    case div = "/"
 
-        /// `&`
-        case and = "&"
+    /// `&`
+    case and = "&"
 
-        /// `(`
-        case parenthesisLeft = "("
+    /// `(`
+    case parenthesisLeft = "("
 
-        /// `)`
-        case parenthesisRight = ")"
+    /// `)`
+    case parenthesisRight = ")"
 
-        /// `{`
-        case braceLeft = "{"
+    /// `{`
+    case braceLeft = "{"
 
-        /// `}`
-        case braceRight = "}"
+    /// `}`
+    case braceRight = "}"
 
-        /// `[`
-        case squareLeft = "["
+    /// `[`
+    case squareLeft = "["
 
-        /// `]`
-        case squareRight = "]"
+    /// `]`
+    case squareRight = "]"
 
-        /// `==`
-        case equal = "=="
+    /// `==`
+    case equal = "=="
 
-        /// `!=`
-        case notEqual = "!="
+    /// `!=`
+    case notEqual = "!="
 
-        /// `<`
-        case lessThan = "<"
+    /// `<`
+    case lessThan = "<"
 
-        /// `<=`
-        case lessThanOrEqual = "<="
+    /// `<=`
+    case lessThanOrEqual = "<="
 
-        /// `>`
-        case greaterThan = ">"
+    /// `>`
+    case greaterThan = ">"
 
-        /// `>=`
-        case greaterThanOrEqual = ">="
+    /// `>=`
+    case greaterThanOrEqual = ">="
 
-        /// `=`
-        case assign = "="
+    /// `=`
+    case assign = "="
 
-        /// `;`
-        case semicolon = ";"
+    /// `;`
+    case semicolon = ";"
 
-        /// `,`
-        case comma = ","
-    }
+    /// `,`
+    case comma = ","
+}
 
-    public enum KeywordKind: String, CaseIterable {
-        case `return`
-        case `if`
-        case `else`
-        case `while`
-        case `for`
+public enum KeywordKind: String, CaseIterable {
+    case `return`
+    case `if`
+    case `else`
+    case `while`
+    case `for`
 
-        case sizeof
-    }
+    case sizeof
+}
 
-    public enum TypeKind: String, CaseIterable {
-        case int
-        case char
-    }
+public enum TypeKind: String, CaseIterable {
+    case int
+    case char
 }

@@ -31,7 +31,7 @@ public class Tokenizer {
     public func tokenize() throws -> [Token] {
         var tokens: [Token] = []
 
-        while index < charactors.count {
+        while tokens.last?.kind != .endOfFile {
             let leadingTrivia = extractTrivia(untilBeforeNewLine: false)
 
             // sourceLocationにtriviaは含まない
@@ -48,10 +48,6 @@ public class Tokenizer {
                 sourceRange: SourceRange(start: startLocation, end: endLocation)
             )
             tokens.append(token)
-        }
-
-        if let lastToken = tokens.last, lastToken.kind != .endOfFile {
-            tokens.append(Token(kind: .endOfFile, sourceRange: SourceRange(start: currentSourceLocation, end: currentSourceLocation)))
         }
 
         return tokens
@@ -170,9 +166,9 @@ public class Tokenizer {
 
     // 文字数が多い物からチェックしないといけない
     // 例: <= の時に<を先にチェックすると<, =の2つのトークンになってしまう
-    private let reservedKinds = TokenKind.ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
-    private let keywordKinds = TokenKind.KeywordKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
-    private let typeKinds = TokenKind.TypeKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    private let reservedKinds = ReservedKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    private let keywordKinds = KeywordKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
+    private let typeKinds = TypeKind.allCases.sorted { $0.rawValue.count > $1.rawValue.count }
 
     private func extractTokenKind() throws -> TokenKind {
         if index >= charactors.count {
