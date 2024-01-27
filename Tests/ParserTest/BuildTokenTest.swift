@@ -26,7 +26,7 @@ final class BuildTokenTest: XCTestCase {
         let kinds: [TokenKind] = [
             .identifier("a"),
             .reserved(.assign),
-            .number("2"),
+            .integerLiteral("2"),
             .reserved(.semicolon)
         ]
         let tokens = buildTokens(kinds: kinds)
@@ -73,9 +73,9 @@ final class BuildTokenTest: XCTestCase {
             .reserved(.parenthesisLeft),
             .reserved(.parenthesisRight),
             .reserved(.braceLeft),
-            .number("1"),
+            .integerLiteral("1"),
             .reserved(.semicolon),
-            .number("2"),
+            .integerLiteral("2"),
             .reserved(.semicolon),
             .reserved(.braceRight)
         ]

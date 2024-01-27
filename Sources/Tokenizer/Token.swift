@@ -91,7 +91,7 @@ public enum TokenSpec: Equatable {
             }
 
         case .integerLiteral:
-            if case .number = token.kind {
+            if case .integerLiteral = token.kind {
                 return true
             } else {
                 return false
@@ -128,7 +128,7 @@ public enum TokenKind: Equatable {
 
     case reserved(_ kind: ReservedKind)
     case keyword(_ kind: KeywordKind)
-    case number(_ value: String)
+    case integerLiteral(_ value: String)
     case stringLiteral(_ value: String)
     case identifier(_ value: String)
     case type(_ kind: TypeKind)
@@ -145,7 +145,7 @@ public enum TokenKind: Equatable {
         case .keyword(let kind):
             return kind.rawValue
 
-        case .number(let value):
+        case .integerLiteral(let value):
             return value
 
         case .stringLiteral(let value):

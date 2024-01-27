@@ -11,7 +11,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -19,7 +19,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
@@ -39,7 +39,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -47,7 +47,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
@@ -67,7 +67,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -75,7 +75,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
@@ -95,7 +95,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -103,7 +103,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
@@ -151,7 +151,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
@@ -179,7 +179,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
@@ -207,7 +207,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
@@ -235,7 +235,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -243,7 +243,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
                 ),
                 Token(
@@ -263,7 +263,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -271,7 +271,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
                 ),
                 Token(
@@ -291,7 +291,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -299,7 +299,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
@@ -319,7 +319,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -327,7 +327,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
                 ),
                 Token(
@@ -347,7 +347,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -355,7 +355,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
@@ -375,7 +375,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -383,7 +383,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 4), end: SourceLocation(line: 1, column: 5))
                 ),
                 Token(
@@ -411,7 +411,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(
@@ -431,7 +431,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -455,7 +455,7 @@ final class TokensTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("1"),
+                    kind: .integerLiteral("1"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -463,7 +463,7 @@ final class TokensTest: XCTestCase {
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 2), end: SourceLocation(line: 1, column: 3))
                 ),
                 Token(
-                    kind: .number("2"),
+                    kind: .integerLiteral("2"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 3), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(

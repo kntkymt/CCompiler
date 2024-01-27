@@ -9,7 +9,7 @@ final class ParseErrorTest: XCTestCase {
             _ = try Parser(
                 tokens: buildTokens(
                     kinds: [
-                        .number("1"),
+                        .integerLiteral("1"),
                         .reserved(.add),
                         .reserved(.semicolon),
                         .endOfFile
@@ -28,10 +28,10 @@ final class ParseErrorTest: XCTestCase {
             _ = try Parser(
                 tokens: buildTokens(
                     kinds: [
-                        .number("1"),
+                        .integerLiteral("1"),
                         .reserved(.add),
                         .reserved(.div),
-                        .number("2"),
+                        .integerLiteral("2"),
                         .reserved(.semicolon),
                         .endOfFile
                     ]
@@ -49,9 +49,9 @@ final class ParseErrorTest: XCTestCase {
             _ = try Parser(
                 tokens: buildTokens(
                     kinds: [
-                        .number("1"),
+                        .integerLiteral("1"),
                         .reserved(.add),
-                        .number("2"),
+                        .integerLiteral("2"),
                         .endOfFile
                     ]
                 )

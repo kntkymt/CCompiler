@@ -1,9 +1,9 @@
 import XCTest
 @testable import Tokenizer
 
-final class NumberTest: XCTestCase {
+final class IntegerLiteralTest: XCTestCase {
 
-    func testNumber() throws {
+    func testIntegerLiteral() throws {
         let source = "5"
         let tokens = try Tokenizer(source: source).tokenize()
 
@@ -12,7 +12,7 @@ final class NumberTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("5"),
+                    kind: .integerLiteral("5"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 2))
                 ),
                 Token(
@@ -23,7 +23,7 @@ final class NumberTest: XCTestCase {
         )
     }
 
-    func testNumberMultitoken() throws {
+    func testIntegerLiteralMulti() throws {
         let source = "123"
         let tokens = try Tokenizer(source: source).tokenize()
 
@@ -32,7 +32,7 @@ final class NumberTest: XCTestCase {
             tokens,
             [
                 Token(
-                    kind: .number("123"),
+                    kind: .integerLiteral("123"),
                     sourceRange: SourceRange(start: SourceLocation(line: 1, column: 1), end: SourceLocation(line: 1, column: 4))
                 ),
                 Token(

@@ -55,7 +55,7 @@ public class Tokenizer {
 
     // MARK: - Private
 
-    private func extractNumber() -> TokenKind {
+    private func extractIntegerLiteral() -> TokenKind {
         var string = ""
 
         while index < charactors.count {
@@ -68,10 +68,10 @@ public class Tokenizer {
             }
         }
 
-        return .number(string)
+        return .integerLiteral(string)
     }
 
-    private func extractString() -> TokenKind {
+    private func extractStringLiteral() -> TokenKind {
         var content = ""
 
         // 開始の"
@@ -176,11 +176,11 @@ public class Tokenizer {
         }
 
         if charactors[index].isNumber {
-            return extractNumber()
+            return extractIntegerLiteral()
         }
 
         if charactors[index] == "\"" {
-            return extractString()
+            return extractStringLiteral()
         }
 
         for reservedKind in reservedKinds {

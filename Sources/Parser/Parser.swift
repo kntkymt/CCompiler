@@ -407,17 +407,11 @@ public final class Parser {
                 parenthesisRight: try consume(.reserved(.parenthesisRight))
             )
 
-        case .number:
-            let numberToken = try consume(.integerLiteral)
-            let numberNode = IntegerLiteralNode(literal: numberToken)
-
-            return numberNode
+        case .integerLiteral:
+            return IntegerLiteralNode(literal: try consume(.integerLiteral))
 
         case .stringLiteral:
-            let stringToken = try consume(.stringLiteral)
-            let stringLiteralNode = StringLiteralNode(literal: stringToken)
-
-            return stringLiteralNode
+            return StringLiteralNode(literal: try consume(.stringLiteral))
 
         case .identifier:
             let identifierToken = try consume(.identifier)

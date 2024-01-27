@@ -9,9 +9,9 @@ final class WhileTest: XCTestCase {
             kinds: [
                 .keyword(.while),
                 .reserved(.parenthesisLeft),
-                .number("1"),
+                .integerLiteral("1"),
                 .reserved(.parenthesisRight),
-                .number("2"),
+                .integerLiteral("2"),
                 .reserved(.semicolon),
                 .endOfFile
             ]
@@ -44,7 +44,7 @@ final class WhileTest: XCTestCase {
                     kinds: [
                         .keyword(.while),
                         .reserved(.parenthesisLeft),
-                        .number("1"),
+                        .integerLiteral("1"),
                         .reserved(.parenthesisRight),
                         .reserved(.semicolon),
                         .endOfFile
