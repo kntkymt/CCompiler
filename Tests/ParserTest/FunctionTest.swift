@@ -116,7 +116,7 @@ final class FunctionTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: FunctionCallExprSyntax(
-                    identifier: TokenSyntax(token: tokens[0]),
+                    identifier: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
                     parenthesisLeft: TokenSyntax(token: tokens[1]),
                     arguments: [],
                     parenthesisRight: TokenSyntax(token: tokens[2])
@@ -198,14 +198,14 @@ final class FunctionTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: FunctionCallExprSyntax(
-                    identifier: TokenSyntax(token: tokens[0]),
+                    identifier: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
                     parenthesisLeft: TokenSyntax(token: tokens[1]),
                     arguments: [
                         ExprListItemSyntax(
                             expression: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
                             comma: TokenSyntax(token: tokens[3])
                         ),
-                        ExprListItemSyntax(expression: IdentifierSyntax(baseName: TokenSyntax(token: tokens[4])))
+                        ExprListItemSyntax(expression: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[4])))
                     ],
                     parenthesisRight: TokenSyntax(token: tokens[5])
                 ),
@@ -300,7 +300,7 @@ final class FunctionTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: SubscriptCallExprSyntax(
-                    identifier: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    identifier: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
                     squareLeft: TokenSyntax(token: tokens[1]),
                     argument: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
                     squareRight: TokenSyntax(token: tokens[3])
@@ -330,12 +330,12 @@ final class FunctionTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: SubscriptCallExprSyntax(
-                    identifier: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    identifier: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
                     squareLeft: TokenSyntax(token: tokens[1]),
                     argument: InfixOperatorExprSyntax(
                         left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
-                        operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[3])),
-                        right: IdentifierSyntax(baseName: TokenSyntax(token: tokens[4]))
+                        operator: TokenSyntax(token: tokens[3]),
+                        right: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[4]))
                     ),
                     squareRight: TokenSyntax(token: tokens[5])
                 ),

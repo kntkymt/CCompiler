@@ -4,21 +4,18 @@ public enum SyntaxKind {
     case token
 
     case integerLiteral
-    case identifier
+    case declReference
     case stringLiteral
 
     case type
     case pointerType
     case arrayType
-
-    case binaryOperator
-    case assign
-
+    
     case prefixOperatorExpr
     case infixOperatorExpr
     case functionCallExpr
     case subscriptCallExpr
-    case arrayExpr
+    case initListExpr
     case exprListItem
     case tupleExpr
 
@@ -40,11 +37,17 @@ public protocol SyntaxProtocol: Equatable {
     var kind: SyntaxKind { get }
     var sourceTokens: [Token] { get }
     var children: [any SyntaxProtocol] { get }
+
+    var sourceRange: SourceRange { get }
 }
 
 public extension SyntaxProtocol {
     var sourceTokens: [Token] {
         children.flatMap { $0.sourceTokens }
+    }
+
+    var sourceRange: SourceRange {
+        SourceRange(start: sourceTokens.first?.sourceRange.start ?? .startOfFile, end: sourceTokens.last?.sourceRange.end ?? .startOfFile)
     }
 }
 
@@ -57,11 +60,9 @@ extension SyntaxProtocol {
 public final class AnySyntax: SyntaxProtocol {
 
     public let kind: SyntaxKind
-    public let sourceTokens: [Token]
     public let children: [any SyntaxProtocol]
 
     public init(_ syntax: any SyntaxProtocol) {
-        self.sourceTokens = syntax.sourceTokens
         self.children = syntax.children
         self.kind = syntax.kind
     }
@@ -73,5 +74,6 @@ public final class AnySyntax: SyntaxProtocol {
         && zip(lhs.children, rhs.children).allSatisfy { lhsChild, rhsChild in
             AnySyntax(lhsChild) == AnySyntax(rhsChild)
         }
+        && lhs.sourceRange == rhs.sourceRange
     }
 }

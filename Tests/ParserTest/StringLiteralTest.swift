@@ -43,8 +43,8 @@ final class StringLiteralTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
-                    left: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
-                    operator: AssignSyntax(equal: TokenSyntax(token: tokens[1])),
+                    left: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: StringLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])

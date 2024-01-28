@@ -177,7 +177,7 @@ public class FunctionDeclSyntax: SyntaxProtocol {
         [returnType, functionName, parenthesisLeft] + parameters + [parenthesisRight, block]
     }
 
-    public let returnType: any SyntaxProtocol
+    public let returnType: any TypeSyntaxProtocol
     public let functionName: TokenSyntax
     public let parenthesisLeft: TokenSyntax
     public let parameters: [FunctionParameterSyntax]
@@ -187,7 +187,7 @@ public class FunctionDeclSyntax: SyntaxProtocol {
     // MARK: - Initializer
 
     public init(
-        returnType: any SyntaxProtocol,
+        returnType: any TypeSyntaxProtocol,
         functionName: TokenSyntax,
         parenthesisLeft: TokenSyntax,
         parameters: [FunctionParameterSyntax],

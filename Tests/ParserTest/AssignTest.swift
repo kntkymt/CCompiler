@@ -21,8 +21,8 @@ final class AssignTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
-                    left: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
-                    operator: AssignSyntax(equal: TokenSyntax(token: tokens[1])),
+                    left: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
@@ -49,11 +49,11 @@ final class AssignTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
-                    left: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
-                    operator: AssignSyntax(equal: TokenSyntax(token: tokens[1])),
+                    left: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: InfixOperatorExprSyntax(
-                        left: IdentifierSyntax(baseName: TokenSyntax(token: tokens[2])),
-                        operator: AssignSyntax(equal: TokenSyntax(token: tokens[3])),
+                        left: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[2])),
+                        operator: TokenSyntax(token: tokens[3]),
                         right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4]))
                     )
                 ),
@@ -81,7 +81,7 @@ final class AssignTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: AssignSyntax(equal: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])

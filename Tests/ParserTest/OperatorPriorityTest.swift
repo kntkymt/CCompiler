@@ -25,10 +25,10 @@ final class OperatorPriorityTest: XCTestCase {
                 item: InfixOperatorExprSyntax(
                     left: InfixOperatorExprSyntax(
                         left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                        operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                        operator: TokenSyntax(token: tokens[1]),
                         right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                     ),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[3])),
+                    operator: TokenSyntax(token: tokens[3]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4]))
                 ),
                 semicolon: TokenSyntax(token: tokens[5])
@@ -57,10 +57,10 @@ final class OperatorPriorityTest: XCTestCase {
                 item: InfixOperatorExprSyntax(
                     left: InfixOperatorExprSyntax(
                         left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                        operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                        operator: TokenSyntax(token: tokens[1]),
                         right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                     ),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[3])),
+                    operator: TokenSyntax(token: tokens[3]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4]))
                 ),
                 semicolon: TokenSyntax(token: tokens[5])
@@ -88,10 +88,10 @@ final class OperatorPriorityTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: InfixOperatorExprSyntax(
                         left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
-                        operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[3])),
+                        operator: TokenSyntax(token: tokens[3]),
                         right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[4]))
                     )
                 ),
@@ -125,12 +125,12 @@ final class OperatorPriorityTest: XCTestCase {
                         parenthesisLeft: TokenSyntax(token: tokens[0]),
                         expression: InfixOperatorExprSyntax(
                             left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[1])),
-                            operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[2])),
+                            operator: TokenSyntax(token: tokens[2]),
                             right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[3]))
                         ),
                         parenthesisRight: TokenSyntax(token: tokens[4])
                     ),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[5])),
+                    operator: TokenSyntax(token: tokens[5]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[6]))
                 ),
                 semicolon: TokenSyntax(token: tokens[7])

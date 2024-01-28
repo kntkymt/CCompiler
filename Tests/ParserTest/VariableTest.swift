@@ -185,7 +185,7 @@ final class VariableTest: XCTestCase {
                     ),
                     identifier: TokenSyntax(token: tokens[1]),
                     equal: TokenSyntax(token: tokens[5]),
-                    initializerExpr: ArrayExprSyntax(
+                    initializerExpr: InitListExprSyntax(
                         braceLeft: TokenSyntax(token: tokens[6]),
                         exprListSyntaxs: [
                             ExprListItemSyntax(expression: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[7])), comma: TokenSyntax(token: tokens[8])),
