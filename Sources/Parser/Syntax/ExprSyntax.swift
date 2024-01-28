@@ -51,28 +51,6 @@ public class PrefixOperatorExprSyntax: SyntaxProtocol {
     public let `operator`: TokenSyntax
     public let expression: any SyntaxProtocol
 
-    public var operatorKind: OperatorKind {
-        switch `operator`.tokenKind {
-        case .reserved(.add):
-            return .plus
-
-        case .reserved(.sub):
-            return .minus
-
-        case .reserved(.mul):
-            return .reference
-
-        case .reserved(.and):
-            return .address
-
-        case .keyword(.sizeof):
-            return .sizeof
-
-        default:
-            fatalError()
-        }
-    }
-
     // MARK: - Initializer
 
     public init(operator: TokenSyntax, expression: any SyntaxProtocol) {

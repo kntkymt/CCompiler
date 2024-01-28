@@ -54,7 +54,7 @@ public struct ASTGenerator {
     }
 
     func generate(_ arrayType: ArrayTypeSyntax) -> ArrayTypeNode {
-        ArrayTypeNode(elementType: generate(arrayType.elementType), arrayLength: arrayType.arrayLength, sourceRange: arrayType.sourceRange)
+        ArrayTypeNode(elementType: generate(arrayType.elementType), arrayLength: Int(arrayType.arraySize.text)!, sourceRange: arrayType.sourceRange)
     }
 
     func generate(_ prefixOperatorExpr: PrefixOperatorExprSyntax) -> PrefixOperatorExprNode {
