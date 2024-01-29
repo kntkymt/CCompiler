@@ -1,5 +1,6 @@
 import XCTest
 @testable import Parser
+@testable import AST
 import Tokenizer
 
 final class FunctionTest: XCTestCase {
@@ -47,6 +48,30 @@ final class FunctionTest: XCTestCase {
                     )
                 ],
                 endOfFile: TokenSyntax(token: tokens[10])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SourceFileNode,
+            SourceFileNode(
+                statements: [
+                    FunctionDeclNode(
+                        returnType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                        functionName: tokens[1].text,
+                        parameters: [],
+                        block: BlockStatementNode(
+                            items: [
+                                IntegerLiteralNode(literal: tokens[5].text, sourceRange: tokens[5].sourceRange),
+                                IntegerLiteralNode(literal: tokens[7].text, sourceRange: tokens[7].sourceRange)
+                            ],
+                            sourceRange: SourceRange(start: tokens[4].sourceRange.start, end: tokens[9].sourceRange.end)
+                        ),
+                        sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[9].sourceRange.end)
+                    )
+                ],
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[10].sourceRange.end)
             )
         )
     }
@@ -97,6 +122,33 @@ final class FunctionTest: XCTestCase {
                 endOfFile: TokenSyntax(token: tokens[11])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SourceFileNode,
+            SourceFileNode(
+                statements: [
+                    FunctionDeclNode(
+                        returnType: PointerTypeNode(
+                            referenceType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                            sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
+                        ),
+                        functionName: tokens[2].text,
+                        parameters: [],
+                        block: BlockStatementNode(
+                            items: [
+                                IntegerLiteralNode(literal: tokens[6].text, sourceRange: tokens[6].sourceRange),
+                                IntegerLiteralNode(literal: tokens[8].text, sourceRange: tokens[8].sourceRange)
+                            ],
+                            sourceRange: SourceRange(start: tokens[5].sourceRange.start, end: tokens[10].sourceRange.end)
+                        ),
+                        sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[10].sourceRange.end)
+                    )
+                ],
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[11].sourceRange.end)
+            )
+        )
     }
 
     func testFunctionCall() throws {
@@ -116,12 +168,23 @@ final class FunctionTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: FunctionCallExprSyntax(
-                    identifier: TokenSyntax(token: tokens[0]),
+                    identifier: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
                     parenthesisLeft: TokenSyntax(token: tokens[1]),
                     arguments: [],
                     parenthesisRight: TokenSyntax(token: tokens[2])
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! FunctionCallExprNode,
+            FunctionCallExprNode(
+                identifier: DeclReferenceNode(baseName: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                arguments: [],
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -176,6 +239,40 @@ final class FunctionTest: XCTestCase {
                 endOfFile: TokenSyntax(token: tokens[13])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SourceFileNode,
+            SourceFileNode(
+                statements: [
+                    FunctionDeclNode(
+                        returnType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                        functionName: tokens[1].text,
+                        parameters: [
+                            FunctionParameterNode(
+                                type: TypeNode(type: .int, sourceRange: tokens[3].sourceRange),
+                                identifierName: tokens[4].text,
+                                sourceRange: SourceRange(start: tokens[3].sourceRange.start, end: tokens[5].sourceRange.end)
+                            ),
+                            FunctionParameterNode(
+                                type: TypeNode(type: .int, sourceRange: tokens[6].sourceRange),
+                                identifierName: tokens[7].text,
+                                sourceRange: SourceRange(start: tokens[6].sourceRange.start, end: tokens[7].sourceRange.end)
+                            )
+                        ],
+                        block: BlockStatementNode(
+                            items: [
+                                IntegerLiteralNode(literal: tokens[10].text, sourceRange: tokens[10].sourceRange)
+                            ],
+                            sourceRange: SourceRange(start: tokens[9].sourceRange.start, end: tokens[12].sourceRange.end)
+                        ),
+                        sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[12].sourceRange.end)
+                    )
+                ],
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[13].sourceRange.end)
+            )
+        )
     }
 
     func testFunctionCallWithArguments() throws {
@@ -198,18 +295,32 @@ final class FunctionTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: FunctionCallExprSyntax(
-                    identifier: TokenSyntax(token: tokens[0]),
+                    identifier: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
                     parenthesisLeft: TokenSyntax(token: tokens[1]),
                     arguments: [
                         ExprListItemSyntax(
                             expression: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
                             comma: TokenSyntax(token: tokens[3])
                         ),
-                        ExprListItemSyntax(expression: IdentifierSyntax(baseName: TokenSyntax(token: tokens[4])))
+                        ExprListItemSyntax(expression: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[4])))
                     ],
                     parenthesisRight: TokenSyntax(token: tokens[5])
                 ),
                 semicolon: TokenSyntax(token: tokens[6])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! FunctionCallExprNode,
+            FunctionCallExprNode(
+                identifier: DeclReferenceNode(baseName: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                arguments: [
+                    IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                    DeclReferenceNode(baseName: tokens[4].text, sourceRange: tokens[4].sourceRange)
+                ],
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[5].sourceRange.end)
             )
         )
     }
@@ -280,6 +391,41 @@ final class FunctionTest: XCTestCase {
                 endOfFile: TokenSyntax(token: tokens[16])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SourceFileNode,
+            SourceFileNode(
+                statements: [
+                    FunctionDeclNode(
+                        returnType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                        functionName: tokens[1].text,
+                        parameters: [],
+                        block: BlockStatementNode(
+                            items: [
+                                IntegerLiteralNode(literal: tokens[5].text, sourceRange: tokens[5].sourceRange)
+                            ],
+                            sourceRange: SourceRange(start: tokens[4].sourceRange.start, end: tokens[7].sourceRange.end)
+                        ),
+                        sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[7].sourceRange.end)
+                    ),
+                    FunctionDeclNode(
+                        returnType: TypeNode(type: .int, sourceRange: tokens[8].sourceRange),
+                        functionName: tokens[9].text,
+                        parameters: [],
+                        block: BlockStatementNode(
+                            items: [
+                                IntegerLiteralNode(literal: tokens[13].text, sourceRange: tokens[13].sourceRange)
+                            ],
+                            sourceRange: SourceRange(start: tokens[12].sourceRange.start, end: tokens[15].sourceRange.end)
+                        ),
+                        sourceRange: SourceRange(start: tokens[8].sourceRange.start, end: tokens[15].sourceRange.end)
+                    )
+                ],
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[16].sourceRange.end)
+            )
+        )
     }
 
     func testSubscriptCall() throws {
@@ -300,12 +446,23 @@ final class FunctionTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: SubscriptCallExprSyntax(
-                    identifier: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    identifier: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
                     squareLeft: TokenSyntax(token: tokens[1]),
                     argument: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
                     squareRight: TokenSyntax(token: tokens[3])
                 ),
                 semicolon: TokenSyntax(token: tokens[4])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SubscriptCallExprNode,
+            SubscriptCallExprNode(
+                identifier: DeclReferenceNode(baseName: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                argument: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[3].sourceRange.end)
             )
         )
     }
@@ -330,16 +487,32 @@ final class FunctionTest: XCTestCase {
             syntax,
             BlockItemSyntax(
                 item: SubscriptCallExprSyntax(
-                    identifier: IdentifierSyntax(baseName: TokenSyntax(token: tokens[0])),
+                    identifier: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[0])),
                     squareLeft: TokenSyntax(token: tokens[1]),
                     argument: InfixOperatorExprSyntax(
                         left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2])),
-                        operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[3])),
-                        right: IdentifierSyntax(baseName: TokenSyntax(token: tokens[4]))
+                        operator: TokenSyntax(token: tokens[3]),
+                        right: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[4]))
                     ),
                     squareRight: TokenSyntax(token: tokens[5])
                 ),
                 semicolon: TokenSyntax(token: tokens[6])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SubscriptCallExprNode,
+            SubscriptCallExprNode(
+                identifier: DeclReferenceNode(baseName: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                argument: InfixOperatorExprNode(
+                    left: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                    operator: .add,
+                    right: DeclReferenceNode(baseName: tokens[4].text, sourceRange: tokens[4].sourceRange),
+                    sourceRange: SourceRange(start: tokens[2].sourceRange.start, end: tokens[4].sourceRange.end)
+                ),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[5].sourceRange.end)
             )
         )
     }

@@ -1,5 +1,6 @@
 import XCTest
 @testable import Parser
+@testable import AST
 import Tokenizer
 
 final class OperatorsTest: XCTestCase {
@@ -22,10 +23,22 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .add,
+                right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -48,10 +61,22 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .sub,
+                right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -74,10 +99,22 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .mul,
+                right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -100,10 +137,22 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .div,
+                right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -130,6 +179,17 @@ final class OperatorsTest: XCTestCase {
                 semicolon: TokenSyntax(token: tokens[2])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! PrefixOperatorExprNode,
+            PrefixOperatorExprNode(
+                operator: .plus,
+                expression: IntegerLiteralNode(literal: tokens[1].text, sourceRange: tokens[1].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
+            )
+        )
     }
 
     func testUnarySub() throws {
@@ -154,6 +214,17 @@ final class OperatorsTest: XCTestCase {
                 semicolon: TokenSyntax(token: tokens[2])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! PrefixOperatorExprNode,
+            PrefixOperatorExprNode(
+                operator: .minus,
+                expression: IntegerLiteralNode(literal: tokens[1].text, sourceRange: tokens[1].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
+            )
+        )
     }
 
     func testUnaryAddress() throws {
@@ -173,9 +244,20 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: PrefixOperatorExprSyntax(
                     operator: TokenSyntax(token: tokens[0]),
-                    expression: IdentifierSyntax(baseName: TokenSyntax(token: tokens[1]))
+                    expression: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[1]))
                 ),
                 semicolon: TokenSyntax(token: tokens[2])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! PrefixOperatorExprNode,
+            PrefixOperatorExprNode(
+                operator: .address,
+                expression: DeclReferenceNode(baseName: tokens[1].text, sourceRange: tokens[1].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
             )
         )
     }
@@ -197,9 +279,20 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: PrefixOperatorExprSyntax(
                     operator: TokenSyntax(token: tokens[0]),
-                    expression: IdentifierSyntax(baseName: TokenSyntax(token: tokens[1]))
+                    expression: DeclReferenceSyntax(baseName: TokenSyntax(token: tokens[1]))
                 ),
                 semicolon: TokenSyntax(token: tokens[2])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! PrefixOperatorExprNode,
+            PrefixOperatorExprNode(
+                operator: .reference,
+                expression: DeclReferenceNode(baseName: tokens[1].text, sourceRange: tokens[1].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
             )
         )
     }
@@ -222,10 +315,22 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .equal,
+                right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -248,10 +353,22 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .notEqual,
+                right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -274,10 +391,22 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .greaterThan,
+                right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -300,10 +429,22 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .greaterThanOrEqual,
+                right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -326,7 +467,7 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
@@ -352,15 +493,26 @@ final class OperatorsTest: XCTestCase {
             BlockItemSyntax(
                 item: InfixOperatorExprSyntax(
                     left: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[0])),
-                    operator: BinaryOperatorSyntax(operator: TokenSyntax(token: tokens[1])),
+                    operator: TokenSyntax(token: tokens[1]),
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[2]))
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .lessThanOrEqual,
+                right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
+            )
+        )
     }
 
-    // FIXME: sizeofって本当にAST上で置き換えるの？
     func testSizeof() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
@@ -387,6 +539,20 @@ final class OperatorsTest: XCTestCase {
                     )
                 ),
                 semicolon: TokenSyntax(token: tokens[4])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! PrefixOperatorExprNode,
+            PrefixOperatorExprNode(
+                operator: .sizeof,
+                expression: TupleExprNode(
+                    expression: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                    sourceRange: SourceRange(start: tokens[1].sourceRange.start, end: tokens[3].sourceRange.end)
+                ),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[3].sourceRange.end)
             )
         )
     }

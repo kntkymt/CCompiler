@@ -10,12 +10,12 @@ public class InfixOperatorExprSyntax: SyntaxProtocol {
     }
 
     public let left: any SyntaxProtocol
-    public let `operator`: any SyntaxProtocol
+    public let `operator`: TokenSyntax
     public let right: any SyntaxProtocol
 
     // MARK: - Initializer
 
-    public init(left: any SyntaxProtocol, operator: any SyntaxProtocol, right: any SyntaxProtocol) {
+    public init(left: any SyntaxProtocol, operator: TokenSyntax, right: any SyntaxProtocol) {
         self.left = left
         self.operator = `operator`
         self.right = right
@@ -51,28 +51,6 @@ public class PrefixOperatorExprSyntax: SyntaxProtocol {
     public let `operator`: TokenSyntax
     public let expression: any SyntaxProtocol
 
-    public var operatorKind: OperatorKind {
-        switch `operator`.tokenKind {
-        case .reserved(.add):
-            return .plus
-
-        case .reserved(.sub):
-            return .minus
-
-        case .reserved(.mul):
-            return .reference
-
-        case .reserved(.and):
-            return .address
-
-        case .keyword(.sizeof):
-            return .sizeof
-
-        default:
-            fatalError()
-        }
-    }
-
     // MARK: - Initializer
 
     public init(operator: TokenSyntax, expression: any SyntaxProtocol) {
@@ -90,14 +68,14 @@ public class FunctionCallExprSyntax: SyntaxProtocol {
         [identifier, parenthesisLeft] + arguments + [parenthesisRight]
     }
 
-    public let identifier: TokenSyntax
+    public let identifier: DeclReferenceSyntax
     public let parenthesisLeft: TokenSyntax
     public let arguments: [ExprListItemSyntax]
     public let parenthesisRight: TokenSyntax
 
     // MARK: - Initializer
 
-    public init(identifier: TokenSyntax, parenthesisLeft: TokenSyntax, arguments: [ExprListItemSyntax], parenthesisRight: TokenSyntax) {
+    public init(identifier: DeclReferenceSyntax, parenthesisLeft: TokenSyntax, arguments: [ExprListItemSyntax], parenthesisRight: TokenSyntax) {
         self.identifier = identifier
         self.parenthesisLeft = parenthesisLeft
         self.arguments = arguments
@@ -114,14 +92,14 @@ public class SubscriptCallExprSyntax: SyntaxProtocol {
         [identifier, squareLeft, argument, squareRight]
     }
 
-    public let identifier: IdentifierSyntax
+    public let identifier: DeclReferenceSyntax
     public let squareLeft: TokenSyntax
     public let argument: any SyntaxProtocol
     public let squareRight: TokenSyntax
 
     // MARK: - Initializer
 
-    public init(identifier: IdentifierSyntax, squareLeft: TokenSyntax, argument: any SyntaxProtocol, squareRight: TokenSyntax) {
+    public init(identifier: DeclReferenceSyntax, squareLeft: TokenSyntax, argument: any SyntaxProtocol, squareRight: TokenSyntax) {
         self.identifier = identifier
         self.squareLeft = squareLeft
         self.argument = argument
@@ -129,24 +107,24 @@ public class SubscriptCallExprSyntax: SyntaxProtocol {
     }
 }
 
-public class ArrayExprSyntax: SyntaxProtocol {
+public class InitListExprSyntax: SyntaxProtocol {
 
     // MARK: - Property
 
-    public let kind: SyntaxKind = .arrayExpr
+    public let kind: SyntaxKind = .initListExpr
     public var children: [any SyntaxProtocol] {
-        [braceLeft] + exprListSyntaxs + [braceRight]
+        [braceLeft] + exprListItemSyntaxs + [braceRight]
     }
 
     public let braceLeft: TokenSyntax
-    public let exprListSyntaxs: [ExprListItemSyntax]
+    public let exprListItemSyntaxs: [ExprListItemSyntax]
     public let braceRight: TokenSyntax
 
     // MARK: - Initializer
 
     public init(braceLeft: TokenSyntax, exprListSyntaxs: [ExprListItemSyntax], braceRight: TokenSyntax) {
         self.braceLeft = braceLeft
-        self.exprListSyntaxs = exprListSyntaxs
+        self.exprListItemSyntaxs = exprListSyntaxs
         self.braceRight = braceRight
     }
 }

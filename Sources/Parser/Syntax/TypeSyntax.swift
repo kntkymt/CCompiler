@@ -1,8 +1,6 @@
 import Tokenizer
 
 public protocol TypeSyntaxProtocol: SyntaxProtocol {
-
-    var memorySize: Int { get }
 }
 
 public class TypeSyntax: TypeSyntaxProtocol {
@@ -15,19 +13,6 @@ public class TypeSyntax: TypeSyntaxProtocol {
     }
 
     public let type: TokenSyntax
-
-    public var memorySize: Int {
-        return switch type.tokenKind {
-        case .type(let typeKind):
-            switch typeKind {
-            case .int: 8
-            case .char: 1
-            }
-
-        default:
-            fatalError()
-        }
-    }
 
     // MARK: - Initializer
 
@@ -47,8 +32,6 @@ public class PointerTypeSyntax: TypeSyntaxProtocol {
 
     public let referenceType: any TypeSyntaxProtocol
     public let pointer: TokenSyntax
-
-    public let memorySize: Int = 8
 
     // MARK: - Initializer
 
@@ -72,13 +55,6 @@ public class ArrayTypeSyntax: TypeSyntaxProtocol {
     public let arraySize: TokenSyntax
     public let squareRight: TokenSyntax
 
-    public var arrayLength: Int {
-        Int(arraySize.text)!
-    }
-
-    public var memorySize: Int {
-        arrayLength * elementType.memorySize
-    }
     // MARK: - Initializer
 
     public init(elementType: any TypeSyntaxProtocol, squareLeft: TokenSyntax, arraySize: TokenSyntax, squareRight: TokenSyntax) {

@@ -251,7 +251,7 @@ public final class Parser {
                     type: type,
                     identifier: identifier,
                     equal: initializer,
-                    initializerExpr: ArrayExprSyntax(
+                    initializerExpr: InitListExprSyntax(
                         braceLeft: try consume(.reserved(.braceLeft)),
                         exprListSyntaxs: try exprList(),
                         braceRight: try consume(.reserved(.braceRight))
@@ -302,12 +302,12 @@ public final class Parser {
     func assign() throws -> any SyntaxProtocol {
         var syntax = try equality()
 
-        if let token = consume(if: .reserved(.assign)) {
+        if let assignToken = consume(if: .reserved(.assign)) {
             let rightSyntax = try assign()
 
             syntax = InfixOperatorExprSyntax(
                 left: syntax, 
-                operator: AssignSyntax(equal: token),
+                operator: assignToken,
                 right: rightSyntax
             )
         }
@@ -322,7 +322,7 @@ public final class Parser {
         while let equalityToken = consume(if: .reserved(.equal), .reserved(.notEqual)) {
             syntax = InfixOperatorExprSyntax(
                 left: syntax,
-                operator: BinaryOperatorSyntax(operator: equalityToken),
+                operator: equalityToken,
                 right: try relational()
             )
         }
@@ -337,7 +337,7 @@ public final class Parser {
         while let relationalToken = consume(if: .reserved(.lessThan), .reserved(.lessThanOrEqual), .reserved(.greaterThan), .reserved(.greaterThanOrEqual)) {
             syntax = InfixOperatorExprSyntax(
                 left: syntax,
-                operator: BinaryOperatorSyntax(operator: relationalToken),
+                operator: relationalToken,
                 right: try add()
             )
         }
@@ -352,7 +352,7 @@ public final class Parser {
         while let addOrSub = consume(if: .reserved(.add), .reserved(.sub)) {
             syntax = InfixOperatorExprSyntax(
                 left: syntax,
-                operator: BinaryOperatorSyntax(operator: addOrSub),
+                operator: addOrSub,
                 right: try mul()
             )
         }
@@ -367,7 +367,7 @@ public final class Parser {
         while let mulOrDivToken = consume(if: .reserved(.mul), .reserved(.div)) {
             syntax = InfixOperatorExprSyntax(
                 left: syntax,
-                operator: BinaryOperatorSyntax(operator: mulOrDivToken),
+                operator: mulOrDivToken,
                 right: try unary()
             )
         }
@@ -425,20 +425,20 @@ public final class Parser {
                 let parenthesisRight = try consume(.reserved(.parenthesisRight))
 
                 return FunctionCallExprSyntax(
-                    identifier: identifierToken,
+                    identifier: DeclReferenceSyntax(baseName: identifierToken),
                     parenthesisLeft: parenthesisLeft,
                     arguments: argments,
                     parenthesisRight: parenthesisRight
                 )
             } else if at(.reserved(.squareLeft)) {
                 return SubscriptCallExprSyntax(
-                    identifier: IdentifierSyntax(baseName: identifierToken),
+                    identifier: DeclReferenceSyntax(baseName: identifierToken),
                     squareLeft: try consume(.reserved(.squareLeft)),
                     argument: try expr(),
                     squareRight: try consume(.reserved(.squareRight))
                 )
             } else {
-                return IdentifierSyntax(baseName: identifierToken)
+                return DeclReferenceSyntax(baseName: identifierToken)
             }
 
         default:
