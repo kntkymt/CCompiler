@@ -175,7 +175,6 @@ final class VariableTest: XCTestCase {
         )
     }
 
-    // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclVariableArray() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
@@ -190,24 +189,38 @@ final class VariableTest: XCTestCase {
         )
         let syntax = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
+
         XCTAssertEqual(
             syntax,
             BlockItemSyntax(
                 item: VariableDeclSyntax(
-                    type: ArrayTypeSyntax(
-                        elementType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
-                        squareLeft: TokenSyntax(token: tokens[2]),
-                        arraySize: TokenSyntax(token: tokens[3]),
-                        squareRight: TokenSyntax(token: tokens[4])
-                    ),
-                    identifier: TokenSyntax(token: tokens[1])
+                    type: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                    identifier: TokenSyntax(token: tokens[1]),
+                    squareLeft: TokenSyntax(token: tokens[2]),
+                    arrayLength: TokenSyntax(token: tokens[3]),
+                    squareRight: TokenSyntax(token: tokens[4])
                 ),
                 semicolon: TokenSyntax(token: tokens[5])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! VariableDeclNode,
+            VariableDeclNode(
+                type: ArrayTypeNode(
+                    elementType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange), 
+                    arrayLength: Int(tokens[3].text)!,
+                    sourceRange: tokens[0].sourceRange
+                ),
+                identifierName: tokens[1].text,
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[4].sourceRange.end)
+            )
+        )
     }
 
-    // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclAndInitVariableArray() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
@@ -228,17 +241,17 @@ final class VariableTest: XCTestCase {
         )
         let syntax = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
+
         XCTAssertEqual(
             syntax,
             BlockItemSyntax(
                 item: VariableDeclSyntax(
-                    type: ArrayTypeSyntax(
-                        elementType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
-                        squareLeft: TokenSyntax(token: tokens[2]),
-                        arraySize: TokenSyntax(token: tokens[3]),
-                        squareRight: TokenSyntax(token: tokens[4])
-                    ),
+                    type: TypeSyntax(type: TokenSyntax(token: tokens[0])),
                     identifier: TokenSyntax(token: tokens[1]),
+                    squareLeft: TokenSyntax(token: tokens[2]),
+                    arrayLength: TokenSyntax(token: tokens[3]),
+                    squareRight: TokenSyntax(token: tokens[4]),
                     equal: TokenSyntax(token: tokens[5]),
                     initializerExpr: InitListExprSyntax(
                         braceLeft: TokenSyntax(token: tokens[6]),
@@ -252,9 +265,36 @@ final class VariableTest: XCTestCase {
                 semicolon: TokenSyntax(token: tokens[11])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! VariableDeclNode,
+            VariableDeclNode(
+                type: ArrayTypeNode(
+                    elementType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                    arrayLength: Int(tokens[3].text)!,
+                    sourceRange: tokens[0].sourceRange
+                ),
+                identifierName: tokens[1].text,
+                initializerExpr: InitListExprNode(
+                    expressions: [
+                        IntegerLiteralNode(
+                            literal: tokens[7].text,
+                            sourceRange: tokens[7].sourceRange
+                        ),
+                        IntegerLiteralNode(
+                            literal: tokens[9].text,
+                            sourceRange: tokens[9].sourceRange
+                        )
+                    ],
+                    sourceRange: SourceRange(start: tokens[6].sourceRange.start, end: tokens[10].sourceRange.end)
+                ),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[10].sourceRange.end)
+            )
+        )
     }
 
-    // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclAndInitVariableStringLiteral() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
@@ -271,26 +311,41 @@ final class VariableTest: XCTestCase {
         )
         let syntax = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
+
         XCTAssertEqual(
             syntax,
             BlockItemSyntax(
                 item: VariableDeclSyntax(
-                    type: ArrayTypeSyntax(
-                        elementType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
-                        squareLeft: TokenSyntax(token: tokens[2]),
-                        arraySize: TokenSyntax(token: tokens[3]),
-                        squareRight: TokenSyntax(token: tokens[4])
-                    ),
+                    type: TypeSyntax(type: TokenSyntax(token: tokens[0])),
                     identifier: TokenSyntax(token: tokens[1]),
+                    squareLeft: TokenSyntax(token: tokens[2]),
+                    arrayLength: TokenSyntax(token: tokens[3]),
+                    squareRight: TokenSyntax(token: tokens[4]),
                     equal: TokenSyntax(token: tokens[5]),
                     initializerExpr: StringLiteralSyntax(literal: TokenSyntax(token: tokens[6]))
                 ),
                 semicolon: TokenSyntax(token: tokens[7])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! VariableDeclNode,
+            VariableDeclNode(
+                type: ArrayTypeNode(
+                    elementType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                    arrayLength: Int(tokens[3].text)!,
+                    sourceRange: tokens[0].sourceRange
+                ),
+                identifierName: tokens[1].text,
+                initializerExpr: StringLiteralNode(literal: "ai", sourceRange: tokens[6].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[6].sourceRange.end)
+            )
+        )
     }
 
-    // FIXME: ArrayTypeのsourceTokenの順序がおかしくなる
     func testDeclVariableArrayPointer() throws {
         let tokens: [Token] = buildTokens(
             kinds: [
@@ -306,19 +361,37 @@ final class VariableTest: XCTestCase {
         )
         let syntax = try Parser(tokens: tokens).stmt()
 
+        XCTAssertEqual(syntax.sourceTokens, tokens.dropLast())
+
         XCTAssertEqual(
             syntax,
             BlockItemSyntax(
                 item: VariableDeclSyntax(
-                    type: ArrayTypeSyntax(
-                        elementType: PointerTypeSyntax(referenceType: TypeSyntax(type: TokenSyntax(token: tokens[0])), pointer: TokenSyntax(token: tokens[1])),
-                        squareLeft: TokenSyntax(token: tokens[3]),
-                        arraySize: TokenSyntax(token: tokens[4]),
-                        squareRight: TokenSyntax(token: tokens[5])
-                    ),
-                    identifier: TokenSyntax(token: tokens[2])
+                    type: PointerTypeSyntax(referenceType: TypeSyntax(type: TokenSyntax(token: tokens[0])), pointer: TokenSyntax(token: tokens[1])),
+                    identifier: TokenSyntax(token: tokens[2]),
+                    squareLeft: TokenSyntax(token: tokens[3]),
+                    arrayLength: TokenSyntax(token: tokens[4]),
+                    squareRight: TokenSyntax(token: tokens[5])
                 ),
                 semicolon: TokenSyntax(token: tokens[6])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! VariableDeclNode,
+            VariableDeclNode(
+                type: ArrayTypeNode(
+                    elementType: PointerTypeNode(
+                        referenceType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                        sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
+                    ),
+                    arrayLength: Int(tokens[4].text)!,
+                    sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
+                ),
+                identifierName: tokens[2].text,
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[5].sourceRange.end)
             )
         )
     }

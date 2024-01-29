@@ -209,19 +209,33 @@ public class VariableDeclSyntax: SyntaxProtocol {
 
     public let kind: SyntaxKind = .variableDecl
     public var children: [any SyntaxProtocol] {
-        [type, identifier, equal, initializerExpr].compactMap { $0 }
+        [type, identifier, squareLeft, arrayLength, squareRight, equal, initializerExpr].compactMap { $0 }
     }
 
     public let type: any TypeSyntaxProtocol
     public let identifier: TokenSyntax
+    public let squareLeft: TokenSyntax?
+    public let arrayLength: TokenSyntax?
+    public let squareRight: TokenSyntax?
     public let equal: TokenSyntax?
     public let initializerExpr: (any SyntaxProtocol)?
 
     // MARK: - Initializer
 
-    public init(type: any TypeSyntaxProtocol, identifier: TokenSyntax, equal: TokenSyntax? = nil, initializerExpr: (any SyntaxProtocol)? = nil) {
+    public init(
+        type: any TypeSyntaxProtocol,
+        identifier: TokenSyntax,
+        squareLeft: TokenSyntax? = nil,
+        arrayLength: TokenSyntax? = nil,
+        squareRight: TokenSyntax? = nil,
+        equal: TokenSyntax? = nil,
+        initializerExpr: (any SyntaxProtocol)? = nil
+    ) {
         self.type = type
         self.identifier = identifier
+        self.squareLeft = squareLeft
+        self.arrayLength = arrayLength
+        self.squareRight = squareRight
         self.equal = equal
         self.initializerExpr = initializerExpr
     }
@@ -233,18 +247,31 @@ public class FunctionParameterSyntax: SyntaxProtocol {
 
     public let kind: SyntaxKind = .functionParameter
     public var children: [any SyntaxProtocol] {
-        ([type, identifier, comma] as [(any SyntaxProtocol)?]).compactMap { $0 }
+        ([type, identifier, squareLeft, arrayLength, squareRight, comma] as [(any SyntaxProtocol)?]).compactMap { $0 }
     }
 
     public let type: any TypeSyntaxProtocol
     public let identifier: TokenSyntax
+    public let squareLeft: TokenSyntax?
+    public let arrayLength: TokenSyntax?
+    public let squareRight: TokenSyntax?
     public let comma: TokenSyntax?
 
     // MARK: - Initializer
 
-    public init(type: any TypeSyntaxProtocol, identifier: TokenSyntax, comma: TokenSyntax? = nil) {
+    public init(
+        type: any TypeSyntaxProtocol,
+        identifier: TokenSyntax,
+        squareLeft: TokenSyntax? = nil,
+        arrayLength: TokenSyntax? = nil,
+        squareRight: TokenSyntax? = nil,
+        comma: TokenSyntax? = nil
+    ) {
         self.type = type
         self.identifier = identifier
+        self.squareLeft = squareLeft
+        self.arrayLength = arrayLength
+        self.squareRight = squareRight
         self.comma = comma
     }
 }

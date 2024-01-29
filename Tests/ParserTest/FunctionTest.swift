@@ -325,6 +325,87 @@ final class FunctionTest: XCTestCase {
         )
     }
 
+    func testFunctionCallWithArrayParameter() throws {
+        let tokens: [Token] = buildTokens(
+            kinds: [
+                .type(.int),
+                .identifier("main"),
+                .reserved(.parenthesisLeft),
+                .type(.int),
+                .identifier("a"),
+                .reserved(.squareLeft),
+                .reserved(.squareRight),
+                .reserved(.parenthesisRight),
+                .reserved(.braceLeft),
+                .reserved(.braceRight),
+                .endOfFile
+            ]
+        )
+        let syntax = try Parser(tokens: tokens).parse()
+
+        XCTAssertEqual(syntax.sourceTokens, tokens)
+
+        XCTAssertEqual(
+            syntax,
+            SourceFileSyntax(
+                statements: [
+                    BlockItemSyntax(
+                        item: FunctionDeclSyntax(
+                            returnType: TypeSyntax(type: TokenSyntax(token: tokens[0])),
+                            functionName: TokenSyntax(token: tokens[1]),
+                            parenthesisLeft: TokenSyntax(token: tokens[2]),
+                            parameters: [
+                                FunctionParameterSyntax(
+                                    type: TypeSyntax(type: TokenSyntax(token: tokens[3])),
+                                    identifier: TokenSyntax(token: tokens[4]),
+                                    squareLeft: TokenSyntax(token: tokens[5]),
+                                    squareRight: TokenSyntax(token: tokens[6])
+                                )
+                            ],
+                            parenthesisRight: TokenSyntax(token: tokens[7]),
+                            block: BlockStatementSyntax(
+                                braceLeft: TokenSyntax(token: tokens[8]),
+                                items: [],
+                                braceRight: TokenSyntax(token: tokens[9])
+                            )
+                        )
+                    )
+                ],
+                endOfFile: TokenSyntax(token: tokens[10])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SourceFileNode,
+            SourceFileNode(
+                statements: [
+                    FunctionDeclNode(
+                        returnType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                        functionName: tokens[1].text,
+                        parameters: [
+                            FunctionParameterNode(
+                                type: PointerTypeNode(
+                                    referenceType: TypeNode(type: .int, sourceRange: tokens[3].sourceRange),
+                                    sourceRange: tokens[3].sourceRange
+                                ),
+                                identifierName: tokens[4].text,
+                                sourceRange: SourceRange(start: tokens[3].sourceRange.start, end: tokens[6].sourceRange.end)
+                            )
+                        ],
+                        block: BlockStatementNode(
+                            items: [],
+                            sourceRange: SourceRange(start: tokens[8].sourceRange.start, end: tokens[9].sourceRange.end)
+                        ),
+                        sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[9].sourceRange.end)
+                    )
+                ],
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[10].sourceRange.end)
+            )
+        )
+    }
+
     func testFunctionDecls() throws {
         let tokens: [Token] = buildTokens(
             kinds: [

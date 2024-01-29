@@ -40,27 +40,3 @@ public class PointerTypeSyntax: TypeSyntaxProtocol {
         self.pointer = pointer
     }
 }
-
-public class ArrayTypeSyntax: TypeSyntaxProtocol {
-
-    // MARK: - Property
-
-    public let kind: SyntaxKind = .arrayType
-    public var children: [any SyntaxProtocol] {
-        [elementType, squareLeft, arraySize, squareRight]
-    }
-
-    public let elementType: any TypeSyntaxProtocol
-    public let squareLeft: TokenSyntax
-    public let arraySize: TokenSyntax
-    public let squareRight: TokenSyntax
-
-    // MARK: - Initializer
-
-    public init(elementType: any TypeSyntaxProtocol, squareLeft: TokenSyntax, arraySize: TokenSyntax, squareRight: TokenSyntax) {
-        self.elementType = elementType
-        self.squareLeft = squareLeft
-        self.arraySize = arraySize
-        self.squareRight = squareRight
-    }
-}
