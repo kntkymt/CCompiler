@@ -1,5 +1,6 @@
 import XCTest
 @testable import Parser
+@testable import AST
 import Tokenizer
 
 final class EmptyTest: XCTestCase {
@@ -17,6 +18,13 @@ final class EmptyTest: XCTestCase {
         XCTAssertEqual(
             syntax,
             SourceFileSyntax(statements: [], endOfFile: TokenSyntax(token: tokens[0]))
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SourceFileNode,
+            SourceFileNode(statements: [], sourceRange: tokens[0].sourceRange)
         )
     }
 }

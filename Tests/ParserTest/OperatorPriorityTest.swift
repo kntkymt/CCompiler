@@ -1,5 +1,6 @@
 import XCTest
 @testable import Parser
+@testable import AST
 import Tokenizer
 
 final class OperatorPriorityTest: XCTestCase {
@@ -34,6 +35,23 @@ final class OperatorPriorityTest: XCTestCase {
                 semicolon: TokenSyntax(token: tokens[5])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: InfixOperatorExprNode(
+                    left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                    operator: .add,
+                    right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                    sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
+                ),
+                operator: .add,
+                right: IntegerLiteralNode(literal: tokens[4].text, sourceRange: tokens[4].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[4].sourceRange.end)
+            )
+        )
     }
 
     func testMulPriority() throws {
@@ -66,6 +84,23 @@ final class OperatorPriorityTest: XCTestCase {
                 semicolon: TokenSyntax(token: tokens[5])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: InfixOperatorExprNode(
+                    left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                    operator: .mul,
+                    right: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                    sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
+                ),
+                operator: .mul,
+                right: IntegerLiteralNode(literal: tokens[4].text, sourceRange: tokens[4].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[4].sourceRange.end)
+            )
+        )
     }
 
     func testAddAndMulPriority() throws {
@@ -96,6 +131,23 @@ final class OperatorPriorityTest: XCTestCase {
                     )
                 ),
                 semicolon: TokenSyntax(token: tokens[5])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: IntegerLiteralNode(literal: tokens[0].text, sourceRange: tokens[0].sourceRange),
+                operator: .add,
+                right: InfixOperatorExprNode(
+                    left: IntegerLiteralNode(literal: tokens[2].text, sourceRange: tokens[2].sourceRange),
+                    operator: .mul,
+                    right: IntegerLiteralNode(literal: tokens[4].text, sourceRange: tokens[4].sourceRange),
+                    sourceRange: SourceRange(start: tokens[2].sourceRange.start, end: tokens[4].sourceRange.end)
+                ),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[4].sourceRange.end)
             )
         )
     }
@@ -134,6 +186,26 @@ final class OperatorPriorityTest: XCTestCase {
                     right: IntegerLiteralSyntax(literal: TokenSyntax(token: tokens[6]))
                 ),
                 semicolon: TokenSyntax(token: tokens[7])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! InfixOperatorExprNode,
+            InfixOperatorExprNode(
+                left: TupleExprNode(
+                    expression: InfixOperatorExprNode(
+                        left: IntegerLiteralNode(literal: tokens[1].text, sourceRange: tokens[1].sourceRange),
+                        operator: .add,
+                        right: IntegerLiteralNode(literal: tokens[3].text, sourceRange: tokens[3].sourceRange),
+                        sourceRange: SourceRange(start: tokens[1].sourceRange.start, end: tokens[3].sourceRange.end)
+                    ),
+                    sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[4].sourceRange.end)
+                ),
+                operator: .add,
+                right: IntegerLiteralNode(literal: tokens[6].text, sourceRange: tokens[6].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[6].sourceRange.end)
             )
         )
     }

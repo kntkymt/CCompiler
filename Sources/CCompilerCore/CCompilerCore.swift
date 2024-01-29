@@ -14,7 +14,7 @@ public func compile(_ source: String) throws -> String {
     do {
         let tokens = try Tokenizer(source: source).tokenize()
         let syntax = try Parser(tokens: tokens).parse()
-        let node = ASTGenerator().generate(syntax)
+        let node = ASTGenerator.generate(sourceFileSyntax: syntax)
 
         return try Generator().generate(sourceFileNode: node)
     } catch let error as TokenizeError {

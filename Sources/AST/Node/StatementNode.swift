@@ -135,7 +135,7 @@ public class FunctionDeclNode: NodeProtocol {
     }
     public let sourceRange: SourceRange
 
-    public let returnType: any NodeProtocol
+    public let returnType: any TypeNodeProtocol
     public let functionName: String
     public let parameters: [FunctionParameterNode]
     public let block: BlockStatementNode
@@ -143,7 +143,7 @@ public class FunctionDeclNode: NodeProtocol {
     // MARK: - Initializer
 
     public init(
-        returnType: any NodeProtocol,
+        returnType: any TypeNodeProtocol,
         functionName: String,
         parameters: [FunctionParameterNode],
         block: BlockStatementNode,

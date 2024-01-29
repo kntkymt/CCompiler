@@ -6,23 +6,21 @@ extension SyntaxProtocol {
     }
 }
 
-public struct ASTGenerator {
+public enum ASTGenerator {
 
-    public init() {}
-
-    public func generate(_ sourceFileSyntax: SourceFileSyntax) -> SourceFileNode {
-        SourceFileNode(statements: sourceFileSyntax.statements.map { generate($0) }, sourceRange: sourceFileSyntax.sourceRange)
+    public static func generate(sourceFileSyntax: SourceFileSyntax) -> SourceFileNode {
+        SourceFileNode(statements: sourceFileSyntax.statements.map { generate(syntax: $0) }, sourceRange: sourceFileSyntax.sourceRange)
     }
 
-    func generate(_ integerLiteral: IntegerLiteralSyntax) -> IntegerLiteralNode {
+    static func generate(integerLiteral: IntegerLiteralSyntax) -> IntegerLiteralNode {
         IntegerLiteralNode(literal: integerLiteral.literal.text, sourceRange: integerLiteral.sourceRange)
     }
 
-    func generate(_ declReference: DeclReferenceSyntax) -> DeclReferenceNode {
+    static func generate(declReference: DeclReferenceSyntax) -> DeclReferenceNode {
         DeclReferenceNode(baseName: declReference.baseName.text, sourceRange: declReference.sourceRange)
     }
 
-    func generate(_ stringLiteral: StringLiteralSyntax) -> StringLiteralNode {
+    static func generate(stringLiteral: StringLiteralSyntax) -> StringLiteralNode {
         if case .stringLiteral(let content) = stringLiteral.literal.tokenKind {
             return StringLiteralNode(literal: content, sourceRange: stringLiteral.sourceRange)
         } else {
@@ -30,16 +28,16 @@ public struct ASTGenerator {
         }
     }
 
-    func generate(_ type: any TypeSyntaxProtocol) -> any TypeNodeProtocol {
-        switch type.kind {
-        case .type: generate(type.casted(TypeSyntax.self))
-        case .pointerType: generate(type.casted(PointerTypeSyntax.self))
-        case .arrayType: generate(type.casted(ArrayTypeSyntax.self))
+    static func generate(typeProtocol: any TypeSyntaxProtocol) -> any TypeNodeProtocol {
+        switch typeProtocol.kind {
+        case .type: generate(type: typeProtocol.casted(TypeSyntax.self))
+        case .pointerType: generate(pointerType: typeProtocol.casted(PointerTypeSyntax.self))
+        case .arrayType: generate(arrayType: typeProtocol.casted(ArrayTypeSyntax.self))
         default: fatalError()
         }
     }
 
-    func generate(_ type: TypeSyntax) -> TypeNode {
+    static func generate(type: TypeSyntax) -> TypeNode {
         let typeKind: TypeNode.TypeKind = switch type.type.tokenKind {
         case .type(.int): .int
         case .type(.char): .char
@@ -49,15 +47,15 @@ public struct ASTGenerator {
         return TypeNode(type: typeKind, sourceRange: type.sourceRange)
     }
 
-    func generate(_ pointerType: PointerTypeSyntax) -> PointerTypeNode {
-        PointerTypeNode(referenceType: generate(pointerType.referenceType), sourceRange: pointerType.sourceRange)
+    static func generate(pointerType: PointerTypeSyntax) -> PointerTypeNode {
+        PointerTypeNode(referenceType: generate(typeProtocol: pointerType.referenceType), sourceRange: pointerType.sourceRange)
     }
 
-    func generate(_ arrayType: ArrayTypeSyntax) -> ArrayTypeNode {
-        ArrayTypeNode(elementType: generate(arrayType.elementType), arrayLength: Int(arrayType.arraySize.text)!, sourceRange: arrayType.sourceRange)
+    static func generate(arrayType: ArrayTypeSyntax) -> ArrayTypeNode {
+        ArrayTypeNode(elementType: generate(typeProtocol: arrayType.elementType), arrayLength: Int(arrayType.arraySize.text)!, sourceRange: arrayType.sourceRange)
     }
 
-    func generate(_ prefixOperatorExpr: PrefixOperatorExprSyntax) -> PrefixOperatorExprNode {
+    static func generate(prefixOperatorExpr: PrefixOperatorExprSyntax) -> PrefixOperatorExprNode {
         let prefixOperatorExpr = prefixOperatorExpr.casted(PrefixOperatorExprSyntax.self)
         let operatorKind: PrefixOperatorExprNode.OperatorKind = switch prefixOperatorExpr.`operator`.tokenKind {
         case .reserved(.add): .plus
@@ -68,10 +66,10 @@ public struct ASTGenerator {
         default: fatalError()
         }
 
-        return PrefixOperatorExprNode(operator: operatorKind, expression: generate(prefixOperatorExpr.expression), sourceRange: prefixOperatorExpr.sourceRange)
+        return PrefixOperatorExprNode(operator: operatorKind, expression: generate(syntax: prefixOperatorExpr.expression), sourceRange: prefixOperatorExpr.sourceRange)
     }
 
-    func generate(_ infixOperatorExpr: InfixOperatorExprSyntax) -> InfixOperatorExprNode {
+    static func generate(infixOperatorExpr: InfixOperatorExprSyntax) -> InfixOperatorExprNode {
         let operatorKind: InfixOperatorExprNode.OperatorKind = switch  infixOperatorExpr.operator.tokenKind {
         case .reserved(.add): .add
         case .reserved(.sub): .sub
@@ -88,186 +86,147 @@ public struct ASTGenerator {
         }
 
         return InfixOperatorExprNode(
-            left: generate(infixOperatorExpr.left),
+            left: generate(syntax: infixOperatorExpr.left),
             operator: operatorKind,
-            right: generate(infixOperatorExpr.right),
+            right: generate(syntax: infixOperatorExpr.right),
             sourceRange: infixOperatorExpr.sourceRange
         )
     }
 
-    func generate(_ functionCallExpr: FunctionCallExprSyntax) -> FunctionCallExprNode {
+    static func generate(functionCallExpr: FunctionCallExprSyntax) -> FunctionCallExprNode {
         FunctionCallExprNode(
-            identifier: generate(functionCallExpr.identifier),
-            arguments: functionCallExpr.arguments.map { generate($0) },
+            identifier: generate(declReference: functionCallExpr.identifier),
+            arguments: functionCallExpr.arguments.map { generate(syntax: $0) },
             sourceRange: functionCallExpr.sourceRange
         )
     }
 
-    func generate(_ subscriptCallExpr: SubscriptCallExprSyntax) -> SubscriptCallExprNode {
+    static func generate(subscriptCallExpr: SubscriptCallExprSyntax) -> SubscriptCallExprNode {
         SubscriptCallExprNode(
-            identifier: generate(subscriptCallExpr.identifier),
-            argument: generate(subscriptCallExpr.argument),
+            identifier: generate(declReference: subscriptCallExpr.identifier),
+            argument: generate(syntax: subscriptCallExpr.argument),
             sourceRange: subscriptCallExpr.sourceRange
         )
     }
 
-    func generate(_ initListExpr: InitListExprSyntax) -> InitListExprNode {
+    static func generate(initListExpr: InitListExprSyntax) -> InitListExprNode {
         InitListExprNode(
-            expressions: initListExpr.exprListItemSyntaxs.map { generate($0) },
+            expressions: initListExpr.exprListItemSyntaxs.map { generate(syntax: $0) },
             sourceRange: initListExpr.sourceRange
         )
     }
 
-    func generate(_ tupleExpr: TupleExprSyntax) -> TupleExprNode {
+    static func generate(tupleExpr: TupleExprSyntax) -> TupleExprNode {
         TupleExprNode(
-            expression: generate(tupleExpr.expression),
+            expression: generate(syntax: tupleExpr.expression),
             sourceRange: tupleExpr.sourceRange
         )
     }
 
-    func generate(_ ifStatement: IfStatementSyntax) -> IfStatementNode {
+    static func generate(ifStatement: IfStatementSyntax) -> IfStatementNode {
         IfStatementNode(
-            condition: generate(ifStatement.condition),
-            trueBody: generate(ifStatement.trueBody),
-            falseBody: ifStatement.falseBody.map { generate($0) },
+            condition: generate(syntax: ifStatement.condition),
+            trueBody: generate(syntax: ifStatement.trueBody),
+            falseBody: ifStatement.falseBody.map { generate(syntax: $0) },
             sourceRange: ifStatement.sourceRange
         )
     }
 
-    func generate(_ whileStatement: WhileStatementSyntax) -> WhileStatementNode {
+    static func generate(whileStatement: WhileStatementSyntax) -> WhileStatementNode {
         WhileStatementNode(
-            condition: generate(whileStatement.condition),
-            body: generate(whileStatement.body),
+            condition: generate(syntax: whileStatement.condition),
+            body: generate(syntax: whileStatement.body),
             sourceRange: whileStatement.sourceRange
         )
     }
 
-    func generate(_ forStatement: ForStatementSyntax) -> ForStatementNode {
+    static func generate(forStatement: ForStatementSyntax) -> ForStatementNode {
         ForStatementNode(
-            pre: forStatement.pre.map { generate($0) },
-            condition: forStatement.condition.map { generate($0) },
-            post: forStatement.post.map { generate($0) },
-            body: generate(forStatement.body), 
+            pre: forStatement.pre.map { generate(syntax: $0) },
+            condition: forStatement.condition.map { generate(syntax: $0) },
+            post: forStatement.post.map { generate(syntax: $0) },
+            body: generate(syntax: forStatement.body), 
             sourceRange: forStatement.sourceRange
         )
     }
 
-    func generate(_ returnStatement: ReturnStatementSyntax) -> ReturnStatementNode {
+    static func generate(returnStatement: ReturnStatementSyntax) -> ReturnStatementNode {
         ReturnStatementNode(
-            expression: generate(returnStatement.expression),
+            expression: generate(syntax: returnStatement.expression),
             sourceRange: returnStatement.sourceRange
         )
     }
 
-    func generate(_ blockStatement: BlockStatementSyntax) -> BlockStatementNode {
+    static func generate(blockStatement: BlockStatementSyntax) -> BlockStatementNode {
         BlockStatementNode(
-            items: blockStatement.items.map { generate($0) },
+            items: blockStatement.items.map { generate(syntax: $0) },
             sourceRange: blockStatement.sourceRange
         )
     }
 
-    func generate(_ functionDecl: FunctionDeclSyntax) -> FunctionDeclNode {
+    static func generate(functionDecl: FunctionDeclSyntax) -> FunctionDeclNode {
         FunctionDeclNode(
-            returnType: generate(functionDecl.returnType),
+            returnType: generate(typeProtocol: functionDecl.returnType),
             functionName: functionDecl.functionName.text,
-            parameters: functionDecl.parameters.map { generate($0) },
-            block: generate(functionDecl.block),
+            parameters: functionDecl.parameters.map { generate(functionParameter: $0) },
+            block: generate(blockStatement: functionDecl.block),
             sourceRange: functionDecl.sourceRange
         )
     }
 
-    func generate(_ functionParameter: FunctionParameterSyntax) -> FunctionParameterNode {
+    static func generate(functionParameter: FunctionParameterSyntax) -> FunctionParameterNode {
         FunctionParameterNode(
-            type: generate(functionParameter.type),
+            type: generate(typeProtocol: functionParameter.type),
             identifierName: functionParameter.identifier.text,
             sourceRange: functionParameter.sourceRange
         )
     }
 
-    func generate(_ variableDecl: VariableDeclSyntax) -> VariableDeclNode {
+    static func generate(variableDecl: VariableDeclSyntax) -> VariableDeclNode {
         VariableDeclNode(
-            type: generate(variableDecl.type),
+            type: generate(typeProtocol: variableDecl.type),
             identifierName: variableDecl.identifier.text,
-            initializerExpr: variableDecl.initializerExpr.map { generate($0) },
+            initializerExpr: variableDecl.initializerExpr.map { generate(syntax: $0) },
             sourceRange: variableDecl.sourceRange
         )
     }
 
-    func generate(_ syntax: any SyntaxProtocol) -> any NodeProtocol {
-        switch syntax.kind {
-        case .token:
-            fatalError()
+    // ExprListItem is removed on AST
+    static func generate(exprListItem: ExprListItemSyntax) -> any NodeProtocol {
+        generate(syntax: exprListItem.expression)
+    }
 
-        case .integerLiteral:
-            return generate(syntax.casted(IntegerLiteralSyntax.self))
+    // BlockItem is removed on AST
+    static func generate(blockItem: BlockItemSyntax) -> any NodeProtocol {
+        generate(syntax: blockItem.item)
+    }
 
-        case .declReference:
-            return generate(syntax.casted(DeclReferenceSyntax.self))
-
-        case .stringLiteral:
-            return generate(syntax.casted(StringLiteralSyntax.self))
-
-        case .type:
-            return generate(syntax.casted(TypeSyntax.self))
-
-        case .pointerType:
-            return generate(syntax.casted(PointerTypeSyntax.self))
-
-        case .arrayType:
-            return generate(syntax.casted(ArrayTypeSyntax.self))
-
-        case .prefixOperatorExpr:
-            return generate(syntax.casted(PrefixOperatorExprSyntax.self))
-
-        case .infixOperatorExpr:
-            return generate(syntax.casted(InfixOperatorExprSyntax.self))
-
-        case .functionCallExpr:
-            return generate(syntax.casted(FunctionCallExprSyntax.self))
-
-        case .subscriptCallExpr:
-            return generate(syntax.casted(SubscriptCallExprSyntax.self))
-
-        case .initListExpr:
-            return generate(syntax.casted(InitListExprSyntax.self))
-
-        case .exprListItem:
-            // ExprListItem is removed on AST
-            return generate(syntax.casted(ExprListItemSyntax.self).expression)
-
-        case .tupleExpr:
-            return generate(syntax.casted(TupleExprSyntax.self))
-
-        case .ifStatement:
-            return generate(syntax.casted(IfStatementSyntax.self))
-
-        case .whileStatement:
-            return generate(syntax.casted(WhileStatementSyntax.self))
-
-        case .forStatement:
-            return generate(syntax.casted(ForStatementSyntax.self))
-
-        case .returnStatement:
-            return generate(syntax.casted(ReturnStatementSyntax.self))
-
-        case .blockStatement:
-            return generate(syntax.casted(BlockStatementSyntax.self))
-
-        case .blockItem:
-            // BlockItem is removed on AST
-            return generate(syntax.casted(BlockItemSyntax.self).item)
-
-        case .functionDecl:
-            return generate(syntax.casted(FunctionDeclSyntax.self))
-
-        case .functionParameter:
-            return generate(syntax.casted(FunctionParameterSyntax.self))
-
-        case .variableDecl:
-            return generate(syntax.casted(VariableDeclSyntax.self))
-
-        case .sourceFile:
-            fatalError()
+    static func generate(syntax: any SyntaxProtocol) -> any NodeProtocol {
+        return switch syntax.kind {
+        case .integerLiteral: generate(integerLiteral: syntax.casted(IntegerLiteralSyntax.self))
+        case .declReference: generate(declReference: syntax.casted(DeclReferenceSyntax.self))
+        case .stringLiteral: generate(stringLiteral: syntax.casted(StringLiteralSyntax.self))
+        case .type: generate(type: syntax.casted(TypeSyntax.self))
+        case .pointerType: generate(pointerType: syntax.casted(PointerTypeSyntax.self))
+        case .arrayType: generate(arrayType: syntax.casted(ArrayTypeSyntax.self))
+        case .prefixOperatorExpr: generate(prefixOperatorExpr: syntax.casted(PrefixOperatorExprSyntax.self))
+        case .infixOperatorExpr: generate(infixOperatorExpr: syntax.casted(InfixOperatorExprSyntax.self))
+        case .functionCallExpr: generate(functionCallExpr: syntax.casted(FunctionCallExprSyntax.self))
+        case .subscriptCallExpr: generate(subscriptCallExpr: syntax.casted(SubscriptCallExprSyntax.self))
+        case .initListExpr: generate(initListExpr: syntax.casted(InitListExprSyntax.self))
+        case .tupleExpr: generate(tupleExpr: syntax.casted(TupleExprSyntax.self))
+        case .ifStatement: generate(ifStatement: syntax.casted(IfStatementSyntax.self))
+        case .whileStatement: generate(whileStatement: syntax.casted(WhileStatementSyntax.self))
+        case .forStatement: generate(forStatement: syntax.casted(ForStatementSyntax.self))
+        case .returnStatement: generate(returnStatement: syntax.casted(ReturnStatementSyntax.self))
+        case .blockStatement: generate(blockStatement: syntax.casted(BlockStatementSyntax.self))
+        case .functionDecl: generate(functionDecl: syntax.casted(FunctionDeclSyntax.self))
+        case .functionParameter: generate(functionParameter: syntax.casted(FunctionParameterSyntax.self))
+        case .variableDecl: generate(variableDecl: syntax.casted(VariableDeclSyntax.self))
+        case .sourceFile: generate(sourceFileSyntax: syntax.casted(SourceFileSyntax.self))
+        case .exprListItem: generate(exprListItem: syntax.casted(ExprListItemSyntax.self))
+        case .blockItem: generate(blockItem: syntax.casted(BlockItemSyntax.self))
+        case .token: fatalError()
         }
     }
 }

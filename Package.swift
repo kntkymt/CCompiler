@@ -58,7 +58,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ParserTest",
-            dependencies: ["Parser"]
+            dependencies: ["Parser", "AST"]
         ),
         .testTarget(
             name: "TokenizerTest",

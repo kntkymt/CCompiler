@@ -1,5 +1,6 @@
 import XCTest
 @testable import Parser
+@testable import AST
 import Tokenizer
 
 final class VariableTest: XCTestCase {
@@ -25,6 +26,17 @@ final class VariableTest: XCTestCase {
                     identifier: TokenSyntax(token: tokens[1])
                 ),
                 semicolon: TokenSyntax(token: tokens[2])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! VariableDeclNode,
+            VariableDeclNode(
+                type: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                identifierName: tokens[1].text,
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
             )
         )
     }
@@ -56,6 +68,18 @@ final class VariableTest: XCTestCase {
                 semicolon: TokenSyntax(token: tokens[4])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! VariableDeclNode,
+            VariableDeclNode(
+                type: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                identifierName: tokens[1].text,
+                initializerExpr: IntegerLiteralNode(literal: tokens[3].text, sourceRange: tokens[3].sourceRange),
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[3].sourceRange.end)
+            )
+        )
     }
 
     func testDeclVariablePointer() throws {
@@ -83,6 +107,20 @@ final class VariableTest: XCTestCase {
                     identifier: TokenSyntax(token: tokens[2])
                 ),
                 semicolon: TokenSyntax(token: tokens[3])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! VariableDeclNode,
+            VariableDeclNode(
+                type: PointerTypeNode(
+                    referenceType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                    sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
+                ),
+                identifierName: tokens[2].text,
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
             )
         )
     }
@@ -116,6 +154,23 @@ final class VariableTest: XCTestCase {
                     identifier: TokenSyntax(token: tokens[3])
                 ),
                 semicolon: TokenSyntax(token: tokens[4])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! VariableDeclNode,
+            VariableDeclNode(
+                type: PointerTypeNode(
+                    referenceType: PointerTypeNode(
+                        referenceType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                        sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
+                    ),
+                    sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
+                ),
+                identifierName: tokens[3].text,
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[3].sourceRange.end)
             )
         )
     }
@@ -296,6 +351,22 @@ final class VariableTest: XCTestCase {
                 endOfFile: TokenSyntax(token: tokens[3])
             )
         )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SourceFileNode,
+            SourceFileNode(
+                statements: [
+                    VariableDeclNode(
+                        type: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                        identifierName: tokens[1].text,
+                        sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
+                    )
+                ],
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[3].sourceRange.end)
+            )
+        )
     }
 
     func testGlobalVariableDeclPointer() throws {
@@ -328,6 +399,25 @@ final class VariableTest: XCTestCase {
                     )
                 ],
                 endOfFile: TokenSyntax(token: tokens[4])
+            )
+        )
+
+        let node = ASTGenerator.generate(syntax: syntax)
+
+        XCTAssertEqual(
+            node as! SourceFileNode,
+            SourceFileNode(
+                statements: [
+                    VariableDeclNode(
+                        type: PointerTypeNode(
+                            referenceType: TypeNode(type: .int, sourceRange: tokens[0].sourceRange),
+                            sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[1].sourceRange.end)
+                        ),
+                        identifierName: tokens[2].text,
+                        sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[2].sourceRange.end)
+                    )
+                ],
+                sourceRange: SourceRange(start: tokens[0].sourceRange.start, end: tokens[4].sourceRange.end)
             )
         )
     }
