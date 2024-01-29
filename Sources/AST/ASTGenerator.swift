@@ -32,7 +32,6 @@ public enum ASTGenerator {
         switch typeProtocol.kind {
         case .type: generate(type: typeProtocol.casted(TypeSyntax.self))
         case .pointerType: generate(pointerType: typeProtocol.casted(PointerTypeSyntax.self))
-        case .arrayType: generate(arrayType: typeProtocol.casted(ArrayTypeSyntax.self))
         default: fatalError()
         }
     }
@@ -49,10 +48,6 @@ public enum ASTGenerator {
 
     static func generate(pointerType: PointerTypeSyntax) -> PointerTypeNode {
         PointerTypeNode(referenceType: generate(typeProtocol: pointerType.referenceType), sourceRange: pointerType.sourceRange)
-    }
-
-    static func generate(arrayType: ArrayTypeSyntax) -> ArrayTypeNode {
-        ArrayTypeNode(elementType: generate(typeProtocol: arrayType.elementType), arrayLength: Int(arrayType.arraySize.text)!, sourceRange: arrayType.sourceRange)
     }
 
     static func generate(prefixOperatorExpr: PrefixOperatorExprSyntax) -> PrefixOperatorExprNode {
@@ -175,16 +170,37 @@ public enum ASTGenerator {
     }
 
     static func generate(functionParameter: FunctionParameterSyntax) -> FunctionParameterNode {
-        FunctionParameterNode(
-            type: generate(typeProtocol: functionParameter.type),
+        let type: any TypeNodeProtocol
+        if functionParameter.squareLeft != nil, functionParameter.squareRight != nil {
+            // 関数の引数の配列はポインタと同じ扱い
+            type = PointerTypeNode(referenceType: generate(typeProtocol: functionParameter.type), sourceRange: functionParameter.type.sourceRange)
+        } else {
+            type = generate(typeProtocol: functionParameter.type)
+        }
+
+        return FunctionParameterNode(
+            type: type,
             identifierName: functionParameter.identifier.text,
             sourceRange: functionParameter.sourceRange
         )
     }
 
     static func generate(variableDecl: VariableDeclSyntax) -> VariableDeclNode {
-        VariableDeclNode(
-            type: generate(typeProtocol: variableDecl.type),
+        let type: any TypeNodeProtocol
+        if variableDecl.squareLeft != nil,
+           let arrayLength = variableDecl.arrayLength,
+           variableDecl.squareRight != nil {
+            type = ArrayTypeNode(
+                elementType: generate(typeProtocol: variableDecl.type),
+                arrayLength: Int(arrayLength.text)!,
+                sourceRange: variableDecl.type.sourceRange
+            )
+        } else {
+            type = generate(typeProtocol: variableDecl.type)
+        }
+
+        return VariableDeclNode(
+            type: type,
             identifierName: variableDecl.identifier.text,
             initializerExpr: variableDecl.initializerExpr.map { generate(syntax: $0) },
             sourceRange: variableDecl.sourceRange
@@ -208,7 +224,6 @@ public enum ASTGenerator {
         case .stringLiteral: generate(stringLiteral: syntax.casted(StringLiteralSyntax.self))
         case .type: generate(type: syntax.casted(TypeSyntax.self))
         case .pointerType: generate(pointerType: syntax.casted(PointerTypeSyntax.self))
-        case .arrayType: generate(arrayType: syntax.casted(ArrayTypeSyntax.self))
         case .prefixOperatorExpr: generate(prefixOperatorExpr: syntax.casted(PrefixOperatorExprSyntax.self))
         case .infixOperatorExpr: generate(infixOperatorExpr: syntax.casted(InfixOperatorExprSyntax.self))
         case .functionCallExpr: generate(functionCallExpr: syntax.casted(FunctionCallExprSyntax.self))

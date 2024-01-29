@@ -23,7 +23,7 @@ public final class Parser {
 
     // MARK: - Syntax
 
-    // program = (functionDecl | variableDecl)*
+    // program = (functionDecl | variableDecl ";")*
     func program() throws -> SourceFileSyntax {
         var statements: [BlockItemSyntax] = []
 
@@ -71,30 +71,32 @@ public final class Parser {
         return results
     }
 
-    // functionParameter = type identifier ","?
+    // functionParameter = type identifier ("[" integerLiteral?  "]")? ","?
     func functionParameter() throws -> FunctionParameterSyntax {
-        var type = try type()
+        let type = try type()
         let identifier = try consume(.identifier)
 
         if at(.reserved(.squareLeft)) {
-            type = ArrayTypeSyntax(
-                elementType: type,
+            return FunctionParameterSyntax(
+                type: type,
+                identifier: identifier,
                 squareLeft: try consume(.reserved(.squareLeft)),
-                arraySize: try consume(.integerLiteral),
-                squareRight: try consume(.reserved(.squareRight))
+                arrayLength: consume(if: .integerLiteral),
+                squareRight: try consume(.reserved(.squareRight)),
+                comma: consume(if: .reserved(.comma))
+            )
+        } else {
+            return FunctionParameterSyntax(
+                type: type,
+                identifier: identifier,
+                comma: consume(if: .reserved(.comma))
             )
         }
-
-        return FunctionParameterSyntax(
-            type: type,
-            identifier: identifier,
-            comma: consume(if: .reserved(.comma))
-        )
     }
 
     // stmt    = expr ";"
     //         | block
-    //         | variableDecl
+    //         | variableDecl ";"
     //         | "if" "(" expr ")" stmt ("else" stmt)?
     //         | "while" "(" expr ")" stmt
     //         | "for" "(" expr? ";" expr? ";" expr? ")" stmt
@@ -230,55 +232,49 @@ public final class Parser {
         )
     }
 
-    // variableDecl = type identifier ("[" num "]")? ("=" (expr | "{" exprList "}" | stringLiteral)? ";"
+    // variableDecl = type identifier ("[" num "]")? ("=" (expr | "{" exprList "}" | stringLiteral)?
     func variableDecl(variableType: (any TypeSyntaxProtocol)? = nil, identifier: TokenSyntax? = nil) throws -> VariableDeclSyntax {
-        var type = if let variableType { variableType } else { try type() }
+        let type = if let variableType { variableType } else { try type() }
         let identifier = if let identifier { identifier } else { try consume(.identifier) }
 
+        var squareLeft: TokenSyntax?
+        var arrayLength: TokenSyntax?
+        var squareRight: TokenSyntax?
         if at(.reserved(.squareLeft)) {
-            type = ArrayTypeSyntax(
-                elementType: type,
-                squareLeft: try consume(.reserved(.squareLeft)),
-                arraySize: try consume(.integerLiteral),
-                squareRight: try consume(.reserved(.squareRight))
-            )
+            squareLeft = try consume(.reserved(.squareLeft))
+            arrayLength = try consume(.integerLiteral)
+            squareRight = try consume(.reserved(.squareRight))
         }
 
-        if let initializer = consume(if: .reserved(.assign)) {
+        var initializer: TokenSyntax?
+        var initializerExpr: (any SyntaxProtocol)?
+        if at(.reserved(.assign)) {
+            initializer = try consume(.reserved(.assign))
+
             switch tokens[index].kind {
             case .reserved(.braceLeft):
-                return VariableDeclSyntax(
-                    type: type,
-                    identifier: identifier,
-                    equal: initializer,
-                    initializerExpr: InitListExprSyntax(
-                        braceLeft: try consume(.reserved(.braceLeft)),
-                        exprListSyntaxs: try exprList(),
-                        braceRight: try consume(.reserved(.braceRight))
-                    )
+                initializerExpr = InitListExprSyntax(
+                    braceLeft: try consume(.reserved(.braceLeft)),
+                    exprListSyntaxs: try exprList(),
+                    braceRight: try consume(.reserved(.braceRight))
                 )
 
             case .stringLiteral:
-                return VariableDeclSyntax(
-                    type: type,
-                    identifier: identifier,
-                    equal: initializer,
-                    initializerExpr: StringLiteralSyntax(literal: try consume(.stringLiteral))
-                )
+                initializerExpr = StringLiteralSyntax(literal: try consume(.stringLiteral))
 
             default:
-                return VariableDeclSyntax(
-                    type: type,
-                    identifier: identifier,
-                    equal: initializer,
-                    initializerExpr: try expr()
-                )
+                initializerExpr = try expr()
             }
         }
 
         return VariableDeclSyntax(
             type: type,
-            identifier: identifier
+            identifier: identifier,
+            squareLeft: squareLeft,
+            arrayLength: arrayLength,
+            squareRight: squareRight,
+            equal: initializer,
+            initializerExpr: initializerExpr
         )
     }
 

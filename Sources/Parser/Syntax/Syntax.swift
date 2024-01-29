@@ -9,7 +9,6 @@ public enum SyntaxKind {
 
     case type
     case pointerType
-    case arrayType
     
     case prefixOperatorExpr
     case infixOperatorExpr
