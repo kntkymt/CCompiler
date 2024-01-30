@@ -218,7 +218,7 @@ public enum ASTGenerator {
     }
 
     static func generate(syntax: any SyntaxProtocol) -> any NodeProtocol {
-        return switch syntax.kind {
+        switch syntax.kind {
         case .integerLiteral: generate(integerLiteral: syntax.casted(IntegerLiteralSyntax.self))
         case .declReference: generate(declReference: syntax.casted(DeclReferenceSyntax.self))
         case .stringLiteral: generate(stringLiteral: syntax.casted(StringLiteralSyntax.self))
