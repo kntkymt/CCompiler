@@ -26,11 +26,11 @@ public final class Generator {
 
     struct VariableInfo {
         var type: any TypeNodeProtocol
-        var addressOffset: Int
+        var addressOffset: Int64
     }
 
     private var globalVariables: [String: any TypeNodeProtocol] = [:]
-    private var variables: [String: VariableInfo] = [:]
+    private var localVariables: [String: VariableInfo] = [:]
     private var stringLiteralLabels: [String: String] = [:]
     private var functionLabels: Set<String> = Set()
 
@@ -39,15 +39,15 @@ public final class Generator {
 
     // MARK: - Public
 
-    public func generate(sourceFileNode: SourceFileNode) throws -> String {
+    public func generate(sourceFileNode: SourceFileNode) throws -> [AsmRepresent.Instruction] {
 
-        var dataSection = ""
-        var functionDeclResult = ""
+        var dataSection: [AsmRepresent.Instruction] = []
+        var functionDeclResult: [AsmRepresent.Instruction] = []
         for statement in sourceFileNode.statements {
             switch statement.kind {
             case .variableDecl:
                 if dataSection.isEmpty {
-                    dataSection += ".section    __DATA,__data\n"
+                    dataSection.append(.section(kinds: [.DATA,.data]))
                 }
 
                 let casted = statement.casted(VariableDeclNode.self)
@@ -55,7 +55,6 @@ public final class Generator {
 
             case .functionDecl:
                 let casted = statement.casted(FunctionDeclNode.self)
-                functionDeclResult += ".p2align 2\n"
                 functionDeclResult += try generate(node: casted)
 
             default:
@@ -63,47 +62,47 @@ public final class Generator {
             }
         }
 
-        let functionMeta = ".globl \(functionLabels.joined(separator: ", "))\n"
-
         if !stringLiteralLabels.isEmpty {
-            dataSection += ".section __TEXT,__cstring,cstring_literals\n"
+            dataSection.append(.section(kinds: [.TEXT, .cstring, .cstring_literals]))
             for (literal, label) in stringLiteralLabels {
-                dataSection += "\(label):\n"
-                dataSection += "    .asciz \"\(literal)\"\n"
+                dataSection.append(contentsOf: [
+                    .label(label: label),
+                    .dataDecl(kind: .asciz, value: "\"\(literal)\"")
+                ])
             }
         }
 
-        return functionMeta + functionDeclResult + dataSection
+        return functionDeclResult + dataSection
     }
 
-    func generateGlobalVariableDecl(node: VariableDeclNode) throws -> String {
+    func generateGlobalVariableDecl(node: VariableDeclNode) throws -> [AsmRepresent.Instruction] {
         globalVariables[node.identifierName] = node.type
 
-        var result = ""
+        var result: [AsmRepresent.Instruction] = []
 
         if let initializerExpr = node.initializerExpr {
 
-            result += ".globl \(node.identifierName)\n"
+            result.append(.globl(label: node.identifierName))
             if node.type.memorySize != 1 {
-                result += ".p2align 3, 0x0\n"
+                result.append(.p2align(factor: 3))
             }
-            result += "\(node.identifierName):\n"
+            result.append(.label(label: node.identifierName))
 
             switch initializerExpr.kind {
             case .integerLiteral:
-                let sizeKind = node.type.memorySize == 1 ? "byte" : "quad"
                 let value = initializerExpr.casted(IntegerLiteralNode.self).literal
-                result += "    .\(sizeKind) \(value)\n"
+
+                result.append(.dataDecl(kind: node.type.memorySize == 1 ? .byte : .quad, value: value))
 
             case .stringLiteral:
                 let value = initializerExpr.casted(StringLiteralNode.self).literal
-                result += "    .asciz \"\(value)\"\n"
+                result.append(.dataDecl(kind: .asciz, value: "\"\(value)\""))
 
             case .prefixOperatorExpr:
                 let prefixOperatorExpr = initializerExpr.casted(PrefixOperatorExprNode.self)
                 if prefixOperatorExpr.operator == .address {
                     let value = prefixOperatorExpr.expression.casted(DeclReferenceNode.self).baseName
-                    result += "    .quad \(value)\n"
+                    result.append(.dataDecl(kind: .quad, value: value))
                 } else {
                     throw GenerateError.invalidSyntax(location: initializerExpr.sourceRange.start)
                 }
@@ -111,13 +110,13 @@ public final class Generator {
             case .infixOperatorExpr:
                 let infixOperator = initializerExpr.casted(InfixOperatorExprNode.self)
 
-                func generateAddressValue(referenceNode: any NodeProtocol, IntegerLiteralNode: any NodeProtocol) -> String? {
+                func generateAddressValue(referenceNode: any NodeProtocol, IntegerLiteralNode: any NodeProtocol) -> AsmRepresent.Instruction? {
                     if let prefix = referenceNode as? PrefixOperatorExprNode,
                        prefix.operator == .address,
                        let identifier = prefix.expression as? DeclReferenceNode,
                        (infixOperator.operator == .add || infixOperator.operator == .sub),
                        let integerLiteral = IntegerLiteralNode as? IntegerLiteralNode {
-                        return "    .quad \(identifier.baseName) \(infixOperator.operator.rawValue) \(integerLiteral.literal)\n"
+                        return .dataDecl(kind: .quad, value: "\(identifier.baseName) \(infixOperator.operator.rawValue) \(integerLiteral.literal)")
                     } else {
                         return nil
                     }
@@ -125,9 +124,9 @@ public final class Generator {
 
                 // 左右一方が「&変数」, 他方が「IntergerLiteral」のはず
                 if let leftIsReference = generateAddressValue(referenceNode: infixOperator.left, IntegerLiteralNode: infixOperator.right) {
-                    result += leftIsReference
+                    result += [leftIsReference]
                 } else if let rightIsReference = generateAddressValue(referenceNode: infixOperator.right, IntegerLiteralNode: infixOperator.left) {
-                    result += rightIsReference
+                    result += [rightIsReference]
                 } else {
                     throw GenerateError.invalidSyntax(location: initializerExpr.sourceRange.start)
                 }
@@ -138,22 +137,20 @@ public final class Generator {
         } else {
             // Apple Clangでは初期化がない場合は.commじゃないとダメっぽい？
             let alignment = isElementOrReferenceTypeMemorySizeOf(1, identifierName: node.identifierName) ? 0 : 3
-            result += ".comm \(node.identifierName),\(node.type.memorySize),\(alignment)\n"
+            result.append(.dataDecl(kind: .comm, value: "\(node.identifierName),\(node.type.memorySize),\(alignment)"))
         }
 
         return result
     }
 
-    func generate(integerLiteral: IntegerLiteralNode) -> String {
-        var result = ""
-        result += "    mov x0, #\(integerLiteral.literal)\n"
-        result += "    str x0, [sp, #-16]!\n"
-
-        return result
+    func generate(integerLiteral: IntegerLiteralNode) -> [AsmRepresent.Instruction] {
+        [
+            .movi(dst: .x0, immediate: Int64(integerLiteral.literal)!),
+            .push(src: .x0)
+        ]
     }
 
-    func generate(stringLiteral: StringLiteralNode) -> String {
-        var result = ""
+    func generate(stringLiteral: StringLiteralNode) -> [AsmRepresent.Instruction] {
         // stringLiteral自体はグローバル領域に定義し
         // 式自体は先頭のポインタを表す
         let label: String
@@ -165,16 +162,14 @@ public final class Generator {
             label = stringLabel
         }
 
-        result += "    adrp x0, \(label)@GOTPAGE\n"
-        result += "    ldr x0, [x0, \(label)@GOTPAGEOFF]\n"
-
-        result += "    str x0, [sp, #-16]!\n"
-
-        return result
+        return [
+            .addr(dst: .x0, label: label),
+            .push(src: .x0)
+        ]
     }
 
-    func generate(declReference: DeclReferenceNode) throws -> String {
-        var result = ""
+    func generate(declReference: DeclReferenceNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
         // アドレスをpush
         result += try generatePushVariableAddress(node: declReference)
 
@@ -182,23 +177,21 @@ public final class Generator {
         // 配列以外の場合はアドレスの中身を返す
         if let variableType = getVariableType(name: declReference.baseName), variableType.kind != .arrayType {
             // アドレスをpop
-            result += "    ldr x0, [sp]\n"
-            result += "    add sp, sp, #16\n"
-
+            result.append(.pop(dst: .x0))
             // アドレスを値に変換してpush
             if variableType.memorySize == 1 {
-                result += "    ldrb w0, [x0]\n"
+                result.append(.ldrb(dst: .w0, address: .register(.x0)))
             } else {
-                result += "    ldr x0, [x0]\n"
+                result.append(.ldr(dst: .x0, address: .register(.x0)))
             }
-            result += "    str x0, [sp, #-16]!\n"
+            result.append(.push(src: .x0))
         }
 
         return result
     }
 
-    func generate(functionCallExpr: FunctionCallExprNode) throws -> String {
-        var result = ""
+    func generate(functionCallExpr: FunctionCallExprNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
         // 引数を評価してスタックに積む
         for argument in functionCallExpr.arguments {
             result += try generate(node: argument)
@@ -208,53 +201,59 @@ public final class Generator {
         // 結果はスタックに積まれているので番号は逆から
         // 例: call(a, b) -> x0: a, x1: b
         for registorIndex in (0..<functionCallExpr.arguments.count).reversed() {
-            result += "    ldr x\(registorIndex), [sp]\n"
-            result += "    add sp, sp, #16\n"
+            result.append(.pop(dst: .x(registorIndex)))
         }
 
-        let functionLabel = functionCallExpr.identifier.baseName == "main" ? "_main" : functionCallExpr.identifier.baseName
-        result += "    bl \(functionLabel)\n"
+        result.append(.bl(label: functionCallExpr.identifier.baseName))
 
-        // 帰り値をpush
-        result += "    str x0, [sp, #-16]!\n"
+        // 帰り値をpush 帰り値はx0に入っている
+        result.append(.push(src: .x0))
 
         return result
     }
 
-    func generate(functionDecl: FunctionDeclNode) throws -> String {
-        var result = ""
-        // 関数定義ごとに作り直す
-        variables = [:]
+    func generate(functionDecl: FunctionDeclNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
 
-        let functionLabel = functionDecl.functionName == "main" ? "_main" : functionDecl.functionName
+        // 関数定義ごとに作り直す
+        localVariables = [:]
+
+        let functionLabel = functionDecl.functionName
         functionLabels.insert(functionLabel)
-        result += "\(functionLabel):\n"
+
+        result.append(contentsOf: [
+            .p2align(factor: 2),
+            .globl(label: functionLabel),
+            .label(label: functionLabel)
+        ])
 
         // プロローグ
-        var prologue = ""
-        // push 古いBR, 呼び出し元LR
-        prologue += "    stp x29, x30, [sp, #-16]!\n"
-        // 今のスタックのトップをBRに（新しい関数フレームを宣言）
-        prologue += "    mov x29, sp\n"
+        let prologue: [AsmRepresent.Instruction] = [
+            .subi(dst: .sp, src: .sp, immediate: 16),
+            // push 古いBR, 呼び出し元LR
+            .stp(src1: .x29, src2: .x30, address: .register(.sp)),
+            // 今のスタックのトップをBRに（新しい関数フレームを宣言）
+            .mov(dst: .x29, src: .sp)
+        ]
 
-        var parameterDecl = ""
+        var parameterDecl: [AsmRepresent.Instruction] = []
         // 引数をローカル変数として保存し直す
         for (index, parameter) in functionDecl.parameters.enumerated() {
-            let offset = (variables.count + 1) * 8
-            variables[parameter.identifierName] = VariableInfo(type: parameter.type, addressOffset: offset)
+            let offset = (localVariables.count + 1) * 8
+            localVariables[parameter.identifierName] = VariableInfo(type: parameter.type, addressOffset: Int64(offset))
 
-            parameterDecl += "    str x\(index), [x29, #-\(offset)]\n"
+            parameterDecl.append(.str(src: .x(index), address: .distance(.x29, -Int64(offset))))
         }
 
         let body = try generate(node: functionDecl.block)
 
-        // 確保するスタックの量はbodyを見てからじゃないとわからない
+        // 確保するスタックの量はbodyを見てからじゃないとわからないので
+        // body生成後のlocalVariableのサイズを見てprologueにスタック確保を追加する
         result += prologue
-
-        if !variables.isEmpty {
+        if !localVariables.isEmpty {
             // FIXME: スタックのサイズは16の倍数...のはずだが32じゃないとダメっぽい？
-            let variableSize = variables.reduce(0) { $0 + $1.value.type.memorySize }
-            result += "    sub sp, sp, #\(variableSize.isMultiple(of: 64) ? variableSize : (1 + variableSize / 128) * 128)\n"
+            let variableSize = localVariables.reduce(0) { $0 + $1.value.type.memorySize }
+            result.append(.subi(dst: .sp, src: .sp, immediate: Int64(variableSize.isMultiple(of: 64) ? variableSize : (1 + variableSize / 128) * 128)))
         }
 
         result += parameterDecl
@@ -263,10 +262,10 @@ public final class Generator {
         return result
     }
 
-    func generate(variableDecl: VariableDeclNode) throws -> String {
-        var result = ""
-        let offset = variables.reduce(0) { $0 + $1.value.type.memorySize } + variableDecl.type.memorySize
-        variables[variableDecl.identifierName] = VariableInfo(type: variableDecl.type, addressOffset: offset)
+    func generate(variableDecl: VariableDeclNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
+        let offset = localVariables.reduce(0) { $0 + $1.value.type.memorySize } + variableDecl.type.memorySize
+        localVariables[variableDecl.identifierName] = VariableInfo(type: variableDecl.type, addressOffset: Int64(offset))
 
         if let initializerExpr = variableDecl.initializerExpr {
             switch initializerExpr.kind {
@@ -278,15 +277,13 @@ public final class Generator {
                     result += try generatePushArrayElementAddress(identifierName: variableDecl.identifierName, index: arrayIndex, sourceLocation: variableDecl.sourceRange.start)
                     result += try generate(node: element)
 
-                    result += "    ldr x0, [sp]\n"
-                    result += "    add sp, sp, #16\n"
-                    result += "    ldr x1, [sp]\n"
-                    result += "    add sp, sp, #16\n"
+                    result.append(.pop(dst: .x0))
+                    result.append(.pop(dst: .x1))
 
-                    if isElementOrReferenceTypeMemorySizeOf(1, identifierName: variableDecl.identifierName) {
-                        result += "    strb w0, [x1]\n"
+                    if getVariableType(name: variableDecl.identifierName)?.memorySize == 1 {
+                        result.append(.strb(src: .w0, address: .register(.x1)))
                     } else {
-                        result += "    str x0, [x1]\n"
+                        result.append(.str(src: .x0, address: .register(.x1)))
                     }
                 }
 
@@ -296,14 +293,13 @@ public final class Generator {
                     for arrayIndex in arrayExpr.expressions.count..<arrayType.arrayLength {
                         result += try generatePushArrayElementAddress(identifierName: variableDecl.identifierName, index: arrayIndex, sourceLocation: variableDecl.sourceRange.start)
 
-                        result += "    mov x0, #0\n"
-                        result += "    ldr x1, [sp]\n"
-                        result += "    add sp, sp, #16\n"
+                        result.append(.movi(dst: .x0, immediate: 0))
+                        result.append(.pop(dst: .x1))
 
-                        if isElementOrReferenceTypeMemorySizeOf(1, identifierName: variableDecl.identifierName) {
-                            result += "    strb w0, [x1]\n"
+                        if getVariableType(name: variableDecl.identifierName)?.memorySize == 1 {
+                            result.append(.strb(src: .w0, address: .register(.x1)))
                         } else {
-                            result += "    str x0, [x1]\n"
+                            result.append(.str(src: .x0, address: .register(.x1)))
                         }
                     }
                 }
@@ -318,11 +314,11 @@ public final class Generator {
                 for (arrayIndex, element) in stringLiteralNode.literal.enumerated() {
                     result += try generatePushArrayElementAddress(identifierName: variableDecl.identifierName, index: arrayIndex, sourceLocation: variableDecl.sourceRange.start)
 
-                    result += "    mov x0, #\(element.asciiValue ?? 0)\n"
-                    result += "    ldr x1, [sp]\n"
-                    result += "    add sp, sp, #16\n"
-
-                    result += "    strb w0, [x1]\n"
+                    result.append(contentsOf: [
+                        .movi(dst: .x0, immediate: Int64(element.asciiValue ?? 0)),
+                        .pop(dst: .x1),
+                        .strb(src: .w0, address: .register(.x1))
+                    ])
                 }
 
                 // ""の要素が足りなかったら0埋めする
@@ -331,11 +327,11 @@ public final class Generator {
                     for arrayIndex in stringLiteralNode.literal.count..<arrayType.arrayLength {
                         result += try generatePushArrayElementAddress(identifierName: variableDecl.identifierName, index: arrayIndex, sourceLocation: variableDecl.sourceRange.start)
 
-                        result += "    mov x0, #0\n"
-                        result += "    ldr x1, [sp]\n"
-                        result += "    add sp, sp, #16\n"
-
-                        result += "    strb w0, [x1]\n"
+                        result.append(contentsOf: [
+                            .movi(dst: .x0, immediate: 0),
+                            .pop(dst: .x1),
+                            .strb(src: .w0, address: .register(.x1))
+                        ])
                     }
                 }
 
@@ -343,15 +339,15 @@ public final class Generator {
                 result += try generatePushVariableAddress(identifierName: variableDecl.identifierName, sourceLocation: variableDecl.sourceRange.start)
                 result += try generate(node: initializerExpr)
 
-                result += "    ldr x0, [sp]\n"
-                result += "    add sp, sp, #16\n"
-                result += "    ldr x1, [sp]\n"
-                result += "    add sp, sp, #16\n"
+                result.append(contentsOf: [
+                    .pop(dst: .x0),
+                    .pop(dst: .x1)
+                ])
 
                 if getVariableType(name: variableDecl.identifierName)?.memorySize == 1 {
-                    result += "    strb w0, [x1]\n"
+                    result.append(.strb(src: .w0, address: .register(.x1)))
                 } else {
-                    result += "    str x0, [x1]\n"
+                    result.append(.str(src: .x0, address: .register(.x1)))
                 }
             }
         }
@@ -359,118 +355,117 @@ public final class Generator {
         return result
     }
 
-    func generate(subscriptCallExpr: SubscriptCallExprNode) throws -> String {
-        var result = ""
-        result += try generatePushArrayElementAddress(node: subscriptCallExpr)
+    func generate(subscriptCallExpr: SubscriptCallExprNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
 
-        // 結果のアドレスの値をロードしてスタックに積む
-        result += "    ldr x0, [sp]\n"
-        result += "    add sp, sp, #16\n"
+        // 配列の先頭アドレスをx0に
+        result += try generatePushArrayElementAddress(node: subscriptCallExpr)
+        result.append(.pop(dst: .x0))
 
         if isElementOrReferenceTypeMemorySizeOf(1, identifierName: subscriptCallExpr.identifier.baseName) {
-            result += "    ldrb w0, [x0]\n"
+            result.append(.ldrb(dst: .w0, address: .register(.x0)))
         } else {
-            result += "    ldr x0, [x0]\n"
+            result.append(.ldr(dst: .x0, address: .register(.x0)))
         }
-        result += "    str x0, [sp, #-16]!\n"
+
+        result.append(.push(src: .x0))
 
         return  result
     }
 
-    func generate(blockStatement: BlockStatementNode) throws -> String {
-        var result = ""
+    func generate(blockStatement: BlockStatementNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
         for statement in blockStatement.items {
             result += try generate(node: statement)
 
             // 次のstmtに行く前に今のstmtの最終結果を消す
-            result += "    ldr x0, [sp]\n"
-            result += "    add sp, sp, #16\n"
+            result.append(.pop(dst: .x0))
         }
 
         return result
     }
 
-    func generate(returnStatement: ReturnStatementNode) throws -> String {
-        var result = ""
+    func generate(returnStatement: ReturnStatementNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
 
-        // return結果をスタックにpush
+        // return結果をx0に
         result += try generate(node: returnStatement.expression)
-        result += "    ldr x0, [sp]\n"
-        result += "    add sp, sp, #16\n"
+        result.append(.pop(dst: .x0))
 
         // エピローグ
-        // spを元の位置に戻す
-        result += "    mov sp, x29\n"
-
-        // 古いBR, 古いLRを復帰
-        result += "    ldp x29, x30, [x29]\n"
-        result += "    add sp, sp, #16\n"
-
-        result += "    ret\n"
+        result.append(contentsOf: [
+            // spを元の位置に戻す
+            .mov(dst: .sp, src: .x29),
+            // 古いBR, 古いLRを復帰
+            .ldp(dst1: .x29, dst2: .x30, address: .register(.x29)),
+            .addi(dst: .sp, src: .sp, immediate: 16),
+            .ret
+        ])
 
         return result
     }
 
-    func generate(whileStatement: WhileStatementNode) throws -> String {
-        var result = ""
+    func generate(whileStatement: WhileStatementNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
         let labelID = getLabelID()
         let beginLabel = ".Lbegin\(labelID)"
         let endLabel = ".Lend\(labelID)"
 
-        result += "\(beginLabel):\n"
+        result.append(.label(label: beginLabel))
 
         result += try generate(node: whileStatement.condition)
 
-        result += "    ldr x0, [sp]\n"
-        result += "    add sp, sp, #16\n"
-
-        result += "    cmp x0, #0\n"
-        result += "    beq \(endLabel)\n"
+        result.append(contentsOf: [
+            .pop(dst: .x0),
+            .cmpi(src: .x0, immediate: 0),
+            .beq(label: endLabel)
+        ])
 
         result += try generate(node: whileStatement.body)
 
-        result += "    b \(beginLabel)\n"
-
-        result += "\(endLabel):\n"
+        result.append(contentsOf: [
+            .b(label: beginLabel),
+            .label(label: endLabel)
+        ])
 
         return result
     }
 
-    func generate(ifStatement: IfStatementNode) throws -> String {
-        var result = ""
+    func generate(ifStatement: IfStatementNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
         let labelID = getLabelID()
         let endLabel = ".Lend\(labelID)"
 
         result += try generate(node: ifStatement.condition)
 
-        result += "    ldr x0, [sp]\n"
-        result += "    add sp, sp, #16\n"
-
-        result += "    cmp x0, #0\n"
+        result.append(contentsOf: [
+            .pop(dst: .x0),
+            .cmpi(src: .x0, immediate: 0)
+        ])
 
         if let falseBody = ifStatement.falseBody {
             let elseLabel = ".Lelse\(labelID)"
 
-            result += "    beq \(elseLabel)\n"
+            result.append(.beq(label: elseLabel))
             result += try generate(node: ifStatement.trueBody)
-            result += "    b \(endLabel)\n"
 
-            result += "\(elseLabel):\n"
+            result.append(.b(label: endLabel))
+            result.append(.label(label: elseLabel))
+
             result += try generate(node: falseBody)
-
         } else {
-            result += "    beq \(endLabel)\n"
+            result.append(.beq(label: endLabel))
 
             result += try generate(node: ifStatement.trueBody)
         }
 
-        result += "\(endLabel):\n"
+        result.append(.label(label: endLabel))
 
         return result
     }
 
-    func generate(forStatement: ForStatementNode) throws -> String {
-        var result = ""
+    func generate(forStatement: ForStatementNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
 
         let labelID = getLabelID()
         let beginLabel = ".Lbegin\(labelID)"
@@ -480,20 +475,21 @@ public final class Generator {
             result += try generate(node: preExpr)
         }
 
-        result += "\(beginLabel):\n"
+        result.append(.label(label: beginLabel))
 
         if let condition = forStatement.condition {
             result += try generate(node: condition)
 
-            result += "    ldr x0, [sp]\n"
-            result += "    add sp, sp, #16\n"
+            result.append(.pop(dst: .x0))
         } else {
             // 条件がない場合はtrue
-            result += "    mov x0, #1\n"
+            result.append(.movi(dst: .x0, immediate: 1))
         }
 
-        result += "    cmp x0, #0\n"
-        result += "    beq \(endLabel)\n"
+        result.append(contentsOf: [
+            .cmpi(src: .x0, immediate: 0),
+            .beq(label: endLabel)
+        ])
 
         result += try generate(node: forStatement.body)
 
@@ -501,54 +497,53 @@ public final class Generator {
             result += try generate(node: postExpr)
         }
 
-        result += "    b \(beginLabel)\n"
-
-        result += "\(endLabel):\n"
+        result.append(.b(label: beginLabel))
+        result.append(.label(label: endLabel))
 
         return result
     }
 
-    func generate(tupleExpr: TupleExprNode) throws -> String {
+    func generate(tupleExpr: TupleExprNode) throws -> [AsmRepresent.Instruction] {
         try generate(node: tupleExpr.expression)
     }
 
-    func generate(prefixOperatorExpr: PrefixOperatorExprNode) throws -> String {
-        var result = ""
-
+    func generate(prefixOperatorExpr: PrefixOperatorExprNode) throws -> [AsmRepresent.Instruction] {
         switch prefixOperatorExpr.operator {
         case .plus:
             // +は影響がないのでそのまま
-            result += try generate(node: prefixOperatorExpr.expression)
+            return try generate(node: prefixOperatorExpr.expression)
 
         case .minus:
+            var result: [AsmRepresent.Instruction] = []
             result += try generate(node: prefixOperatorExpr.expression)
 
-            result += "    ldr x0, [sp]\n"
-            result += "    add sp, sp, #16\n"
+            result.append(contentsOf: [
+                .pop(dst: .x0),
+                .neg(des: .x0, src: .x0),
+                .push(src: .x0)
+            ])
 
-            // 符号反転
-            result += "    neg x0, x0\n"
-
-            result += "    str x0, [sp, #-16]!\n"
+            return result
 
         case .reference:
+            var result: [AsmRepresent.Instruction] = []
             // *のあとはどんな値でも良い
             result += try generate(node: prefixOperatorExpr.expression)
 
-            // 値をロードしてpush
-            result += "    ldr x0, [sp]\n"
-            result += "    add sp, sp, #16\n"
+            result.append(.pop(dst: .x0))
 
             // 値をアドレスとして読み、アドレスが指す値をロード
             if let identifier = prefixOperatorExpr.expression as? DeclReferenceNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.baseName) {
-                result += "    ldrb w0, [x0]\n"
+                result.append(.ldrb(dst: .w0, address: .register(.x0)))
             } else {
-                result += "    ldr x0, [x0]\n"
+                result.append(.ldr(dst: .x0, address: .register(.x0)))
             }
 
-            result += "    str x0, [sp, #-16]!\n"
+            result.append(.push(src: .x0))
+            return result
 
         case .address:
+            var result: [AsmRepresent.Instruction] = []
             // &のあとは変数しか入らない（はず？）
             if let right = prefixOperatorExpr.expression as? DeclReferenceNode {
                 result += try generatePushVariableAddress(node: right)
@@ -556,18 +551,20 @@ public final class Generator {
                 throw GenerateError.invalidSyntax(location: prefixOperatorExpr.sourceRange.start)
             }
 
+            return result
+
         case .sizeof:
             // FIXME: どうやって式の型を推測する？
             // 今はとりあえず固定で8
-            result += "    mov x0, #8\n"
-            result += "    str x0, [sp, #-16]!\n"
+            return [
+                .movi(dst: .x0, immediate: 8),
+                .push(src: .x0)
+            ]
         }
-
-        return result
     }
 
-    func generate(infixOperatorExpr: InfixOperatorExprNode) throws -> String {
-        var result = ""
+    func generate(infixOperatorExpr: InfixOperatorExprNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
 
         if case .assign = infixOperatorExpr.operator {
             // 左辺は変数, `*値`, subscriptCall
@@ -588,82 +585,94 @@ public final class Generator {
 
         // 両方のノードの結果をpop
         // rightが先に取れるので x0, x1, x0の順番
-        result += "    ldr x0, [sp]\n"
-        result += "    add sp, sp, #16\n"
-        result += "    ldr x1, [sp]\n"
-        result += "    add sp, sp, #16\n"
+        result.append(contentsOf: [
+            .pop(dst: .x0),
+            .pop(dst: .x1)
+        ])
 
         if infixOperatorExpr.operator == .add || infixOperatorExpr.operator == .sub {
             // addまたはsubの時、一方が変数でポインタ型または配列だったら、他方を8倍する
             // 8は8バイト（ポインタの指すサイズ、今は全部8バイトなので）
             if let identifier = infixOperatorExpr.left as? DeclReferenceNode, isElementOrReferenceTypeMemorySizeOf(8, identifierName: identifier.baseName) {
-                result += "    lsl x0, x0, #3\n"
+                result.append(.lsli(dst: .x0, src: .x0, immediate: 3))
             } else if let identifier = infixOperatorExpr.right as? DeclReferenceNode, isElementOrReferenceTypeMemorySizeOf(8, identifierName: identifier.baseName) {
-                result += "    lsl x1, x1, #3\n"
+                result.append(.lsli(dst: .x0, src: .x0, immediate: 3))
             }
         }
 
         switch infixOperatorExpr.operator {
         case .assign:
             if let identifier = infixOperatorExpr.left as? DeclReferenceNode, getVariableType(name: identifier.baseName)?.memorySize == 1 {
-                result += "    strb w0, [x1]\n"
+                result.append(.strb(src: .w0, address: .register(.x1)))
             } else if let pointer = infixOperatorExpr.left as? PrefixOperatorExprNode, pointer.operator == .reference, let identifier = pointer.expression as? DeclReferenceNode, isElementOrReferenceTypeMemorySizeOf(1, identifierName: identifier.baseName) {
-                result += "    strb w0, [x1]\n"
+                result.append(.strb(src: .w0, address: .register(.x1)))
             } else if let subscriptCall = infixOperatorExpr.left as? SubscriptCallExprNode,
                       isElementOrReferenceTypeMemorySizeOf(1, identifierName: subscriptCall.identifier.baseName) {
-                result += "    strb w0, [x1]\n"
+                result.append(.strb(src: .w0, address: .register(.x1)))
             } else {
-                result += "    str x0, [x1]\n"
+                result.append(.str(src: .x0, address: .register(.x1)))
             }
 
-            result += "    str x0, [sp, #-16]!\n"
+            result.append(.push(src: .x0))
 
         case .add:
-            result += "    add x0, x1, x0\n"
+            result.append(.add(dst: .x0, src1: .x1, src2: .x0))
 
         case .sub:
-            result += "    sub x0, x1, x0\n"
+            result.append(.sub(dst: .x0, src1: .x1, src2: .x0))
 
         case .mul:
-            result += "    mul x0, x1, x0\n"
+            result.append(.mul(dst: .x0, src1: .x1, src2: .x0))
 
         case .div:
-            result += "    sdiv x0, x1, x0\n"
+            result.append(.div(dst: .x0, src1: .x1, src2: .x0))
 
         case .equal:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, eq\n"
+            result.append(contentsOf: [
+                .cmp(src1: .x1, src2: .x0),
+                .cset(dst: .x0, flag: .eq)
+            ])
 
         case .notEqual:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, ne\n"
+            result.append(contentsOf: [
+                .cmp(src1: .x1, src2: .x0),
+                .cset(dst: .x0, flag: .ne)
+            ])
 
         case .lessThan:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, lt\n"
+            result.append(contentsOf: [
+                .cmp(src1: .x1, src2: .x0),
+                .cset(dst: .x0, flag: .lt)
+            ])
 
         case .lessThanOrEqual:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, le\n"
+            result.append(contentsOf: [
+                .cmp(src1: .x1, src2: .x0),
+                .cset(dst: .x0, flag: .le)
+            ])
 
         case .greaterThan:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, gt\n"
+            result.append(contentsOf: [
+                .cmp(src1: .x1, src2: .x0),
+                .cset(dst: .x0, flag: .gt)
+            ])
 
         case .greaterThanOrEqual:
-            result += "    cmp x1, x0\n"
-            result += "    cset x0, ge\n"
+            result.append(contentsOf: [
+                .cmp(src1: .x1, src2: .x0),
+                .cset(dst: .x0, flag: .ge)
+            ])
         }
 
         if case .assign = infixOperatorExpr.operator {
         } else {
-            result += "    str x0, [sp, #-16]!\n"
+            result.append(.push(src: .x0))
         }
 
         return result
     }
 
-    func generate(node: any NodeProtocol) throws -> String {
+    func generate(node: any NodeProtocol) throws -> [AsmRepresent.Instruction] {
         switch node.kind {
         case .integerLiteral: generate(integerLiteral: node.casted(IntegerLiteralNode.self))
         case .stringLiteral: generate(stringLiteral: node.casted(StringLiteralNode.self))
@@ -693,7 +702,7 @@ public final class Generator {
 
     /// local or global variableから変数を検索する
     private func getVariableType(name: String) -> (any TypeNodeProtocol)? {
-        if let type = variables[name]?.type {
+        if let type = localVariables[name]?.type {
             type
         } else if let type = globalVariables[name] {
             type
@@ -717,88 +726,85 @@ public final class Generator {
     }
 
     /// nameの変数のアドレスをスタックにpushするコードを生成する
-    private func generatePushVariableAddress(node: DeclReferenceNode) throws -> String {
+    private func generatePushVariableAddress(node: DeclReferenceNode) throws -> [AsmRepresent.Instruction] {
         try generatePushVariableAddress(identifierName: node.baseName, sourceLocation: node.sourceRange.start)
     }
 
-    private func generatePushVariableAddress(identifierName: String, sourceLocation: SourceLocation) throws -> String {
-        var result = ""
+    private func generatePushVariableAddress(identifierName: String, sourceLocation: SourceLocation) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
 
-        if let localVariableInfo = variables[identifierName] {
-            result += "    sub x0, x29, #\(localVariableInfo.addressOffset)\n"
+        if let localVariableInfo = localVariables[identifierName] {
+            result.append(.subi(dst: .x0, src: .x29, immediate: localVariableInfo.addressOffset))
         } else if globalVariables[identifierName] != nil {
-            // addじゃなくてldrであってる？
-            result += "    adrp x0, \(identifierName)@GOTPAGE\n"
-            result += "    ldr x0, [x0, \(identifierName)@GOTPAGEOFF]\n"
+            result.append(.addr(dst: .x0, label: identifierName))
         } else {
             throw GenerateError.noSuchVariable(varibaleName: identifierName, location: sourceLocation)
         }
 
-        result += "    str x0, [sp, #-16]!\n"
+        result.append(.push(src: .x0))
 
         return result
     }
 
-    private func generatePushArrayElementAddress(node: SubscriptCallExprNode) throws -> String {
-        var result = ""
+    private func generatePushArrayElementAddress(node: SubscriptCallExprNode) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
 
         // 配列の先頭アドレス, subscriptの値をpush
         result += try generatePushVariableAddress(node: node.identifier)
         result += try generate(node: node.argument)
 
-        result += "    ldr x0, [sp]\n"
-        result += "    add sp, sp, #16\n"
+        result.append(.pop(dst: .x0))
+
         // subscript内の値は要素のメモリサイズに応じてn倍する
         if let arrayType = getVariableType(name: node.identifier.baseName) as? ArrayTypeNode, arrayType.elementType.memorySize == 8 {
-            result += "    lsl x0, x0, 3\n"
+            result.append(.lsli(dst: .x0, src: .x0, immediate: 3))
         } else if let pointerType = getVariableType(name: node.identifier.baseName)  as? PointerTypeNode, pointerType.referenceType.memorySize == 8 {
-            result += "    lsl x0, x0, 3\n"
+            result.append(.lsli(dst: .x0, src: .x0, immediate: 3))
         }
 
-        result += "    ldr x1, [sp]\n"
-        result += "    add sp, sp, #16\n"
+        result.append(.pop(dst: .x1))
 
         // identifierがポインタだった場合はアドレスが指す値にする
-        if variables[node.identifier.baseName]?.type.kind == .pointerType {
-            result += "    ldr x1, [x1]\n"
+        if localVariables[node.identifier.baseName]?.type.kind == .pointerType {
+            result.append(.ldr(dst: .x1, address: .register(.x1)))
 
         }
 
         // それらを足す
-        result += "    add x0, x1, x0\n"
-
-        result += "    str x0, [sp, #-16]!\n"
+        result.append(contentsOf: [
+            .add(dst: .x0, src1: .x1, src2: .x0),
+            .push(src: .x0)
+        ])
 
         return result
     }
 
-    private func generatePushArrayElementAddress(identifierName: String, index: Int, sourceLocation: SourceLocation) throws -> String {
-        var result = ""
+    private func generatePushArrayElementAddress(identifierName: String, index: Int, sourceLocation: SourceLocation) throws -> [AsmRepresent.Instruction] {
+        var result: [AsmRepresent.Instruction] = []
 
         // 配列の先頭アドレス, subscriptの値をpush
         result += try generatePushVariableAddress(identifierName: identifierName, sourceLocation: sourceLocation)
 
-        result += "    mov x0, #\(index)\n"
+        result.append(.movi(dst: .x0, immediate: Int64(index)))
         // subscript内の値は要素のメモリサイズに応じてn倍する
         if let arrayType = getVariableType(name: identifierName) as? ArrayTypeNode, arrayType.elementType.memorySize == 8 {
-            result += "    lsl x0, x0, 3\n"
+            result.append(.lsli(dst: .x0, src: .x0, immediate: 3))
         } else if let pointerType = getVariableType(name: identifierName)  as? PointerTypeNode, pointerType.referenceType.memorySize == 8 {
-            result += "    lsl x0, x0, 3\n"
+            result.append(.lsli(dst: .x0, src: .x0, immediate: 3))
         }
 
-        result += "    ldr x1, [sp]\n"
-        result += "    add sp, sp, #16\n"
+        result.append(.pop(dst: .x1))
 
         // identifierがポインタだった場合はアドレスが指す値にする
-        if variables[identifierName]?.type.kind == .pointerType {
-            result += "    ldr x1, [x1]\n"
-
+        if localVariables[identifierName]?.type.kind == .pointerType {
+            result.append(.ldr(dst: .x1, address: .register(.x1)))
         }
 
         // それらを足す
-        result += "    add x0, x1, x0\n"
-
-        result += "    str x0, [sp, #-16]!\n"
+        result.append(contentsOf: [
+            .add(dst: .x0, src1: .x1, src2: .x0),
+            .push(src: .x0)
+        ])
 
         return result
     }

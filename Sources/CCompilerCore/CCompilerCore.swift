@@ -15,8 +15,9 @@ public func compile(_ source: String) throws -> String {
         let tokens = try Tokenizer(source: source).tokenize()
         let syntax = try Parser(tokens: tokens).parse()
         let node = ASTGenerator.generate(sourceFileSyntax: syntax)
-
-        return try Generator().generate(sourceFileNode: node)
+        let asm = try Generator().generate(sourceFileNode: node)
+        
+        return ArmAsmPrinter.print(instructions: asm)
     } catch let error as TokenizeError {
         switch error {
         case .unknownToken(let location):
