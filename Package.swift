@@ -57,6 +57,10 @@ let package = Package(
             dependencies: ["CCompilerCore"]
         ),
         .testTarget(
+            name: "GeneratorTest",
+            dependencies: ["Generator"]
+        ),
+        .testTarget(
             name: "ParserTest",
             dependencies: ["Parser", "AST"]
         ),
