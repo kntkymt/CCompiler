@@ -28,7 +28,8 @@ let package = Package(
                 "Tokenizer",
                 "Parser",
                 "AST",
-                "Generator"
+                "Generator",
+                "Optimizer"
             ]
         ),
         .target(
@@ -50,6 +51,12 @@ let package = Package(
             name: "Generator",
             dependencies: [
                 "AST"
+            ]
+        ),
+        .target(
+            name: "Optimizer",
+            dependencies: [
+                "Generator"
             ]
         ),
         .testTarget(
