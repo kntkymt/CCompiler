@@ -1,7 +1,7 @@
 
 public enum AsmRepresent {
 
-    public enum Instruction {
+    public enum Instruction: Equatable {
         case mov(dst: Register, src: Register)
         case movi(dst: Register, immediate: Int64)
 
@@ -49,7 +49,7 @@ public enum AsmRepresent {
         case globl(label: String)
         case dataDecl(kind: DataKind, value: String)
 
-        public enum Address {
+        public enum Address: Equatable {
             case register(_ register: Register)
             case distance(_ register: Register, _ diff: Int64)
         }
@@ -79,7 +79,7 @@ public enum AsmRepresent {
         }
     }
 
-    public enum Register: String {
+    public enum Register: String, Equatable {
         case x0
         case x1
         case x2
