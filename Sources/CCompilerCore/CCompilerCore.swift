@@ -2,6 +2,7 @@ import Parser
 import AST
 import Generator
 import Tokenizer
+import Optimizer
 
 public enum CompileError: Error, Equatable {
     case invalidSyntax(location: SourceLocation)
@@ -16,8 +17,9 @@ public func compile(_ source: String) throws -> String {
         let syntax = try Parser(tokens: tokens).parse()
         let node = ASTGenerator.generate(sourceFileSyntax: syntax)
         let asm = try Generator().generate(sourceFileNode: node)
-        
-        return ArmAsmPrinter.print(instructions: asm)
+        let optimizedAsm = AsmOptimizer.optimize(instructions: asm)
+
+        return ArmAsmPrinter.print(instructions: optimizedAsm)
     } catch let error as TokenizeError {
         switch error {
         case .unknownToken(let location):
