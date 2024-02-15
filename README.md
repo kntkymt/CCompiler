@@ -1,2 +1,2 @@
 # CCompiler
-A compiler for C subsets written by Swift
+A compiler for C subsets written in Swift
